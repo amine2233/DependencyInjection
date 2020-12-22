@@ -1,10 +1,10 @@
 import Foundation
 
-public struct CoreDependency: Dependency {
+public struct DependencyCore: DependencyType {
     private var dependencies: [String: Any] = [:]
 
     /// Register class for using with resolve
-    public mutating func register<T>(_ type: T.Type, completion: (Dependency) -> T) -> T {
+    public mutating func register<T>(_ type: T.Type, completion: (DependencyType) -> T) -> T {
         let object = completion(self)
         dependencies[String(describing: type)] = object
         return object
@@ -19,7 +19,7 @@ public struct CoreDependency: Dependency {
     }
 
     /// Create a new class, this method not register class
-    public func create<T>(completion: (Dependency) -> T) -> T {
+    public func create<T>(completion: (DependencyType) -> T) -> T {
         return completion(self)
     }
 
@@ -36,7 +36,7 @@ public struct CoreDependency: Dependency {
 
     /// Create a singleton
     @discardableResult
-    public mutating func singleton<T>(completion: (Dependency) -> T) -> T {
+    public mutating func singleton<T>(completion: (DependencyType) -> T) -> T {
         if let singleton = dependencies[String(describing: T.self)] as? T {
             return singleton
         }
