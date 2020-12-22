@@ -1,29 +1,20 @@
 import Foundation
 
-@propertyWrapper
-public struct Dependency<T: DependencyServiceType> {
-    var dependencies: DependencyType
-    var dependency: T!
-    
-    public init(dependencies: DependencyType = DependencyInjector.dependencies, dependency: T? = nil) {
-        self.dependencies = dependencies
-        self.dependency = dependency
+public struct Dependency {
+    public typealias ResolveBlock<T> = (DependencyType) -> T
+
+    public private(set) var value: Any!
+
+    let name: String
+
+    private let resolveBlock: ResolveBlock<Any>
+
+    public init<T>(_ block: @escaping ResolveBlock<T>) {
+        resolveBlock = block // Save block for future
+        name = String(describing: T.self)
     }
-    
-    public var wrappedValue: T {
-        mutating get {
-            if dependency == nil {
-                if let resolver = dependencies.resolve(T.self) {
-                    self.dependency = resolver
-                } else {
-                    let copy = dependencies.register(T.self)
-                    self.dependency = copy
-                }
-            }
-            return dependency
-        }
-        mutating set {
-            dependency = newValue
-        }
+
+    public mutating func resolve(dependencies: DependencyType) {
+        value = resolveBlock(dependencies)
     }
 }
