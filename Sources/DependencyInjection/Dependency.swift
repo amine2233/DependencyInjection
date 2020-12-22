@@ -1,31 +1,20 @@
-//
-//  Dependency.swift
-//  DependencyInjection
-//
-//  Created by Amine Bensalah on 14/11/2019.
-//
-
 import Foundation
 
-public protocol Dependency {
+public struct Dependency {
+    public typealias ResolveBlock<T> = (DependencyType) -> T
 
-    func create<T>(completion: (Dependency) -> T) -> T
+    public private(set) var value: Any!
 
-    func create<T: DependencyServiceType>(_ type: T.Type) -> T
+    let name: String
 
-    @discardableResult
-    mutating func register<T>(_ type: T.Type, completion: (Dependency) -> T) -> T
+    private let resolveBlock: ResolveBlock<Any>
 
-    @discardableResult
-    mutating func register<T: DependencyServiceType>(_ type: T.Type) -> T
+    public init<T>(_ block: @escaping ResolveBlock<T>) {
+        resolveBlock = block // Save block for future
+        name = String(describing: T.self)
+    }
 
-    @discardableResult
-    mutating func unregister<T>(_ type: T.Type) -> T?
-
-    func resolve<T>(_ type: T.Type) -> T?
-
-    mutating func singleton<T>(completion: (Dependency) -> T) -> T
-
-    @discardableResult
-    mutating func singleton<T: DependencyServiceType>(_ type: T.Type) -> T
+    public mutating func resolve(dependencies: DependencyType) {
+        value = resolveBlock(dependencies)
+    }
 }

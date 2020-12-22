@@ -1,7 +1,7 @@
 import DependencyInjection
 
 @propertyWrapper
-public struct Inject<T> {
+public struct InjectCreateServiceType<T: DependencyServiceType> {
     var dependencies: DependencyType
 
     public init(dependencies: DependencyType) {
@@ -9,9 +9,8 @@ public struct Inject<T> {
     }
 
     public var wrappedValue: T {
-        guard let dependency: T = try? dependencies.resolve() else {
-            fatalError("The dependency \(String(describing: T.self)) is not registred.")
+        mutating get {
+            return dependencies.create(T.self)
         }
-        return dependency
     }
 }
