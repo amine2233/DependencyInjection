@@ -179,3 +179,30 @@ extension DependencyInjection {
         providers = providers.filter { $0.description == String(describing: type) }
     }
 }
+
+extension DependencyInjection {
+    @discardableResult
+    public mutating func register<T>(withName name: String, completion: (DependencyType) -> T) -> T {
+        let object = completion(self)
+        dependencies[name] = object
+        return object
+    }
+
+    public mutating func unregister(withName name: String) {
+        dependencies.removeValue(forKey: name)
+    }
+
+    public func resolve<T>(withName name: String) throws -> T {
+        guard let object = dependencies[name] as? T else {
+            throw DependencyError.notFound(name: String(describing: T.self))
+        }
+        return object
+    }
+
+    public func resolve<T>(withName name: String, type: T.Type) throws -> T {
+        guard let object = dependencies[name] as? T else {
+            throw DependencyError.notFound(name: String(describing: type))
+        }
+        return object
+    }
+}
