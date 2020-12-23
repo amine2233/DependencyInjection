@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum DependencyError: Error {
+public enum DependencyError: Error, Equatable {
     case notFound(name: String)
 }
 
@@ -34,14 +34,24 @@ public protocol DependencyType: CustomStringConvertible {
     @discardableResult
     mutating func register(_ dependency: Dependency) -> Any
 
+    // MARK: Registration with name
+    @discardableResult
+    mutating func register<T>(withName name: String, completion: (DependencyType) -> T) -> T
+
     // MARK: Unregister
     @discardableResult
     mutating func unregister<T>(_ type: T.Type) throws -> T
+
+    mutating func unregister(withName name: String)
 
     // MARK: Resolver
     func resolve<T>(_ type: T.Type) throws -> T
 
     func resolve<T>() throws -> T
+
+    func resolve<T>(withName name: String) throws -> T
+
+    func resolve<T>(withName name: String, type: T.Type) throws -> T
 
     // MARK: Singleton
     mutating func singleton<T>(completion: (DependencyType) -> T) -> T

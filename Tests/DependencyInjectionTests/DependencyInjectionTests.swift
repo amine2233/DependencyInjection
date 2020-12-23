@@ -300,4 +300,62 @@ class DependencyInjectionTests: XCTestCase {
         // THEN
         XCTAssertEqual(dependencies.dependenciesCount, 2)
     }
+
+    func testResolveWithNameAndType() throws {
+        // GIVEN
+        // WHEN
+        let dependencies = factory().dependencies
+
+        // THEN
+        XCTAssertNoThrow(try dependencies.resolve(withName: "LocationMock", type: LocationMock.self))
+    }
+
+    func testResolveWithName() throws {
+        // GIVEN
+        // WHEN
+        let dependencies = factory().dependencies
+
+        // THEN
+        XCTAssertNoThrow(try dependencies.resolve(withName: "JourneyMock") as JourneyMock)
+    }
+
+    func testResolveWithNameAndTypeFailure() throws {
+        // GIVEN
+        // WHEN
+        let dependencies = factory().dependencies
+
+        // THEN
+        XCTAssertThrowsError(try dependencies.resolve(withName: "Mock", type: LocationMock.self))
+    }
+
+    func testResolveWithNameFailure() throws {
+        // GIVEN
+        // WHEN
+        let dependencies = factory().dependencies
+
+        // THEN
+        XCTAssertThrowsError(try dependencies.resolve(withName: "Mock") as JourneyMock)
+    }
+
+    func testUnregisterWithName() throws {
+        // GIVEN
+        // WHEN
+        var dependencies = factory().dependencies
+        dependencies.unregister(withName: "JourneyMock")
+
+        // THEN
+        XCTAssertEqual(dependencies.dependenciesCount, 1)
+    }
+
+    func testRegisterWithName() throws {
+        // GIVEN
+        // WHEN
+        var dependencies = factory().dependencies
+        dependencies.register(withName: "Mock") { _ in
+            ExecutableServiceMock()
+        }
+
+        // THEN
+        XCTAssertEqual(dependencies.dependenciesCount, 3)
+    }
 }
