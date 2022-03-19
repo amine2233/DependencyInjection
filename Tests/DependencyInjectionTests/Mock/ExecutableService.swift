@@ -16,7 +16,7 @@ final class ExecutableServiceMock: ExecutableService {
 }
 
 extension ExecutableServiceMock: DependencyServiceType {
-    static func makeService(for container: DependencyType) -> ExecutableServiceMock {
+    static func makeService(for container: Dependency) -> ExecutableServiceMock {
         ExecutableServiceMock()
     }
 }

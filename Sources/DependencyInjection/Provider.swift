@@ -1,36 +1,29 @@
 import Foundation
 
-public struct Provider: DependencyProvider {
+public protocol Provider: CustomStringConvertible {
+    // MARK: Description
+    var description: String { get }
 
-    public typealias ResolveBlock<T> = (DependencyType) -> T
-    public private(set) var value: Any!
+    // MARK: Methods
+    func willBoot(_ container: DependencyProvider)
 
-    public var description: String
-    private let resolveBlock: ResolveBlock<Any>
+    func didBoot(_ container: DependencyProvider)
 
-    public init<T: DependencyProvider>(_ block: @escaping ResolveBlock<T>) {
-        resolveBlock = block // Save block for future
-        description = String(describing: T.self)
+    func didEnterBackground(_ container: DependencyProvider)
+
+    func willShutdown(_ container: DependencyProvider)
+}
+
+extension Provider {
+    var description: String {
+        return String(describing: Self.self)
     }
 
-    public mutating func resolve(dependencies: DependencyType) {
-        value = resolveBlock(dependencies)
-    }
+    func willBoot(_ container: DependencyProvider) {}
 
+    func didBoot(_ container: DependencyProvider) {}
 
-    public func willBoot(_ container: DependencyType) {
-        (value as? DependencyProvider)?.willBoot(container)
-    }
+    func didEnterBackground(_ container: DependencyProvider) {}
 
-    public func didBoot(_ container: DependencyType) {
-        (value as? DependencyProvider)?.didBoot(container)
-    }
-
-    public func didEnterBackground(_ container: DependencyType) {
-        (value as? DependencyProvider)?.didEnterBackground(container)
-    }
-
-    public func willShutdown(_ container: DependencyType) {
-        (value as? DependencyProvider)?.willShutdown(container)
-    }
+    func willShutdown(_ container: DependencyProvider) {}
 }
