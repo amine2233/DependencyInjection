@@ -3,10 +3,10 @@ import XCTest
 
 class DependencyInjectionTests: XCTestCase {
 
-    var dependencyCore: DependencyInjection!
+    var dependencyCore: DependencyCore!
 
     override func setUpWithError() throws {
-        dependencyCore = DependencyInjection()
+        dependencyCore = DependencyCore()
     }
 
     override func tearDownWithError() throws {
@@ -15,8 +15,8 @@ class DependencyInjectionTests: XCTestCase {
 
     func factory() -> DependencyInjector {
         DependencyInjector(dependencies: dependencyCore) {
-            Dependency { _ in LocationMock() }
-            Dependency { _ in JourneyMock() }
+            DependencyResolver { _ in LocationMock() }
+            DependencyResolver { _ in JourneyMock() }
         }
     }
 
@@ -72,7 +72,7 @@ class DependencyInjectionTests: XCTestCase {
         // Given
         // WHEN
         var dependencies = factory().dependencies
-        dependencies.register(Dependency { _ in ExecutableServiceMock() })
+        dependencies.register(DependencyResolver { _ in ExecutableServiceMock() })
 
         // THEN
         XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
@@ -92,20 +92,27 @@ class DependencyInjectionTests: XCTestCase {
 
     func testUnregister() throws {
         // Given
-        // WHEN
         var dependencies = factory().dependencies
 
+        // WHEN
+        dependencies.unregister(LocationMock.self)
+
         // THEN
-        XCTAssertNoThrow(try dependencies.unregister(LocationMock.self))
+        XCTAssertEqual(dependencies.dependenciesCount, 1)
     }
 
     func testUnregisterNotFoundService() throws {
         // Given
-        // WHEN
         var dependencies = factory().dependencies
+        dependencies.register(ExecutableServiceMock.self) { _ in
+            ExecutableServiceMock()
+        }
+
+        // WHEN
+        dependencies.unregister(ExecutableServiceMock.self)
 
         // THEN
-        XCTAssertThrowsError(try dependencies.unregister(ExecutableServiceMock.self))
+        XCTAssertEqual(dependencies.dependenciesCount, 2)
     }
 
     func testCreateWithServiceType() throws {
@@ -122,7 +129,7 @@ class DependencyInjectionTests: XCTestCase {
         // Given
         // WHEN
         var dependencies = factory().dependencies
-        let service = dependencies.create(Dependency { _ in ExecutableServiceMock() })
+        let service = dependencies.create(DependencyResolver { _ in ExecutableServiceMock() })
 
         // THEN
         XCTAssertEqual(String(describing: service.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
@@ -147,17 +154,7 @@ class DependencyInjectionTests: XCTestCase {
         dependencies.singleton(ExecutableServiceMock.self)
 
         // THEN
-        XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
-    }
-
-    func testSingletonRegisterDependency() throws {
-        // Given
-        // WHEN
-        var dependencies = factory().dependencies
-        dependencies.singleton(Dependency { _ in ExecutableServiceMock() })
-
-        // THEN
-        XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
+        XCTAssertNoThrow(try dependencies.singleton() as ExecutableServiceMock)
     }
 
     func testSingletonRegisterWithTypeAndCompletion() throws {
@@ -183,16 +180,6 @@ class DependencyInjectionTests: XCTestCase {
         XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
     }
 
-    func testSingletonResolveDependency() throws {
-        // Given
-        // WHEN
-        var dependencies = factory().dependencies
-        dependencies.singleton(Dependency { _ in LocationMock() })
-
-        // THEN
-        XCTAssertNoThrow(try dependencies.resolve() as LocationMock)
-    }
-
     func testSingletonResolveWithTypeAndCompletion() throws {
         // Given
         // WHEN
@@ -210,10 +197,10 @@ class DependencyInjectionTests: XCTestCase {
         let provider = ProviderMock()
         provider.stubbedDescription = String(describing: ProviderMock.self)
         // WHEN
-        let di = DependencyInjector(dependencies: dependencyCore) { () -> [Dependency] in
+        let di = DependencyInjector(dependencies: dependencyCore) { () -> [DependencyResolver] in
             return []
         } _: { () -> [Provider] in
-            return [Provider { _ in provider }]
+            return [ProviderDefault { _ in provider }]
         }
 
         // THEN
@@ -232,10 +219,12 @@ class DependencyInjectionTests: XCTestCase {
 
     func testUnregisterProvider() throws {
         // Given
-        // WHEN
         var dependencies = factory().dependencies
-        dependencies.register(Provider { _ in ProviderMock() })
-        dependencies.unregister(ProviderMock.self)
+        dependencies.registerProvider(ProviderMock())
+
+        // WHEN
+        dependencies.unregisterProvider(ProviderMock.self)
+
         // THEN
         XCTAssertEqual(dependencies.providersCount, 0)
     }
@@ -245,7 +234,7 @@ class DependencyInjectionTests: XCTestCase {
         let provider = ProviderMock()
         // WHEN
         var dependencies = factory().dependencies
-        dependencies.register(Provider { _ in provider })
+        dependencies.registerProvider(provider)
 
         _ = dependencies.willBoot()
 
@@ -258,7 +247,7 @@ class DependencyInjectionTests: XCTestCase {
         let provider = ProviderMock()
         // WHEN
         var dependencies = factory().dependencies
-        dependencies.register(Provider { _ in provider })
+        dependencies.registerProvider(provider)
 
         _ = dependencies.didBoot()
 
@@ -271,7 +260,7 @@ class DependencyInjectionTests: XCTestCase {
         let provider = ProviderMock()
         // WHEN
         var dependencies = factory().dependencies
-        dependencies.register(Provider { _ in provider })
+        dependencies.registerProvider(provider)
 
         _ = dependencies.willShutdown()
 
@@ -284,7 +273,7 @@ class DependencyInjectionTests: XCTestCase {
         let provider = ProviderMock()
         // WHEN
         var dependencies = factory().dependencies
-        dependencies.register(Provider { _ in provider })
+        dependencies.registerProvider(provider)
 
         _ = dependencies.didEnterBackground()
 
@@ -301,15 +290,6 @@ class DependencyInjectionTests: XCTestCase {
         XCTAssertEqual(dependencies.dependenciesCount, 2)
     }
 
-    func testResolveWithNameAndType() throws {
-        // GIVEN
-        // WHEN
-        let dependencies = factory().dependencies
-
-        // THEN
-        XCTAssertNoThrow(try dependencies.resolve(withName: "LocationMock", type: LocationMock.self))
-    }
-
     func testResolveWithName() throws {
         // GIVEN
         // WHEN
@@ -317,15 +297,6 @@ class DependencyInjectionTests: XCTestCase {
 
         // THEN
         XCTAssertNoThrow(try dependencies.resolve(withName: "JourneyMock") as JourneyMock)
-    }
-
-    func testResolveWithNameAndTypeFailure() throws {
-        // GIVEN
-        // WHEN
-        let dependencies = factory().dependencies
-
-        // THEN
-        XCTAssertThrowsError(try dependencies.resolve(withName: "Mock", type: LocationMock.self))
     }
 
     func testResolveWithNameFailure() throws {

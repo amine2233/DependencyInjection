@@ -7,50 +7,42 @@
 
 import Foundation
 
+public protocol HasDependencies {
+    var dependencies: Dependency { get }
+}
+
 /// The singleton dependency container reference
 /// which can be reassigned to another container
 public struct DependencyInjector: HasDependencies {
-    public var dependencies: DependencyType
+    public var dependencies: Dependency
 
-    @_functionBuilder struct DependencyBuilder {
-        static func buildBlock(_ dependency: Dependency) -> Dependency { dependency }
-        static func buildBlock(_ dependencies: Dependency...) -> [Dependency] { dependencies }
+    @resultBuilder struct DependencyBuilder {
+        static func buildBlock(_ dependency: DependencyResolver) -> DependencyResolver { dependency }
+        static func buildBlock(_ dependencies: DependencyResolver...) -> [DependencyResolver] { dependencies }
     }
 
-    @_functionBuilder struct ProviderBuilder {
+    @resultBuilder struct ProviderBuilder {
         static func buildBlock(_ dependency: Provider) -> Provider { dependency }
         static func buildBlock(_ dependencies: Provider...) -> [Provider] { dependencies }
     }
 
-    public init(dependencies: DependencyType = DependencyInjection()) {
+    public init(dependencies: Dependency = DependencyCore()) {
         self.dependencies = dependencies
     }
 
-    public init(dependencies: DependencyType = DependencyInjection(),
-        @DependencyBuilder _ block: () -> [Dependency] = { [] },
+    public init(dependencies: Dependency = DependencyCore(),
+        @DependencyBuilder _ block: () -> [DependencyResolver] = { [] },
         @ProviderBuilder _ providers: () -> [Provider] = { [] }) {
         self.init(dependencies: dependencies)
         block().forEach { self.dependencies.register($0) }
-        providers().forEach { self.dependencies.register($0) }
+        providers().forEach { self.dependencies.registerProvider($0) }
     }
 
-    init(dependencies: DependencyType = DependencyInjection(),
-        @DependencyBuilder _ dependency:  () -> Dependency,
+    init(dependencies: Dependency = DependencyCore(),
+        @DependencyBuilder _ dependency:  () -> DependencyResolver,
         @ProviderBuilder _ provider:  () -> Provider) {
         self.init(dependencies: dependencies)
         self.dependencies.register(dependency())
-        self.dependencies.register(provider())
+        self.dependencies.registerProvider(provider())
     }
 }
-
-/// Attach to any type for exposing the dependency container
-public protocol HasDependencies {
-    var dependencies: DependencyType { get }
-}
-
-//extension HasDependencies {
-//    /// Container for dependency instance factories
-//    public var dependencies: DependencyType {
-//        return DependencyInjector.di
-//    }
-//}
