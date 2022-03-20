@@ -219,11 +219,12 @@ class DependencyInjectionTests: XCTestCase {
 
     func testUnregisterProvider() throws {
         // Given
+        let provider = ProviderMock()
         var dependencies = factory().dependencies
-        dependencies.registerProvider(ProviderMock())
+        dependencies.registerProvider(provider)
 
         // WHEN
-        dependencies.unregisterProvider(ProviderMock.self)
+        dependencies.unregisterProvider(provider)
 
         // THEN
         XCTAssertEqual(dependencies.providersCount, 0)
@@ -232,6 +233,7 @@ class DependencyInjectionTests: XCTestCase {
     func testWillBoot() throws {
         // Given
         let provider = ProviderMock()
+
         // WHEN
         var dependencies = factory().dependencies
         dependencies.registerProvider(provider)
@@ -245,6 +247,7 @@ class DependencyInjectionTests: XCTestCase {
     func testDidBoot() throws {
         // Given
         let provider = ProviderMock()
+
         // WHEN
         var dependencies = factory().dependencies
         dependencies.registerProvider(provider)

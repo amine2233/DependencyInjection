@@ -266,9 +266,9 @@ extension DependencyCore {
     }
 
     /// Unregister provider
-    /// - Parameter type: the provider you will unregister
-    public mutating func unregisterProvider<T: Provider>(_ type: T.Type) {
-        providers = providers.filter { $0.description == String(describing: type) }
+    /// - Parameter provider: the provider you will unregister
+    public mutating func unregisterProvider(_ provider: Provider) {
+        providers = providers.filter { $0.description != provider.description }
     }
 }
 
