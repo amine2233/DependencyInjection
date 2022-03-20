@@ -90,8 +90,8 @@ public protocol DependencyProvider {
     mutating func registerProvider(_ provider: Provider)
 
     /// Unregister provider
-    /// - Parameter type: the provider you will unregister
-    mutating func unregisterProvider<T: Provider>(_ type: T.Type)
+    /// - Parameter provider: the provider you will unregister
+    mutating func unregisterProvider(_ provider: Provider)
 
     // MARK: Startup and Endup provider configuration
     func willBoot() -> Self
