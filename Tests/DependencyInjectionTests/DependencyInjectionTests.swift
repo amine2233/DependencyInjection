@@ -329,4 +329,52 @@ class DependencyInjectionTests: XCTestCase {
         // THEN
         XCTAssertEqual(dependencies.dependenciesCount, 3)
     }
+
+    func test_register_singleton_with_ServiceType() throws {
+        // Given
+        var dependencies = factory().dependencies
+
+        // WHEN
+        dependencies.singleton(ExecutableServiceMock.self)
+
+        // THEN
+        XCTAssertEqual(dependencies.singletonCount, 1)
+    }
+
+    func test_register_dependency_singleton_with_ServiceType() throws {
+        // Given
+        var dependencies = factory().dependencies
+
+        // WHEN
+        dependencies.singleton { _ in
+            ExecutableServiceMock()
+        }
+
+        // THEN
+        XCTAssertEqual(dependencies.singletonCount, 1)
+    }
+
+    func test_rsolve_singleton_with_ServiceType() throws {
+        // Given
+        var dependencies = factory().dependencies
+        dependencies.singleton(ExecutableServiceMock.self)
+
+        // WHEN
+        let singleton = try? dependencies.singleton() as ExecutableServiceMock
+
+        // THEN
+        XCTAssertNotNil(singleton)
+    }
+
+    func test_unregister_singleton_with_ServiceType() throws {
+        // Given
+        var dependencies = factory().dependencies
+        dependencies.singleton(ExecutableServiceMock.self)
+
+        // WHEN
+        try dependencies.unregisterSingleton(ExecutableServiceMock.self)
+
+        // THEN
+        XCTAssertEqual(dependencies.singletonCount, 0)
+    }
 }
