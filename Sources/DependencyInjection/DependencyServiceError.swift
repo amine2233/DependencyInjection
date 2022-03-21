@@ -12,6 +12,7 @@ public enum DependencyServiceError: Error {
 }
 
 public enum DependencyError: Error, Equatable {
+    case notFoundSingleton(name: String)
     case notFound(name: String)
     case notResolved(name: String)
 }

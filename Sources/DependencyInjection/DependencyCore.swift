@@ -212,7 +212,7 @@ extension DependencyCore {
     public func singleton<T>() throws -> T {
         let identifier = DependencyID(T.self)
         guard let singleton = singletons[identifier] as? T else {
-            throw DependencyError.notFound(name: identifier.description)
+            throw DependencyError.notFoundSingleton(name: identifier.description)
         }
         return singleton
     }
@@ -252,7 +252,7 @@ extension DependencyCore {
     @discardableResult
     public  mutating func unregisterSingleton<T>(_ type: T.Type) throws -> T {
         guard let object = singletons.removeValue(forKey: DependencyID(T.self)) as? T else {
-            throw DependencyError.notFound(name: String(describing: type))
+            throw DependencyError.notFoundSingleton(name: String(describing: type))
         }
         return object
     }

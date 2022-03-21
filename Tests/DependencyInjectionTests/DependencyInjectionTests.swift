@@ -209,12 +209,25 @@ class DependencyInjectionTests: XCTestCase {
 
     func testDescription() throws {
         // Given
-        // WHEN
         let dependencies = factory().dependencies
 
+        // WHEN
+        let description = dependencies.description
+
         // THEN
-        XCTAssertTrue(dependencies.description.contains("\n- \(String(describing: LocationMock.self))"))
-        XCTAssertTrue(dependencies.description.contains("\n- \(String(describing: JourneyMock.self))"))
+        XCTAssertTrue(description.contains("\n- \(String(describing: LocationMock.self))"))
+        XCTAssertTrue(description.contains("\n- \(String(describing: JourneyMock.self))"))
+    }
+
+    func test_description_when_add_singleton() throws {
+        // Given
+        var dependencies = factory().dependencies
+
+        // WHEN
+        dependencies.singleton(ExecutableServiceMock.self)
+
+        // THEN
+        XCTAssertTrue(dependencies.description.contains("\n- \(String(describing: ExecutableServiceMock.self))"))
     }
 
     func testUnregisterProvider() throws {
