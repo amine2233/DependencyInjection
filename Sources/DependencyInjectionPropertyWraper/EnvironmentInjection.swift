@@ -16,7 +16,7 @@ public struct EnvironmentInjection {
         self.environment = environment
     }
 
-    public var wrappedValue: Environement {
+    public var wrappedValue: DependencyEnvironement {
         get { return environment }
         mutating set { environment = newValue }
     }

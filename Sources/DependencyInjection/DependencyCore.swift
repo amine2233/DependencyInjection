@@ -51,6 +51,9 @@ public struct DependencyCore: Dependency {
     public var description: String {
         var desc: [String] = []
 
+        desc.append("Environment:")
+        desc.append(environment.description)
+
         desc.append("Dependencies:")
         if dependencies.isEmpty {
             desc.append("<none>")
