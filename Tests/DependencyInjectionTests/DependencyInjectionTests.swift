@@ -306,46 +306,6 @@ class DependencyInjectionTests: XCTestCase {
         XCTAssertEqual(dependencies.dependenciesCount, 2)
     }
 
-    func testResolveWithName() throws {
-        // GIVEN
-        // WHEN
-        let dependencies = factory().dependencies
-
-        // THEN
-        XCTAssertNoThrow(try dependencies.resolve(withName: "JourneyMock") as JourneyMock)
-    }
-
-    func testResolveWithNameFailure() throws {
-        // GIVEN
-        // WHEN
-        let dependencies = factory().dependencies
-
-        // THEN
-        XCTAssertThrowsError(try dependencies.resolve(withName: "Mock") as JourneyMock)
-    }
-
-    func testUnregisterWithName() throws {
-        // GIVEN
-        // WHEN
-        var dependencies = factory().dependencies
-        dependencies.unregister(withName: "JourneyMock")
-
-        // THEN
-        XCTAssertEqual(dependencies.dependenciesCount, 1)
-    }
-
-    func testRegisterWithName() throws {
-        // GIVEN
-        // WHEN
-        var dependencies = factory().dependencies
-        dependencies.register(withName: "Mock") { _ in
-            ExecutableServiceMock()
-        }
-
-        // THEN
-        XCTAssertEqual(dependencies.dependenciesCount, 3)
-    }
-
     func test_register_singleton_with_ServiceType() throws {
         // Given
         var dependencies = factory().dependencies

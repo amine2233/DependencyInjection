@@ -7,6 +7,11 @@
 
 import Foundation
 
+public protocol DependencyParameters {
+    /// The environment parameter
+    var environment: DependencyEnvironement { get }
+}
+
 public protocol DependencyRegister {
     /// Register class for using with resolve
     /// - Parameters:
@@ -100,26 +105,6 @@ public protocol DependencyProvider {
     func didBoot() -> Self
 }
 
-public protocol DependencyUsingName {
-    /// Register a new dependencies
-    /// - Parameters:
-    ///   - name: The `String` name
-    ///   - completion: The completion
-    mutating func register<T>(
-        withName name: String,
-        completion: @escaping (Dependency) -> T
-    )
-
-    /// Unregister the dependency
-    /// - Parameter name: The name of dependency you will unregister
-    mutating func unregister(withName name: String)
-
-    /// Resolve the dependency
-    /// - Parameter name: The name of the dependency
-    /// - Returns: `T` object
-    func resolve<T>(withName name: String) throws -> T
-}
-
 public protocol DependencyDescription: CustomStringConvertible {
     /// The number of the dependency
     var dependenciesCount: Int { get }
@@ -132,4 +117,4 @@ public protocol DependencyDescription: CustomStringConvertible {
 }
 
 /// The dependency protocol
-public typealias Dependency = DependencyRegister & DependencyCreate & DependencyUnregister & DependencyProvider & DependencyDescription & DependencyReslove & DependencySingleton & DependencyUsingName
+public typealias Dependency = DependencyRegister & DependencyCreate & DependencyUnregister & DependencyProvider & DependencyDescription & DependencyReslove & DependencySingleton & DependencyParameters
