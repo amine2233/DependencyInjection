@@ -20,6 +20,9 @@ import Foundation
 ///
 public struct DependencyCore: Dependency {
 
+    /// The environment parameter
+    public private(set) var environment: DependencyEnvironement
+
     /// The number of the dependency
     public var dependenciesCount: Int {
         dependencies.count
@@ -47,6 +50,9 @@ public struct DependencyCore: Dependency {
     /// The description of the container
     public var description: String {
         var desc: [String] = []
+
+        desc.append("Environment:")
+        desc.append(environment.description)
 
         desc.append("Dependencies:")
         if dependencies.isEmpty {
@@ -84,9 +90,11 @@ public struct DependencyCore: Dependency {
     ///   - singletons: The singletons
     ///   - providers: The providers
     public init(
+        environment: DependencyEnvironement = .production,
         dependencies: [String: DependencyResolver] = [:],
         providers: [Provider] = []
     ) {
+        self.environment = environment
         self.dependencies = dependencies
         self.providers = providers
     }
@@ -269,38 +277,5 @@ extension DependencyCore {
     /// - Parameter provider: the provider you will unregister
     public mutating func unregisterProvider(_ provider: Provider) {
         providers = providers.filter { $0.description != provider.description }
-    }
-}
-
-extension DependencyCore {
-    /// Register a new dependencies
-    /// - Parameters:
-    ///   - name: The `String` name
-    ///   - completion: The completion
-    public mutating func register<T>(
-        withName name: String,
-        completion: @escaping (Dependency) -> T
-    ) {
-        dependencies[name] = DependencyResolver(completion)
-    }
-
-    /// Unregister the dependency
-    /// - Parameter name: The name of dependency you will unregister
-    public mutating func unregister(withName name: String) {
-        dependencies.removeValue(forKey: name)
-    }
-
-    /// Resolve the dependency
-    /// - Parameter name: The name of the dependency
-    /// - Returns: `T` object
-    public func resolve<T>(withName name: String) throws -> T {
-        guard var dependency = dependencies[name] else {
-            throw DependencyError.notFound(name: String(describing: T.self))
-        }
-        dependency.resolve(dependencies: self)
-        guard let object = dependency.value as? T else {
-            throw DependencyError.notResolved(name: name)
-        }
-        return object
     }
 }
