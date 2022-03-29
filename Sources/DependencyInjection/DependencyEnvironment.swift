@@ -1,41 +1,63 @@
 import Foundation
 
-public struct DependencyEnvironement: Equatable, RawRepresentable {
+public struct DependencyEnvironementOptionKey: RawRepresentable {
+    public let rawValue: String
+
+    public init(rawValue: String) {
+        self.rawValue = rawValue
+    }
+}
+
+extension DependencyEnvironementOptionKey: ExpressibleByStringLiteral {
+    public init(stringLiteral value: String) {
+        rawValue = value
+    }
+}
+
+public struct DependencyEnvironementProcessKey: RawRepresentable {
+    public let rawValue: String
+
+    public init(rawValue: String) {
+        self.rawValue = rawValue
+    }
+}
+
+extension DependencyEnvironementProcessKey: ExpressibleByStringLiteral {
+    public init(stringLiteral value: String) {
+        rawValue = value
+    }
+}
+
+public struct DependencyEnvironment: Equatable, RawRepresentable {
     public typealias RawValue = String
 
     /// An environment for deploying your application to consumers.
-    public static var production: DependencyEnvironement {
+    public static var production: DependencyEnvironment {
         .init(name: "production")
     }
 
     /// An environment for developing your application.
-    public static var development: DependencyEnvironement {
+    public static var development: DependencyEnvironment {
         .init(name: "development")
     }
 
     /// An environment for testing your application.
-    public static var testing: DependencyEnvironement {
+    public static var testing: DependencyEnvironment {
         .init(name: "testing")
     }
 
     /// Creates a custom environment.
-    public static func custom(name: String) -> DependencyEnvironement {
+    public static func custom(name: String) -> DependencyEnvironment {
         .init(name: name)
     }
 
-    /// Gets a key from the process environment
-    public static func get(_ key: String) -> String? {
-        ProcessInfo.processInfo.environment[key]
-    }
-
     /// See `Equatable`
-    public static func == (lhs: DependencyEnvironement, rhs: DependencyEnvironement) -> Bool {
+    public static func == (lhs: DependencyEnvironment, rhs: DependencyEnvironment) -> Bool {
         lhs.name == rhs.name && lhs.isRelease == rhs.isRelease
     }
 
-    public static var process: Process {
-        Process()
-    }
+    /// The process options (environment variable key: value)
+    public let process: Process
 
     /// The environment's unique name.
     public let name: String
@@ -51,71 +73,97 @@ public struct DependencyEnvironement: Equatable, RawRepresentable {
     /// The command-line arguments for this `Environment`.
     public private(set) var arguments: [String]
 
-    /// The options for this `Environment`.
-    public private(set) var options: InfoPlist
-
-    public var rawValue: String {
-        name
+    /// The arguments inside ProcessInfo.processInfo.arguments
+    public var processInfoArguments: [String] {
+        ProcessInfo.processInfo.arguments
     }
+
+    /// The options for this `Environment`.
+    public private(set) var options: Options
+
+    public var rawValue: String { name }
 
     // MARK: - Init
 
     public init?(rawValue: String) {
         switch rawValue {
         case "production":
-            self = DependencyEnvironement.production
+            self = DependencyEnvironment.production
         case "development":
-            self = DependencyEnvironement.development
+            self = DependencyEnvironment.development
         case "testing":
-            self = DependencyEnvironement.testing
+            self = DependencyEnvironment.testing
         default:
             // return nil
-            self = DependencyEnvironement(name: rawValue)
+            self = DependencyEnvironment(name: rawValue)
         }
     }
 
     /// Create a new `Environment`.
-    public init(name: String, arguments: [String] = CommandLine.arguments, options: [String: Any] = [:]) {
+    public init(
+        name: String,
+        arguments: [String] = CommandLine.arguments,
+        options: [String: Any] = [:])
+    {
+        self.init(name: name, process: Process(), arguments: arguments, options: options)
+    }
+
+    internal init(
+        name: String,
+        process: Process = Process(),
+        arguments: [String] = CommandLine.arguments,
+        options: [String: Any] = [:])
+    {
         self.name = name
+        self.process = process
         self.arguments = arguments
-        self.options = InfoPlist(infoPlist: options)
+        self.options = Options(infoPlist: options)
     }
 
     // MARK: - Methods
 
     /// Set a `String` option
-    public mutating func setStringOption(key: String, value: String?) {
-        options[dynamicMember: key] = value
+    public mutating func setStringOption(key: DependencyEnvironementOptionKey, value: String?) {
+        options[dynamicMember: key.rawValue] = value
     }
 
     /// Set a generic option conforming to `LosslessStringConvertible`
-    public mutating func setOption<T: LosslessStringConvertible>(key: String, value: T?) {
-        options[dynamicMember: key] = value
+    public mutating func setOption<T: LosslessStringConvertible>(key: DependencyEnvironementOptionKey, value: T?) {
+        options[dynamicMember: key.rawValue] = value
     }
 
     /// Get a `String` option
-    public func getStringOption(key: String) -> String? {
-        options[dynamicMember: key]
+    public func getStringOption(key: DependencyEnvironementOptionKey) -> String? {
+        options[dynamicMember: key.rawValue]
     }
 
     /// Get a generic option
-    public func getOption<T: LosslessStringConvertible>(key: String) -> T? {
-        options[dynamicMember: key] as? T
+    public func getOption<T: LosslessStringConvertible>(key: DependencyEnvironementOptionKey) -> T? {
+        options[dynamicMember: key.rawValue] as? T
+    }
+
+    /// Gets a key from the process environment
+    public func get(_ key: DependencyEnvironementProcessKey) -> String? {
+        ProcessInfo.processInfo.environment[key.rawValue]
     }
 }
 
-extension DependencyEnvironement: CustomStringConvertible {
+extension DependencyEnvironment: CustomStringConvertible {
     public var description: String {
         var desc: [String] = []
-        desc.append("Environement: \(rawValue)")
-        desc.append("\(options.description)")
+        desc.append("Environment: \(rawValue)")
+        if !options.isEmpty {
+            desc.append("\(options.description)")
+        } else {
+            desc.append("<none>")
+        }
         return desc.joined(separator: "\n")
     }
 }
 
 #if swift(>=5.1)
 
-extension DependencyEnvironement {
+extension DependencyEnvironment {
     @dynamicMemberLookup
     public struct Process {
         private let _info: ProcessInfo
@@ -162,10 +210,14 @@ extension DependencyEnvironement {
     }
 }
 
-extension DependencyEnvironement {
+extension DependencyEnvironment {
     @dynamicMemberLookup
-    public struct InfoPlist: CustomStringConvertible {
+    public struct Options: CustomStringConvertible {
         private var _info: [String: Any]
+
+        internal var isEmpty: Bool {
+            _info.isEmpty
+        }
 
         internal init(infoPlist: [String: Any]) {
             _info = infoPlist

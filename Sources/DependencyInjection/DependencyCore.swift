@@ -1,6 +1,5 @@
 import Foundation
 
-
 /// The dependency injection
 ///
 ///
@@ -21,7 +20,7 @@ import Foundation
 public struct DependencyCore: Dependency {
 
     /// The environment parameter
-    public private(set) var environment: DependencyEnvironement
+    public private(set) var environment: DependencyEnvironment
 
     /// The number of the dependency
     public var dependenciesCount: Int {
@@ -39,10 +38,10 @@ public struct DependencyCore: Dependency {
     }
 
     /// The dependencise container
-    private var dependencies: [String: DependencyResolver]
+    private var dependencies: [DependencyKey: DependencyResolver]
 
     /// The singletons container
-    private var singletons: [DependencyID: Any] = [:]
+    private var singletons: [DependencyKey: Any] = [:]
 
     /// The providers container
     private var providers: [Provider]
@@ -90,12 +89,14 @@ public struct DependencyCore: Dependency {
     ///   - singletons: The singletons
     ///   - providers: The providers
     public init(
-        environment: DependencyEnvironement = .production,
-        dependencies: [String: DependencyResolver] = [:],
+        environment: DependencyEnvironment = .production,
+        dependencies: [DependencyKey: DependencyResolver] = [:],
+        singletons: [DependencyKey: Any] = [:],
         providers: [Provider] = []
     ) {
         self.environment = environment
         self.dependencies = dependencies
+        self.singletons = singletons
         self.providers = providers
     }
 
@@ -127,7 +128,7 @@ extension DependencyCore {
     ///   - type: The type of the object you will register
     ///   - completion: The completion
     public mutating func register<T>(_ type: T.Type, completion: @escaping (Dependency) -> T) {
-        dependencies[String(describing: type)] = DependencyResolver(completion)
+        dependencies[DependencyKey(describing: type)] = DependencyResolver(completion)
     }
 
     /// Register class conform to protocol ```DependencyServiceType``` and use it with resolve
@@ -136,13 +137,13 @@ extension DependencyCore {
         let completion = { (container: Dependency) in
             T.makeService(for: container)
         }
-        dependencies[String(describing: type)] = DependencyResolver(completion)
+        dependencies[DependencyKey(describing: type)] = DependencyResolver(completion)
     }
 
     /// Register the dependency
     /// - Parameter dependency: The dependency
     public mutating func register(_ dependency: DependencyResolver) {
-        dependencies[dependency.name] = dependency
+        dependencies[dependency.key] = dependency
     }
 }
 
@@ -177,7 +178,7 @@ extension DependencyCore {
     /// Unregister class
     /// - Parameter type: The type of the object you will unregister
     public mutating func unregister<T>(_ type: T.Type) {
-        dependencies.removeValue(forKey: String(describing: type))
+        dependencies.removeValue(forKey: DependencyKey(describing: type))
     }
 }
 
@@ -187,13 +188,13 @@ extension DependencyCore {
     /// - Parameter type: The type of the object you will reolve
     /// - Returns: The new object
     public func resolve<T>(_ type: T.Type) throws -> T {
-        let identifier = String(describing: type)
+        let identifier = DependencyKey(describing: type)
         guard var dependency = dependencies[identifier] else {
-            throw DependencyError.notFound(name: identifier)
+            throw DependencyError.notFound(name: identifier.rawValue)
         }
         dependency.resolve(dependencies: self)
         guard let object = dependency.value as? T else {
-            throw DependencyError.notResolved(name: identifier)
+            throw DependencyError.notResolved(name: identifier.rawValue)
         }
         return object
     }
@@ -201,13 +202,13 @@ extension DependencyCore {
     /// Get a class who was registred or get a singleton
     /// - Returns: The new object
     public func resolve<T>() throws -> T {
-        let identifier = String(describing: T.self)
+        let identifier = DependencyKey(describing: T.self)
         guard var dependency = dependencies[identifier] else {
-            throw DependencyError.notFound(name: identifier)
+            throw DependencyError.notFound(name: identifier.rawValue)
         }
         dependency.resolve(dependencies: self)
         guard let object = dependency.value as? T else {
-            throw DependencyError.notResolved(name: identifier)
+            throw DependencyError.notResolved(name: identifier.rawValue)
         }
         return object
     }
@@ -218,7 +219,7 @@ extension DependencyCore {
     /// Resolve singleton
     /// - Returns: singleton object
     public func singleton<T>() throws -> T {
-        let identifier = DependencyID(T.self)
+        let identifier = DependencyKey(describing: T.self)
         guard let singleton = singletons[identifier] as? T else {
             throw DependencyError.notFoundSingleton(name: identifier.description)
         }
@@ -230,7 +231,7 @@ extension DependencyCore {
     /// - Returns: The singleton object
     @discardableResult
     public mutating func singleton<T>(completion: (Dependency) -> T) -> T {
-        let identifier = DependencyID(T.self)
+        let identifier = DependencyKey(describing: T.self)
         if let singleton = singletons[identifier] as? T {
             return singleton
         }
@@ -239,13 +240,12 @@ extension DependencyCore {
         return object
     }
 
-
     /// Create a singleton with class conform to protocol ```DependencyServiceType```
     /// - Parameter type: The type of the singleton
     /// - Returns: the singleton object
     @discardableResult
     public mutating func singleton<T: DependencyServiceType>(_ type: T.Type) -> T {
-        let identifier = DependencyID(T.self)
+        let identifier = DependencyKey(describing: T.self)
         if let singleton = singletons[identifier] as? T {
             return singleton
         }
@@ -259,7 +259,7 @@ extension DependencyCore {
     /// - Returns: the singleton you will remove
     @discardableResult
     public  mutating func unregisterSingleton<T>(_ type: T.Type) throws -> T {
-        guard let object = singletons.removeValue(forKey: DependencyID(T.self)) as? T else {
+        guard let object = singletons.removeValue(forKey: DependencyKey(describing: T.self)) as? T else {
             throw DependencyError.notFoundSingleton(name: String(describing: type))
         }
         return object
@@ -277,5 +277,22 @@ extension DependencyCore {
     /// - Parameter provider: the provider you will unregister
     public mutating func unregisterProvider(_ provider: Provider) {
         providers = providers.filter { $0.description != provider.description }
+    }
+}
+
+extension DependencyCore {
+    public mutating func register<T>(using key: DependencyKey, completion: @escaping (Dependency) -> T) {
+        dependencies[key] = DependencyResolver(completion)
+    }
+
+    public func resolve<T>(using key: DependencyKey) throws -> T {
+        guard var dependency = dependencies[key] else {
+            throw DependencyError.notFound(name: key.rawValue)
+        }
+        dependency.resolve(dependencies: self)
+        guard let object = dependency.value as? T else {
+            throw DependencyError.notResolved(name: key.rawValue)
+        }
+        return object
     }
 }

@@ -9,7 +9,7 @@ import Foundation
 
 public protocol DependencyParameters {
     /// The environment parameter
-    var environment: DependencyEnvironement { get }
+    var environment: DependencyEnvironment { get }
 }
 
 public protocol DependencyRegister {
@@ -26,6 +26,12 @@ public protocol DependencyRegister {
     /// Register the dependency
     /// - Parameter dependency: The dependency
     mutating func register(_ dependency: DependencyResolver)
+
+    /// Register class for using with resolve
+    /// - Parameters:
+    ///   - key: The DependencyKey of the object you will register
+    ///   - completion: The completion
+    mutating func register<T>(using key: DependencyKey, completion: @escaping (Dependency) -> T)
 }
 
 public protocol DependencyCreate {
@@ -35,9 +41,9 @@ public protocol DependencyCreate {
     func create<T>(completion: (Dependency) -> T) -> T
 
     /// Create a new object conform to protocol ```DependencyServiceType```, this method not register class
-    /// - Parameter _: The object you will create
+    /// - Parameter type: The object you will create
     /// - Returns: The new object
-    func create<T>(_: T.Type) -> T where T: DependencyServiceType
+    func create<T>(_ type: T.Type) -> T where T: DependencyServiceType
 
     /// Create a new object, this method not register object
     /// - Parameter dependency: The dependency object
@@ -61,6 +67,11 @@ public protocol DependencyReslove {
     /// Get a class who was registred or get a singleton
     /// - Returns: The new object
     func resolve<T>() throws -> T
+
+    /// Get a class who was registred or get a singleton
+    /// - Parameter key: The DependencyKey of the object you will reolve
+    /// - Returns: The new object
+    func resolve<T>(using key: DependencyKey) throws -> T
 }
 
 public protocol DependencySingleton {
