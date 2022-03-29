@@ -7,6 +7,10 @@
 
 import Foundation
 
+public protocol DependencyRegistering {
+    static func registerAllServices(in dependencies: inout Dependency)
+}
+
 public protocol HasDependencies {
     var dependencies: Dependency { get }
 }
@@ -44,5 +48,10 @@ public struct DependencyInjector: HasDependencies {
         self.init(dependencies: dependencies)
         self.dependencies.register(dependency())
         self.dependencies.registerProvider(provider())
+    }
+
+    public init(dependencies: Dependency = DependencyCore(), register: DependencyRegistering.Type) {
+        self.init(dependencies: dependencies)
+        register.registerAllServices(in: &self.dependencies)
     }
 }
