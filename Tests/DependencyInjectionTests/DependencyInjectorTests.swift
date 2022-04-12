@@ -26,10 +26,9 @@ class DependencyInjectorTests: XCTestCase {
 
     func testDependencyInjectionUsingResgistration() throws {
         // given
-        let dependencyRegisteringTest = DependencyRegisteringTest.self
 
         // when
-        let injector = DependencyInjector(register: dependencyRegisteringTest)
+        let injector = DependencyInjector(register: DependencyRegisteringTest.self)
 
         // then
         XCTAssertEqual(injector.dependencies.dependenciesCount, 1)

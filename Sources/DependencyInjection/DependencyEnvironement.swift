@@ -1,5 +1,11 @@
 import Foundation
 
+enum DependencyEnvironementError: Error, Equatable {
+    case notFoundStringOption(DependencyEnvironementKey)
+    case notFoundOption(DependencyEnvironementKey)
+    case notFoundParameter(DependencyEnvironementKey)
+}
+
 public struct DependencyEnvironement: Equatable, RawRepresentable {
     public typealias RawValue = String
 
@@ -54,6 +60,9 @@ public struct DependencyEnvironement: Equatable, RawRepresentable {
     /// The options for this `Environment`.
     public private(set) var options: InfoPlist
 
+    /// The options for this `Environment`.
+    private var parameters: [DependencyEnvironementKey: Any]
+
     public var rawValue: String {
         name
     }
@@ -75,32 +84,50 @@ public struct DependencyEnvironement: Equatable, RawRepresentable {
     }
 
     /// Create a new `Environment`.
-    public init(name: String, arguments: [String] = CommandLine.arguments, options: [String: Any] = [:]) {
+    public init(name: String, arguments: [String] = CommandLine.arguments, options: [DependencyEnvironementKey: Any] = [:], parameters: [DependencyEnvironementKey: Any] = [:]) {
         self.name = name
         self.arguments = arguments
-        self.options = InfoPlist(infoPlist: options)
+        self.options = InfoPlist(info: options)
+        self.parameters = parameters
     }
 
     // MARK: - Methods
 
     /// Set a `String` option
-    public mutating func setStringOption(key: String, value: String?) {
+    public mutating func setStringOption(key: DependencyEnvironementKey, value: String?) {
         options[dynamicMember: key] = value
     }
 
     /// Set a generic option conforming to `LosslessStringConvertible`
-    public mutating func setOption<T: LosslessStringConvertible>(key: String, value: T?) {
+    mutating func setOption<T: LosslessStringConvertible>(key: DependencyEnvironementKey, value: T?) {
         options[dynamicMember: key] = value
     }
 
     /// Get a `String` option
-    public func getStringOption(key: String) -> String? {
-        options[dynamicMember: key]
+    public func getStringOption(key: DependencyEnvironementKey) throws -> String {
+        guard let value = options[dynamicMember: key] else {
+            throw DependencyEnvironementError.notFoundOption(key)
+        }
+        return value
     }
 
-    /// Get a generic option
-    public func getOption<T: LosslessStringConvertible>(key: String) -> T? {
-        options[dynamicMember: key] as? T
+    /// Get a generic option implemented `LosslessStringConvertible`
+    func getOption<T: LosslessStringConvertible>(key: DependencyEnvironementKey) throws -> T {
+        guard let value = options[dynamicMember: key] as? T else {
+            throw DependencyEnvironementError.notFoundOption(key)
+        }
+        return value
+    }
+
+    /// Set a parameter
+    public mutating func setParameter<T>(key: DependencyEnvironementKey, value: T?) {
+        parameters[key] = value
+    }
+
+    /// Get a generic parameter
+    public func getParameter<T>(key: DependencyEnvironementKey) throws -> T {
+        guard let value = parameters[key] as? T else { throw DependencyEnvironementError.notFoundParameter(key) }
+        return value
     }
 }
 
@@ -165,17 +192,17 @@ extension DependencyEnvironement {
 extension DependencyEnvironement {
     @dynamicMemberLookup
     public struct InfoPlist: CustomStringConvertible {
-        private var _info: [String: Any]
+        private var _info: [DependencyEnvironementKey: Any]
 
-        internal init(infoPlist: [String: Any]) {
-            _info = infoPlist
+        internal init(info: [DependencyEnvironementKey: Any]) {
+            _info = info
         }
 
         /// Gets a variable's value from the process' environment, and converts it to generic type `T`.
         ///
         ///     Environment.development.options.DATABASE_PORT = 3306
         ///     Environment.development.options.DATABASE_PORT // 3306
-        public subscript<T>(dynamicMember member: String) -> T? where T: LosslessStringConvertible {
+        subscript<T>(dynamicMember member: DependencyEnvironementKey) -> T? where T: LosslessStringConvertible {
             get {
                 guard let raw = _info[member], let value = raw as? T else { return nil }
                 return value
@@ -189,7 +216,7 @@ extension DependencyEnvironement {
         ///
         ///     Environment.development.options.DATABASE_USER = "root"
         ///     Environment.development.DATABASE_USER // "root"
-        public subscript(dynamicMember member: String) -> String? {
+        public subscript(dynamicMember member: DependencyEnvironementKey) -> String? {
             get {
                 guard let raw = _info[member], let value = raw as? String else { return nil }
                 return value
@@ -216,6 +243,29 @@ extension DependencyEnvironement {
             }
 
             return desc.joined(separator: "\n")
+        }
+    }
+}
+
+/// https://www.swiftbysundell.com/tips/combining-dynamic-member-lookup-with-key-paths/
+extension DependencyEnvironement {
+    @dynamicMemberLookup
+    public class Reference<Value> {
+        fileprivate(set) var value: Value
+
+        public init(value: Value) {
+            self.value = value
+        }
+
+        public subscript<T>(dynamicMember keyPath: KeyPath<Value, T>) -> T {
+            value[keyPath: keyPath]
+        }
+    }
+
+    public final class MutableReference<Value>: Reference<Value> {
+        public subscript<T>(dynamicMember keyPath: WritableKeyPath<Value, T>) -> T {
+            get { value[keyPath: keyPath] }
+            set { value[keyPath: keyPath] = newValue }
         }
     }
 }
