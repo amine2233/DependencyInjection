@@ -119,7 +119,7 @@ class DependencyInjectionTests: XCTestCase {
         // Given
         // WHEN
         let dependencies = factory().dependencies
-        let service = dependencies.create(ExecutableServiceMock.self)
+        let service = try dependencies.create(ExecutableServiceMock.self)
 
         // THEN
         XCTAssertEqual(String(describing: service.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
@@ -129,7 +129,7 @@ class DependencyInjectionTests: XCTestCase {
         // Given
         // WHEN
         var dependencies = factory().dependencies
-        let service = dependencies.create(DependencyResolver { _ in ExecutableServiceMock() })
+        let service = try dependencies.create(DependencyResolver { _ in ExecutableServiceMock() })
 
         // THEN
         XCTAssertEqual(String(describing: service.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
@@ -139,7 +139,7 @@ class DependencyInjectionTests: XCTestCase {
         // Given
         // WHEN
         let dependencies = factory().dependencies
-        let service = dependencies.create { _ in
+        let service = try dependencies.create { _ in
             ExecutableServiceMock()
         }
 
@@ -151,7 +151,7 @@ class DependencyInjectionTests: XCTestCase {
         // Given
         // WHEN
         var dependencies = factory().dependencies
-        dependencies.singleton(ExecutableServiceMock.self)
+        dependencies.registerSingleton(ExecutableServiceMock.self)
 
         // THEN
         XCTAssertNoThrow(try dependencies.singleton() as ExecutableServiceMock)
@@ -159,11 +159,13 @@ class DependencyInjectionTests: XCTestCase {
 
     func testSingletonRegisterWithTypeAndCompletion() throws {
         // Given
-        // WHEN
         var dependencies = factory().dependencies
-        let singleton = dependencies.singleton { _ in
+        dependencies.registerSingleton { _ in
             ExecutableServiceMock()
         }
+
+        // WHEN
+        let singleton: ExecutableServiceMock = try dependencies.singleton()
 
         // THEN
         XCTAssertEqual(String(describing: singleton.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
@@ -174,7 +176,7 @@ class DependencyInjectionTests: XCTestCase {
         // WHEN
         var dependencies = factory().dependencies
         dependencies.register(ExecutableServiceMock.self)
-        dependencies.singleton(ExecutableServiceMock.self)
+        dependencies.registerSingleton(ExecutableServiceMock.self)
 
         // THEN
         XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
@@ -182,11 +184,13 @@ class DependencyInjectionTests: XCTestCase {
 
     func testSingletonResolveWithTypeAndCompletion() throws {
         // Given
-        // WHEN
         var dependencies = factory().dependencies
-        let singleton = dependencies.singleton { _ in
+        dependencies.registerSingleton { _ in
             LocationMock()
         }
+
+        // WHEN
+        let singleton: LocationMock = try dependencies.singleton()
 
         // THEN
         XCTAssertEqual(String(describing: singleton.self).components(separatedBy: ".").last, String(describing: LocationMock.self))
@@ -215,8 +219,8 @@ class DependencyInjectionTests: XCTestCase {
         let description = dependencies.description
 
         // THEN
-        XCTAssertTrue(description.contains("\n- \(String(describing: LocationMock.self))"))
-        XCTAssertTrue(description.contains("\n- \(String(describing: JourneyMock.self))"))
+        XCTAssertTrue(description.contains("\n- \(DependencyKey(type: LocationMock.self))"))
+        XCTAssertTrue(description.contains("\n- \(DependencyKey(type: JourneyMock.self))"))
     }
 
     func test_description_when_add_singleton() throws {
@@ -224,10 +228,10 @@ class DependencyInjectionTests: XCTestCase {
         var dependencies = factory().dependencies
 
         // WHEN
-        dependencies.singleton(ExecutableServiceMock.self)
+        dependencies.registerSingleton(ExecutableServiceMock.self)
 
         // THEN
-        XCTAssertTrue(dependencies.description.contains("\n- \(String(describing: ExecutableServiceMock.self))"))
+        XCTAssertTrue(dependencies.description.contains("\n- \(DependencyKey(type: ExecutableServiceMock.self))"))
     }
 
     func testUnregisterProvider() throws {
@@ -311,7 +315,7 @@ class DependencyInjectionTests: XCTestCase {
         var dependencies = factory().dependencies
 
         // WHEN
-        dependencies.singleton(ExecutableServiceMock.self)
+        dependencies.registerSingleton(ExecutableServiceMock.self)
 
         // THEN
         XCTAssertEqual(dependencies.singletonCount, 1)
@@ -322,7 +326,7 @@ class DependencyInjectionTests: XCTestCase {
         var dependencies = factory().dependencies
 
         // WHEN
-        dependencies.singleton { _ in
+        dependencies.registerSingleton { _ in
             ExecutableServiceMock()
         }
 
@@ -333,7 +337,7 @@ class DependencyInjectionTests: XCTestCase {
     func test_rsolve_singleton_with_ServiceType() throws {
         // Given
         var dependencies = factory().dependencies
-        dependencies.singleton(ExecutableServiceMock.self)
+        dependencies.registerSingleton(ExecutableServiceMock.self)
 
         // WHEN
         let singleton = try? dependencies.singleton() as ExecutableServiceMock
@@ -345,10 +349,10 @@ class DependencyInjectionTests: XCTestCase {
     func test_unregister_singleton_with_ServiceType() throws {
         // Given
         var dependencies = factory().dependencies
-        dependencies.singleton(ExecutableServiceMock.self)
+        dependencies.registerSingleton(ExecutableServiceMock.self)
 
         // WHEN
-        try dependencies.unregisterSingleton(ExecutableServiceMock.self)
+        dependencies.unregisterSingleton(ExecutableServiceMock.self)
 
         // THEN
         XCTAssertEqual(dependencies.singletonCount, 0)

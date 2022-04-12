@@ -70,19 +70,19 @@ class DependencyEnvironementTests: XCTestCase {
         }
     }
 
-    func testOptionsString() {
+    func testOptionsString() throws {
         let urlPath = "http://myurl.com"
         var environement = DependencyEnvironement.development
         environement.setStringOption(key: "URL", value: urlPath)
         XCTAssertEqual(environement.options.URL, urlPath)
-        XCTAssertEqual(environement.getStringOption(key: "URL"), urlPath)
+        XCTAssertEqual(try environement.getStringOption(key: "URL"), urlPath)
 
         environement.setStringOption(key: "URL", value: nil)
         XCTAssertNil(environement.options.URL)
-        XCTAssertNil(environement.getStringOption(key: "URL"))
+        XCTAssertThrowsError(try environement.getStringOption(key: "URL"))
     }
 
-    func testOptionGeneric() {
+    func testOptionGeneric() throws {
         let urlPort = 8080
         var environement = DependencyEnvironement.development
         environement.setOption(key: "URL_PORT", value: urlPort)
@@ -90,6 +90,63 @@ class DependencyEnvironementTests: XCTestCase {
         // XCTAssertEqual(environement.getOption(key: "URL_PORT"), urlPort)
         environement.setStringOption(key: "URL_PORT", value: nil)
         XCTAssertNil(environement.options.URL_PORT)
-        XCTAssertNil(environement.getStringOption(key: "URL_PORT"))
+        XCTAssertThrowsError(try environement.getStringOption(key: "URL_PORT"))
+    }
+
+    func testSetParameter() throws {
+        // Given
+        var environement = DependencyEnvironement.development
+        let timestamp = Double(50)
+        let key = DependencyEnvironementKey(rawValue: "Timestamp")
+
+        // When
+        environement.setParameter(key: key, value: timestamp)
+
+        // Then
+        let expected: Double = try environement.getParameter(key: key)
+        XCTAssertEqual(expected, timestamp)
+    }
+
+    func testGetParameter() throws {
+        // Given
+        var environement = DependencyEnvironement.development
+        let key = DependencyEnvironementKey(rawValue: "Timestamp")
+        let timestamp = Double(50)
+        environement.setParameter(key: key, value: timestamp)
+
+        // When
+        let expectedValue: Double = try environement.getParameter(key: key)
+        // Then
+        XCTAssertEqual(expectedValue, timestamp)
+    }
+
+    func testNotFoundParameter() throws {
+        // Given
+        let environement = DependencyEnvironement.development
+        let key = DependencyEnvironementKey(rawValue: "Timestamp")
+
+        // When
+        let callback: () throws -> Void = {
+            try environement.getParameter(key: key)
+        }
+
+        // Then
+        XCTAssertThrowsError(try callback(), "not found parameter") { error in
+            XCTAssertEqual(error as? DependencyEnvironementError, DependencyEnvironementError.notFoundParameter(key))
+        }
+    }
+
+    func xtestGetOption() throws {
+        // given
+        let urlPort: Int = 8080
+        var environement = DependencyEnvironement.development
+        let key = DependencyEnvironementKey(rawValue: "URL_PORT")
+        environement.setOption(key: key, value: urlPort)
+
+        // when
+        let expectedvalue: Int = try environement.getOption(key: key)
+
+        // then
+        XCTAssertEqual(expectedvalue, urlPort)
     }
 }
