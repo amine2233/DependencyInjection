@@ -4,6 +4,7 @@ enum DependencyEnvironementError: Error, Equatable {
     case notFoundStringOption(DependencyEnvironementKey)
     case notFoundOption(DependencyEnvironementKey)
     case notFoundParameter(DependencyEnvironementKey)
+    case notFoundEnvironment(String)
 }
 
 public struct DependencyEnvironement: Equatable, RawRepresentable {

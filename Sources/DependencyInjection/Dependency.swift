@@ -9,7 +9,7 @@ import Foundation
 
 public protocol DependencyParameters {
     /// The environment parameter
-    var environment: DependencyEnvironement { get }
+    var environment: DependencyEnvironement { get set }
 }
 
 public protocol DependencyRegister {
@@ -17,7 +17,7 @@ public protocol DependencyRegister {
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    mutating func register<T>(_ type: T.Type, completion: @escaping (Dependency) -> T)
+    mutating func register<T>(_ type: T.Type, completion: @escaping (Dependency) throws -> T)
 
     /// Register class conform to protocol ```DependencyServiceType``` and use it with resolve
     /// - Parameter type: The `DependencyServiceType` type of the object you will register
@@ -31,7 +31,7 @@ public protocol DependencyRegister {
     /// - Parameters:
     ///   - key: The dependency key of the object you will register
     ///   - completion: The completion
-    mutating func register<T>(_ key: DependencyKey, completion: @escaping (Dependency) -> T)
+    mutating func register<T>(_ key: DependencyKey, completion: @escaping (Dependency) throws -> T)
 }
 
 public protocol DependencyCreate {

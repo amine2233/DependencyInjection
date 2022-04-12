@@ -126,7 +126,7 @@ extension DependencyCore {
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    public mutating func register<T>(_ type: T.Type, completion: @escaping (Dependency) -> T) {
+    public mutating func register<T>(_ type: T.Type, completion: @escaping (Dependency) throws -> T) {
         register(DependencyKey(type: type), completion: completion)
     }
 
@@ -146,7 +146,7 @@ extension DependencyCore {
         dependencies[dependency.key] = dependency
     }
 
-    public mutating func register<T>(_ key: DependencyKey, completion: @escaping (Dependency) -> T) {
+    public mutating func register<T>(_ key: DependencyKey, completion: @escaping (Dependency) throws -> T) {
         dependencies[key] = DependencyResolver(key: key, resolveBlock: completion)
     }
 }
