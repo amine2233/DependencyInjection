@@ -38,17 +38,17 @@ public protocol DependencyCreate {
     // Create a unique object, this method not register class
     /// - Parameter completion: the completion to create a new object
     /// - Returns: the new object
-    func create<T>(completion: (Dependency) -> T) -> T
+    func create<T>(completion: (Dependency) throws -> T) throws -> T
 
     /// Create a new object conform to protocol ```DependencyServiceType```, this method not register class
     /// - Parameter type: The object you will create
     /// - Returns: The new object
-    func create<T>(_ type: T.Type) -> T where T: DependencyServiceType
+    func create<T>(_ type: T.Type) throws -> T where T: DependencyServiceType
 
     /// Create a new object, this method not register object
     /// - Parameter dependency: The dependency object
     /// - Returns: the new object
-    mutating func create(_ dependency: DependencyResolver) -> Any
+    mutating func create(_ dependency: DependencyResolver) throws -> Any
 }
 
 public protocol DependencyUnregister {
@@ -78,37 +78,31 @@ public protocol DependencySingleton {
 
     /// Resolve singleton
     /// - Returns: singleton object
-    func singleton<T>() throws -> T
+    mutating func singleton<T>() throws -> T
 
     /// Resolve singleton
     /// - Parameter key: The key of the object you will unregister
     /// - Returns: singleton object
-    func singleton<T>(_ key: DependencyKey) throws -> T
+    mutating func singleton<T>(_ key: DependencyKey) throws -> T
 
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
-    /// - Returns: The singleton object
-    @discardableResult
-    mutating func singleton<T>(completion: (Dependency) -> T) -> T
+    mutating func registerSingleton<T>(completion: @escaping (Dependency) throws -> T)
 
 
     /// Create a singleton with class conform to protocol ```DependencyServiceType```
     /// - Parameter type: The type of the singleton
-    /// - Returns: the singleton object
-    @discardableResult
-    mutating func singleton<T: DependencyServiceType>(_ type: T.Type) -> T
+    mutating func registerSingleton<T: DependencyServiceType>(_ type: T.Type)
 
     /// Unregister singleton
     /// - Parameter type: The type of the object you will unregister
     /// - Returns: the singleton you will remove
-    @discardableResult
-    mutating func unregisterSingleton<T>(_ type: T.Type) throws -> T
+    mutating func unregisterSingleton<T>(_ type: T.Type)
 
     /// Unregister singleton
     /// - Parameter key: The key of the object you will unregister
     /// - Returns: the singleton you will remove
-    @discardableResult
-    mutating func unregisterSingleton<T>(_ key: DependencyKey) throws -> T
+    mutating func unregisterSingleton(_ key: DependencyKey)
 }
 
 public protocol DependencyProvider {
