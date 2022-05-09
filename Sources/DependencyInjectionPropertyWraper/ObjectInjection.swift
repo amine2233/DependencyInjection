@@ -14,7 +14,7 @@ public struct ObjectInjection<Service>: DynamicProperty where Service: Observabl
     @ObservedObject private var service: Service
     
     public init(dependencies: DependencyResolver = DependencyInjector.dependencies) {
-        self.service = dependencies.resolve(Value.self)
+        self.service = dependencies.resolve()
     }
     
     public var wrappedValue: Service {

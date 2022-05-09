@@ -16,3 +16,16 @@ public enum DependencyError: Error, Equatable {
     case notFound(name: String)
     case notResolved(name: String)
 }
+
+extension DependencyError: LocalizedError {
+    public var failureReason: String? {
+        switch self {
+        case .notFoundSingleton(let name):
+            return "not found singleton \(name)"
+        case .notFound(let name):
+            return "not found \(name)"
+        case .notResolved(let name):
+            return "not resolved \(name)"
+        }
+    }
+}

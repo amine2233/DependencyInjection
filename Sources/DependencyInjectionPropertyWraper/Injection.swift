@@ -44,7 +44,7 @@ public struct OptionalInjection<Service> {
 
 @propertyWrapper
 public struct LazyInjection<Service> {
-    private var initialize: Bool = true
+    private(set) var isInitialized: Bool = false
     private var service: Service!
     private let dependencies: Dependency
 
@@ -58,14 +58,18 @@ public struct LazyInjection<Service> {
 
     public var wrappedValue: Service {
         mutating get {
-            if initialize {
-                initialize = false
-                service = try! dependencies.resolve()
+            if !isInitialized {
+                isInitialized = true
+                do {
+                    service = try dependencies.resolve(Service.self)
+                } catch {
+                    fatalError("Can't resolve \(Service.self). Error: \(error.localizedDescription)")
+                }
             }
             return service
         }
         mutating set {
-            initialize = false
+            isInitialized = true
             service = newValue
         }
     }
@@ -77,12 +81,13 @@ public struct LazyInjection<Service> {
 
     public mutating func release() {
         self.service = nil
+        self.isInitialized = false
     }
 }
 
 @propertyWrapper
 public struct WeakLazyInjection<Service> {
-    private var initialize: Bool = true
+    private(set) var isInitialized: Bool = false
     private var service: Service?
     private let dependencies: Dependency
 
@@ -96,14 +101,14 @@ public struct WeakLazyInjection<Service> {
 
     public var wrappedValue: Service? {
         mutating get {
-            if initialize {
-                initialize = false
+            if !isInitialized {
+                isInitialized = true
                 service = try? dependencies.resolve(Service.self)
             }
             return service
         }
         mutating set {
-            initialize = false
+            isInitialized = true
             service = newValue
         }
     }
@@ -115,5 +120,6 @@ public struct WeakLazyInjection<Service> {
 
     public mutating func release() {
         self.service = nil
+        self.isInitialized = false
     }
 }
