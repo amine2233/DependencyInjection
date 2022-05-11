@@ -16,8 +16,13 @@ import Foundation
 /// [Environment variables in Mac OSX](https://stackoverflow.com/a/4567308)
 @propertyWrapper
 public struct EnvironmentVariable {
-    var name: String
+    private var name: String
 
+    public init(name: String) {
+        self.name = name
+    }
+
+    /// The property wrapper value
     public var wrappedValue: String? {
         get {
             guard let pointer = getenv(name) else { return nil }

@@ -1,10 +1,3 @@
-//
-//  DependencyInjectorTests.swift
-//  
-//
-//  Created by Amine Bensalah on 29/03/2022.
-//
-
 import XCTest
 @testable import DependencyInjection
 

@@ -1,10 +1,3 @@
-//
-//  Dependency.swift
-//  DependencyInjection
-//
-//  Created by Amine Bensalah on 14/11/2019.
-//
-
 import Foundation
 
 public protocol DependencyParameters {
@@ -78,21 +71,23 @@ public protocol DependencySingleton {
 
     /// Resolve singleton
     /// - Returns: singleton object
-    mutating func singleton<T>() throws -> T
+    @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
+    func singleton<T>() throws -> T
 
     /// Resolve singleton
     /// - Parameter key: The key of the object you will unregister
     /// - Returns: singleton object
-    mutating func singleton<T>(_ key: DependencyKey) throws -> T
+    @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
+    func singleton<T>(_ key: DependencyKey) throws -> T
 
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
-    mutating func registerSingleton<T>(completion: @escaping (Dependency) throws -> T)
+    mutating func registerSingleton<T>(completion: @escaping (Dependency) throws -> T) throws
 
 
     /// Create a singleton with class conform to protocol ```DependencyServiceType```
     /// - Parameter type: The type of the singleton
-    mutating func registerSingleton<T: DependencyServiceType>(_ type: T.Type)
+    mutating func registerSingleton<T: DependencyServiceType>(_ type: T.Type) throws
 
     /// Unregister singleton
     /// - Parameter type: The type of the object you will unregister
@@ -127,9 +122,6 @@ public protocol DependencyDescription: CustomStringConvertible {
 
     /// The number of the provider
     var providersCount: Int { get }
-
-    /// The number of the singleton
-    var singletonCount: Int { get }
 }
 
 /// The dependency protocol
