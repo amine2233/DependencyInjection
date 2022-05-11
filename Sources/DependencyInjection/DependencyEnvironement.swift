@@ -59,7 +59,7 @@ public struct DependencyEnvironement: Equatable, RawRepresentable {
     public private(set) var arguments: [String]
 
     /// The options for this `Environment`.
-    public private(set) var options: InfoPlist
+    public var options: InfoPlist
 
     /// The options for this `Environment`.
     private var parameters: [DependencyEnvironementKey: Any]

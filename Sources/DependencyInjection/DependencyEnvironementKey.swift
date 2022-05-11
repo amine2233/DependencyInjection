@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Amine Bensalah on 12/04/2022.
-//
-
 import Foundation
 
 public struct DependencyEnvironementKey: RawRepresentable, Hashable {

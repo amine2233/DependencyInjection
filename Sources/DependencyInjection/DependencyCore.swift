@@ -210,12 +210,12 @@ extension DependencyCore {
 extension DependencyCore {
     /// Resolve singleton
     /// - Returns: singleton object
-    public mutating func singleton<T>() throws -> T {
+    public func singleton<T>() throws -> T {
         let identifier = DependencyKey(type: T.self)
         return try singleton(identifier)
     }
 
-    public mutating func singleton<T>(_ key: DependencyKey) throws -> T {
+    public func singleton<T>(_ key: DependencyKey) throws -> T {
         try resolve(key)
     }
 

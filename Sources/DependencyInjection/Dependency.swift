@@ -1,10 +1,3 @@
-//
-//  Dependency.swift
-//  DependencyInjection
-//
-//  Created by Amine Bensalah on 14/11/2019.
-//
-
 import Foundation
 
 public protocol DependencyParameters {
@@ -79,13 +72,13 @@ public protocol DependencySingleton {
     /// Resolve singleton
     /// - Returns: singleton object
     @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
-    mutating func singleton<T>() throws -> T
+    func singleton<T>() throws -> T
 
     /// Resolve singleton
     /// - Parameter key: The key of the object you will unregister
     /// - Returns: singleton object
     @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
-    mutating func singleton<T>(_ key: DependencyKey) throws -> T
+    func singleton<T>(_ key: DependencyKey) throws -> T
 
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
