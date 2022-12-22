@@ -109,7 +109,7 @@ extension DependencyCore {
     ///   - type: The type of the object you will register
     ///   - completion: The completion
     public mutating func register<T>(_ type: T.Type, completion: @escaping (Dependency) throws -> T) {
-        register(DependencyKey(type: type), completion: completion)
+        register(key: DependencyKey(type: type), completion: completion)
     }
 
     /// Register class conform to protocol ```DependencyServiceType``` and use it with resolve
@@ -128,7 +128,7 @@ extension DependencyCore {
         dependencies[dependency.key] = dependency
     }
 
-    public mutating func register<T>(_ key: DependencyKey, completion: @escaping (Dependency) throws -> T) {
+    public mutating func register<T>(key: DependencyKey, completion: @escaping (Dependency) throws -> T) {
         dependencies[key] = DependencyResolver(key: key, isSingleton: false, resolveBlock: completion)
     }
 }
@@ -179,17 +179,17 @@ extension DependencyCore {
     /// - Returns: The new object
     public func resolve<T>(_ type: T.Type) throws -> T {
         let identifier = DependencyKey(type: type)
-        return try resolve(identifier)
+        return try resolve(key: identifier)
     }
 
     /// Get a class who was registred or get a singleton
     /// - Returns: The new object
     public func resolve<T>() throws -> T {
         let identifier = DependencyKey(type: T.self)
-        return try resolve(identifier)
+        return try resolve(key: identifier)
     }
 
-    public func resolve<T>(_ key: DependencyKey) throws -> T {
+    public func resolve<T>(key: DependencyKey) throws -> T {
         guard var dependency = dependencies[key] else {
             throw DependencyError.notFound(name: key.rawValue)
         }
@@ -212,11 +212,11 @@ extension DependencyCore {
     /// - Returns: singleton object
     public func singleton<T>() throws -> T {
         let identifier = DependencyKey(type: T.self)
-        return try singleton(identifier)
+        return try singleton(key: identifier)
     }
 
-    public func singleton<T>(_ key: DependencyKey) throws -> T {
-        try resolve(key)
+    public func singleton<T>(key: DependencyKey) throws -> T {
+        try resolve(key: key)
     }
 
     /// Create a singleton
@@ -249,10 +249,10 @@ extension DependencyCore {
     /// Unregister singleton
     /// - Parameter type: The type of the object you will unregister
     public mutating func unregisterSingleton<T>(_ type: T.Type) {
-        unregisterSingleton(DependencyKey(type: T.self))
+        unregisterSingleton(key: DependencyKey(type: T.self))
     }
 
-    public mutating func unregisterSingleton(_ key: DependencyKey) {
+    public mutating func unregisterSingleton(key: DependencyKey) {
         dependencies.removeValue(forKey: key)
     }
 }

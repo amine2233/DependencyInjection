@@ -24,7 +24,7 @@ public protocol DependencyRegister {
     /// - Parameters:
     ///   - key: The dependency key of the object you will register
     ///   - completion: The completion
-    mutating func register<T>(_ key: DependencyKey, completion: @escaping (Dependency) throws -> T)
+    mutating func register<T>(key: DependencyKey, completion: @escaping (Dependency) throws -> T)
 }
 
 public protocol DependencyCreate {
@@ -60,7 +60,7 @@ public protocol DependencyReslove {
     /// Get a class who was registred or get a singleton
     /// - Parameter key: The key of the object you will reolve
     /// - Returns: The new object
-    func resolve<T>(_ key: DependencyKey) throws -> T
+    func resolve<T>(key: DependencyKey) throws -> T
 
     /// Get a class who was registred or get a singleton
     /// - Returns: The new object
@@ -78,7 +78,7 @@ public protocol DependencySingleton {
     /// - Parameter key: The key of the object you will unregister
     /// - Returns: singleton object
     @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
-    func singleton<T>(_ key: DependencyKey) throws -> T
+    func singleton<T>(key: DependencyKey) throws -> T
 
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
@@ -97,7 +97,7 @@ public protocol DependencySingleton {
     /// Unregister singleton
     /// - Parameter key: The key of the object you will unregister
     /// - Returns: the singleton you will remove
-    mutating func unregisterSingleton(_ key: DependencyKey)
+    mutating func unregisterSingleton(key: DependencyKey)
 }
 
 public protocol DependencyProvider {
