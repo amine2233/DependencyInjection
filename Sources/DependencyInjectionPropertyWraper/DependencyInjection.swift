@@ -13,7 +13,7 @@ public struct Injection<Service> {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency) {
+    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
         do {
             self.service = try dependencies.resolve()
         } catch {
@@ -47,7 +47,7 @@ public struct OptionalInjection<Service> {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency) {
+    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
         self.service = try? dependencies.resolve(Service.self)
     }
 
@@ -79,7 +79,7 @@ public struct LazyInjection<Service> {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency) {
+    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
         self.dependencies = dependencies
     }
 
@@ -135,7 +135,7 @@ public struct WeakLazyInjection<Service> {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency) {
+    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
         self.dependencies = dependencies
     }
 
@@ -171,3 +171,39 @@ public struct WeakLazyInjection<Service> {
         self.isInitialized = false
     }
 }
+
+#if canImport(SwifUI)
+
+/// A  property wrapper to resolve dependency values.
+///
+/// ```
+/// @ObjectInjection)
+/// var viewModel: ObjectViewModel
+/// ```
+///
+@propertyWrapper
+public struct ObjectInjection<Service>: DynamicProperty where Service: ObservableObject {
+    @ObservedObject private var service: Service
+
+    /// Initialization
+    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
+        do {
+            self.service = try dependencies.resolve()
+        } catch {
+            fatalError("Can't resolve \(Service.self). Error: \(error.localizedDescription)")
+        }
+    }
+
+    /// The property wrapper
+    public var wrappedValue: Service {
+        get { return service }
+        mutating set { service = newValue }
+    }
+
+    /// The property wrapper
+    public var projectedValue: ObjectInjection<Service>.Wrapper {
+        return self.$service
+    }
+}
+
+#endif

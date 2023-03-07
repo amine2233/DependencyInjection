@@ -21,7 +21,7 @@ class EnvironmentParameterTests: XCTestCase {
 
     func testGetEnvironmentParameter() throws {
         // given
-        dependencyCore.environment = DependencyEnvironement.testing
+        dependencyCore.environment = DependencyEnvironment.testing
         let timeInterval = TimeInterval(50.0)
         dependencyCore.environment.setParameter(key: .timeInterval, value: timeInterval)
 
@@ -35,7 +35,7 @@ class EnvironmentParameterTests: XCTestCase {
 
     func testSetEnvironmentParameter() throws {
         // given
-        dependencyCore.environment = DependencyEnvironement.testing
+        dependencyCore.environment = DependencyEnvironment.testing
         let initialTimeInterval = TimeInterval(50.0)
         dependencyCore.environment.setParameter(key: .timeInterval, value: initialTimeInterval)
         let updatedTimeInterval = TimeInterval(30)
@@ -50,6 +50,6 @@ class EnvironmentParameterTests: XCTestCase {
     }
 }
 
-extension DependencyEnvironementKey {
-    static let timeInterval = DependencyEnvironementKey(stringLiteral: "time_interval")
+extension DependencyEnvironmentKey {
+    static let timeInterval = DependencyEnvironmentKey(stringLiteral: "time_interval")
 }

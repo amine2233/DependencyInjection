@@ -1,6 +1,6 @@
 import Foundation
 
-public struct DependencyEnvironementKey: RawRepresentable, Hashable {
+public struct DependencyEnvironmentKey: RawRepresentable, Hashable {
     public let rawValue: String
 
     public init(rawValue: String) {
@@ -8,7 +8,7 @@ public struct DependencyEnvironementKey: RawRepresentable, Hashable {
     }
 }
 
-extension DependencyEnvironementKey: ExpressibleByStringLiteral {
+extension DependencyEnvironmentKey: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         rawValue = value
     }

@@ -16,9 +16,9 @@ public struct DependencyResolver {
     }
 
     internal init<T>(key: DependencyKey, isSingleton: Bool, resolveBlock: @escaping ResolveBlock<T>) {
-        self.resolveBlock = resolveBlock // Save block for future
-        self.isSingleton = isSingleton
         self.key = key
+        self.isSingleton = isSingleton
+        self.resolveBlock = resolveBlock // Save block for future
     }
 
     public mutating func resolve(dependencies: Dependency) throws {

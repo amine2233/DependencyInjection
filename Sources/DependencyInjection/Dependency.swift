@@ -2,7 +2,7 @@ import Foundation
 
 public protocol DependencyParameters {
     /// The environment parameter
-    var environment: DependencyEnvironement { get set }
+    var environment: DependencyEnvironment { get set }
 }
 
 public protocol DependencyRegister {

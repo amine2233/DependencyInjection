@@ -1,11 +1,11 @@
 import Foundation
 import DependencyInjection
 
-/// The dependency environement.
+/// The dependency environment.
 ///
 /// ```
 /// @EnvironmentInjection(dependencies: .dependencyCore)
-/// var testingEncironment: DependencyEnvironement
+/// var testingEnvironment: DependencyEnvironment
 /// ```
 ///
 @propertyWrapper
@@ -14,12 +14,12 @@ public struct EnvironmentInjection {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency) {
+    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
         self.dependencies = dependencies
     }
 
     /// The property wrapper
-    public var wrappedValue: DependencyEnvironement {
+    public var wrappedValue: DependencyEnvironment {
         get { return dependencies.environment }
         mutating set { dependencies.environment = newValue }
     }
@@ -31,7 +31,7 @@ public struct EnvironmentInjection {
     }
 }
 
-/// The dependency environement parameter.
+/// The dependency environment parameter.
 ///
 /// ```
 /// @EnvironmentParameter(dependencies: .dependencyCore)
@@ -40,13 +40,16 @@ public struct EnvironmentInjection {
 ///
 @propertyWrapper
 public struct EnvironmentParameter<T> {
-    private let key: DependencyEnvironementKey
+    private let key: DependencyEnvironmentKey
     private var dependencies: Dependency
 
     /// Initialization
     /// - Parameter key: The environment parameter key
     /// - Parameter dependencies: The dependency manager
-    public init(key: DependencyEnvironementKey, dependencies: Dependency) {
+    public init(
+        key: DependencyEnvironmentKey,
+        dependencies: Dependency = DependencyInjector.default.dependencies
+    ) {
         self.key = key
         self.dependencies = dependencies
     }
@@ -64,7 +67,7 @@ public struct EnvironmentParameter<T> {
     }
 }
 
-/// The dependency environement option.
+/// The dependency environment option.
 /// It works with `@dynamicMemberLookup`
 ///
 /// ```
@@ -74,13 +77,16 @@ public struct EnvironmentParameter<T> {
 ///
 @propertyWrapper
 public struct EnvironmentStringOption {
-    private let key: DependencyEnvironementKey
+    private let key: DependencyEnvironmentKey
     private var dependencies: Dependency
 
     /// Initialization
     /// - Parameter key: The environment parameter key
     /// - Parameter dependencies: The dependency manager
-    public init(key: DependencyEnvironementKey, dependencies: Dependency) {
+    public init(
+        key: DependencyEnvironmentKey,
+        dependencies: Dependency = DependencyInjector.default.dependencies
+    ) {
         self.key = key
         self.dependencies = dependencies
     }

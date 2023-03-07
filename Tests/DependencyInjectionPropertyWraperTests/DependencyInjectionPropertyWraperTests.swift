@@ -3,21 +3,24 @@ import XCTest
 @testable import DependencyInjectionPropertyWraper
 
 class DependencyInjectionPropertyWraperTests: XCTestCase {
-    var dependencyCore: DependencyCore!
+    var dependencyCore: Dependency!
 
     override func setUpWithError() throws {
         dependencyCore = DependencyCore()
-        factory()
+        factory(&dependencyCore)
+        factory(&DependencyInjector.default.dependencies)
     }
 
     override func tearDownWithError() throws {
         dependencyCore = nil
     }
 
-    func factory() {
-        dependencyCore.register(JourneyService.self, completion: { _ in JourneyMock() })
-        dependencyCore.register(LocationService.self, completion: { _ in LocationMock() })
+    private func factory(_ dependency: inout Dependency) {
+        dependency.register(JourneyService.self, completion: { _ in JourneyMock() })
+        dependency.register(LocationService.self, completion: { _ in LocationMock() })
     }
+
+    // MARK: - Test using @Injection with dependencies
 
     func testGetInjection() throws {
         // given

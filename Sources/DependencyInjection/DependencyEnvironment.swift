@@ -1,32 +1,32 @@
 import Foundation
 
-enum DependencyEnvironementError: Error, Equatable {
-    case notFoundStringOption(DependencyEnvironementKey)
-    case notFoundOption(DependencyEnvironementKey)
-    case notFoundParameter(DependencyEnvironementKey)
+public enum DependencyEnvironmentError: Error, Equatable {
+    case notFoundStringOption(DependencyEnvironmentKey)
+    case notFoundOption(DependencyEnvironmentKey)
+    case notFoundParameter(DependencyEnvironmentKey)
     case notFoundEnvironment(String)
 }
 
-public struct DependencyEnvironement: Equatable, RawRepresentable {
+public struct DependencyEnvironment: Equatable, RawRepresentable {
     public typealias RawValue = String
 
     /// An environment for deploying your application to consumers.
-    public static var production: DependencyEnvironement {
+    public static var production: DependencyEnvironment {
         .init(name: "production")
     }
 
     /// An environment for developing your application.
-    public static var development: DependencyEnvironement {
+    public static var development: DependencyEnvironment {
         .init(name: "development")
     }
 
     /// An environment for testing your application.
-    public static var testing: DependencyEnvironement {
+    public static var testing: DependencyEnvironment {
         .init(name: "testing")
     }
 
     /// Creates a custom environment.
-    public static func custom(name: String) -> DependencyEnvironement {
+    public static func custom(name: String) -> DependencyEnvironment {
         .init(name: name)
     }
 
@@ -36,7 +36,7 @@ public struct DependencyEnvironement: Equatable, RawRepresentable {
     }
 
     /// See `Equatable`
-    public static func == (lhs: DependencyEnvironement, rhs: DependencyEnvironement) -> Bool {
+    public static func == (lhs: DependencyEnvironment, rhs: DependencyEnvironment) -> Bool {
         lhs.name == rhs.name && lhs.isRelease == rhs.isRelease
     }
 
@@ -62,7 +62,7 @@ public struct DependencyEnvironement: Equatable, RawRepresentable {
     public var options: InfoPlist
 
     /// The options for this `Environment`.
-    private var parameters: [DependencyEnvironementKey: Any]
+    private var parameters: [DependencyEnvironmentKey: Any]
 
     public var rawValue: String {
         name
@@ -73,19 +73,24 @@ public struct DependencyEnvironement: Equatable, RawRepresentable {
     public init?(rawValue: String) {
         switch rawValue {
         case "production":
-            self = DependencyEnvironement.production
+            self = DependencyEnvironment.production
         case "development":
-            self = DependencyEnvironement.development
+            self = DependencyEnvironment.development
         case "testing":
-            self = DependencyEnvironement.testing
+            self = DependencyEnvironment.testing
         default:
             // return nil
-            self = DependencyEnvironement(name: rawValue)
+            self = DependencyEnvironment(name: rawValue)
         }
     }
 
     /// Create a new `Environment`.
-    public init(name: String, arguments: [String] = CommandLine.arguments, options: [DependencyEnvironementKey: Any] = [:], parameters: [DependencyEnvironementKey: Any] = [:]) {
+    public init(
+        name: String,
+        arguments: [String] = CommandLine.arguments,
+        options: [DependencyEnvironmentKey: Any] = [:],
+        parameters: [DependencyEnvironmentKey: Any] = [:]
+    ) {
         self.name = name
         self.arguments = arguments
         self.options = InfoPlist(info: options)
@@ -95,47 +100,47 @@ public struct DependencyEnvironement: Equatable, RawRepresentable {
     // MARK: - Methods
 
     /// Set a `String` option
-    public mutating func setStringOption(key: DependencyEnvironementKey, value: String?) {
+    public mutating func setStringOption(key: DependencyEnvironmentKey, value: String?) {
         options[dynamicMember: key] = value
     }
 
     /// Set a generic option conforming to `LosslessStringConvertible`
-    mutating func setOption<T: LosslessStringConvertible>(key: DependencyEnvironementKey, value: T?) {
+    mutating func setOption<T: LosslessStringConvertible>(key: DependencyEnvironmentKey, value: T?) {
         options[dynamicMember: key] = value
     }
 
     /// Get a `String` option
-    public func getStringOption(key: DependencyEnvironementKey) throws -> String {
+    public func getStringOption(key: DependencyEnvironmentKey) throws -> String {
         guard let value = options[dynamicMember: key] else {
-            throw DependencyEnvironementError.notFoundOption(key)
+            throw DependencyEnvironmentError.notFoundOption(key)
         }
         return value
     }
 
     /// Get a generic option implemented `LosslessStringConvertible`
-    func getOption<T: LosslessStringConvertible>(key: DependencyEnvironementKey) throws -> T {
+    func getOption<T: LosslessStringConvertible>(key: DependencyEnvironmentKey) throws -> T {
         guard let value = options[dynamicMember: key] as? T else {
-            throw DependencyEnvironementError.notFoundOption(key)
+            throw DependencyEnvironmentError.notFoundOption(key)
         }
         return value
     }
 
     /// Set a parameter
-    public mutating func setParameter<T>(key: DependencyEnvironementKey, value: T?) {
+    public mutating func setParameter<T>(key: DependencyEnvironmentKey, value: T?) {
         parameters[key] = value
     }
 
     /// Get a generic parameter
-    public func getParameter<T>(key: DependencyEnvironementKey) throws -> T {
-        guard let value = parameters[key] as? T else { throw DependencyEnvironementError.notFoundParameter(key) }
+    public func getParameter<T>(key: DependencyEnvironmentKey) throws -> T {
+        guard let value = parameters[key] as? T else { throw DependencyEnvironmentError.notFoundParameter(key) }
         return value
     }
 }
 
-extension DependencyEnvironement: CustomStringConvertible {
+extension DependencyEnvironment: CustomStringConvertible {
     public var description: String {
         var desc: [String] = []
-        desc.append("Environement: \(rawValue)")
+        desc.append("Environment: \(rawValue)")
         desc.append("\(options.description)")
         return desc.joined(separator: "\n")
     }
@@ -143,7 +148,7 @@ extension DependencyEnvironement: CustomStringConvertible {
 
 #if swift(>=5.1)
 
-extension DependencyEnvironement {
+extension DependencyEnvironment {
     @dynamicMemberLookup
     public struct Process {
         private let _info: ProcessInfo
@@ -190,12 +195,12 @@ extension DependencyEnvironement {
     }
 }
 
-extension DependencyEnvironement {
+extension DependencyEnvironment {
     @dynamicMemberLookup
     public struct InfoPlist: CustomStringConvertible {
-        private var _info: [DependencyEnvironementKey: Any]
+        private var _info: [DependencyEnvironmentKey: Any]
 
-        internal init(info: [DependencyEnvironementKey: Any]) {
+        internal init(info: [DependencyEnvironmentKey: Any]) {
             _info = info
         }
 
@@ -203,7 +208,7 @@ extension DependencyEnvironement {
         ///
         ///     Environment.development.options.DATABASE_PORT = 3306
         ///     Environment.development.options.DATABASE_PORT // 3306
-        subscript<T>(dynamicMember member: DependencyEnvironementKey) -> T? where T: LosslessStringConvertible {
+        subscript<T>(dynamicMember member: DependencyEnvironmentKey) -> T? where T: LosslessStringConvertible {
             get {
                 guard let raw = _info[member], let value = raw as? T else { return nil }
                 return value
@@ -217,7 +222,7 @@ extension DependencyEnvironement {
         ///
         ///     Environment.development.options.DATABASE_USER = "root"
         ///     Environment.development.DATABASE_USER // "root"
-        public subscript(dynamicMember member: DependencyEnvironementKey) -> String? {
+        public subscript(dynamicMember member: DependencyEnvironmentKey) -> String? {
             get {
                 guard let raw = _info[member], let value = raw as? String else { return nil }
                 return value
@@ -249,7 +254,7 @@ extension DependencyEnvironement {
 }
 
 /// https://www.swiftbysundell.com/tips/combining-dynamic-member-lookup-with-key-paths/
-extension DependencyEnvironement {
+extension DependencyEnvironment {
     @dynamicMemberLookup
     public class Reference<Value> {
         fileprivate(set) var value: Value
