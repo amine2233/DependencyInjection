@@ -21,7 +21,7 @@ class EnvironmentStringOptionTests: XCTestCase {
 
     func testGetEnvironmentStringOption() throws {
         // given
-        dependencyCore.environment = DependencyEnvironement.testing
+        dependencyCore.environment = DependencyEnvironment.testing
         let option = "empty_value"
         dependencyCore.environment.setOption(key: .optionValue, value: option)
 
@@ -34,7 +34,7 @@ class EnvironmentStringOptionTests: XCTestCase {
     }
 
     func testSetEnvironmentStringOption() throws {
-        dependencyCore.environment = DependencyEnvironement.testing
+        dependencyCore.environment = DependencyEnvironment.testing
         let option = "empty_value"
         dependencyCore.environment.setOption(key: .optionValue, value: option)
         let updatedOption = "updated_value"
@@ -51,7 +51,7 @@ class EnvironmentStringOptionTests: XCTestCase {
 
     func testGetEnvironmentStringOptionWithDynamicMemberLookup() throws {
         // given
-        dependencyCore.environment = DependencyEnvironement.testing
+        dependencyCore.environment = DependencyEnvironment.testing
         let database_port = "3306"
         dependencyCore.environment.options.DATABASE_PORT = database_port
 
@@ -64,7 +64,7 @@ class EnvironmentStringOptionTests: XCTestCase {
     }
 
     func testSetEnvironmentStringOptionUsingEnv() throws {
-        dependencyCore.environment = DependencyEnvironement.testing
+        dependencyCore.environment = DependencyEnvironment.testing
         let database_port = "3306"
         dependencyCore.environment.options.DATABASE_PORT = database_port
         let update_database_port = "5432"
@@ -81,7 +81,7 @@ class EnvironmentStringOptionTests: XCTestCase {
     }
 }
 
-extension DependencyEnvironementKey {
-    static let optionValue = DependencyEnvironementKey(stringLiteral: "option_value")
-    static let database_port = DependencyEnvironementKey(stringLiteral: "DATABASE_PORT")
+extension DependencyEnvironmentKey {
+    static let optionValue = DependencyEnvironmentKey(stringLiteral: "option_value")
+    static let database_port = DependencyEnvironmentKey(stringLiteral: "DATABASE_PORT")
 }

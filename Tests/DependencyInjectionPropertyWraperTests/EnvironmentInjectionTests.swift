@@ -19,28 +19,28 @@ class EnvironmentTests: XCTestCase {
         dependencyCore.register(LocationService.self, completion: { _ in LocationMock() })
     }
 
-    func testGetDependencyEnvironement() throws {
+    func testGetDependencyEnvironment() throws {
         // given
-        dependencyCore.environment = DependencyEnvironement.testing
+        dependencyCore.environment = DependencyEnvironment.testing
 
         // when
         @EnvironmentInjection(dependencies: dependencyCore)
-        var environment: DependencyEnvironement
+        var environment: DependencyEnvironment
 
         // then
-        XCTAssertEqual(environment.rawValue, DependencyEnvironement.testing.rawValue)
+        XCTAssertEqual(environment.rawValue, DependencyEnvironment.testing.rawValue)
     }
 
-    func testSetDependencyEnvironement() throws {
+    func testSetDependencyEnvironment() throws {
         // given
-        dependencyCore.environment = DependencyEnvironement.testing
+        dependencyCore.environment = DependencyEnvironment.testing
 
         // when
         @EnvironmentInjection(dependencies: dependencyCore)
-        var environment: DependencyEnvironement
-        $environment.wrappedValue = DependencyEnvironement.development
+        var environment: DependencyEnvironment
+        $environment.wrappedValue = DependencyEnvironment.development
 
         // then
-        XCTAssertEqual(environment.rawValue, DependencyEnvironement.development.rawValue)
+        XCTAssertEqual(environment.rawValue, DependencyEnvironment.development.rawValue)
     }
 }

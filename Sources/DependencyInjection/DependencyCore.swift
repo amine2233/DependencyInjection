@@ -20,7 +20,7 @@ import Foundation
 public struct DependencyCore: Dependency {
 
     /// The environment parameter
-    public var environment: DependencyEnvironement
+    public var environment: DependencyEnvironment
 
     /// The number of the dependency
     public var dependenciesCount: Int {
@@ -32,7 +32,7 @@ public struct DependencyCore: Dependency {
         providers.count
     }
 
-    /// The dependencise container
+    /// The dependencies container
     private var dependencies: [DependencyKey: DependencyResolver]
 
     /// The providers container
@@ -72,7 +72,7 @@ public struct DependencyCore: Dependency {
     ///   - singletons: The singletons
     ///   - providers: The providers
     public init(
-        environment: DependencyEnvironement = .production,
+        environment: DependencyEnvironment = .production,
         dependencies: [DependencyKey: DependencyResolver] = [:],
         providers: [Provider] = []
     ) {
@@ -81,21 +81,25 @@ public struct DependencyCore: Dependency {
         self.providers = providers
     }
 
+    /// Provider will boot
     public func willBoot() -> Self {
         _ = self.providers.map { $0.willBoot(self) }
         return self
     }
 
+    /// Provider did boot
     public func didBoot() -> Self  {
         _ = self.providers.map { $0.didBoot(self) }
         return self
     }
 
+    /// Provider will shutdown
     public func willShutdown() -> Self  {
         _ = self.providers.map { $0.willShutdown(self) }
         return self
     }
 
+    /// Provider did enter on background
     public func didEnterBackground() -> Self  {
         _ = self.providers.map { $0.didEnterBackground(self) }
         return self
@@ -103,6 +107,7 @@ public struct DependencyCore: Dependency {
 }
 
 // MARK: - Register methods
+
 extension DependencyCore {
     /// Register class for using with resolve
     /// - Parameters:
@@ -133,26 +138,27 @@ extension DependencyCore {
     }
 }
 
-// MARK: - Create methods
+// MARK: - Factory methods
+
 extension DependencyCore {
     /// Create a unique object, this method not register class
     /// - Parameter completion: the completion to create a new object
     /// - Returns: the new object
-    public func create<T>(completion: (Dependency) throws -> T) throws -> T {
+    public func factory<T>(completion: (Dependency) throws -> T) throws -> T {
         try completion(self)
     }
 
     /// Create a new object conform to protocol ```DependencyServiceType```, this method not register class
     /// - Parameter _: The object you will create
     /// - Returns: The new object
-    public func create<T>(_ type: T.Type) throws -> T where T: DependencyServiceType {
+    public func factory<T>(_ type: T.Type) throws -> T where T: DependencyServiceType {
         try type.makeService(for: self)
     }
 
     /// Create a new object, this method not register object
     /// - Parameter dependency: The dependency object
     /// - Returns: the new object
-    public mutating func create(_ dependency: DependencyResolver) throws -> Any {
+    public mutating func factory(_ dependency: DependencyResolver) throws -> Any {
         var dependency = dependency
         try dependency.resolve(dependencies: self)
 
@@ -164,6 +170,7 @@ extension DependencyCore {
 }
 
 // MARK: - Unregister service
+
 extension DependencyCore {
     /// Unregister class
     /// - Parameter type: The type of the object you will unregister
@@ -173,6 +180,7 @@ extension DependencyCore {
 }
 
 // MARK: - Resolve methods
+
 extension DependencyCore {
     /// Get a class who was registred or get a singleton
     /// - Parameter type: The type of the object you will reolve
@@ -207,6 +215,7 @@ extension DependencyCore {
 }
 
 // MARK: - Singleton methods
+
 extension DependencyCore {
     /// Resolve singleton
     /// - Returns: singleton object
@@ -256,6 +265,8 @@ extension DependencyCore {
         dependencies.removeValue(forKey: key)
     }
 }
+
+// MARK: - Register & Unregister Provider
 
 extension DependencyCore {
     /// Register provider
