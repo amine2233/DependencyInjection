@@ -15,8 +15,8 @@ class DependencyInjectionTests: XCTestCase {
 
     func factory() -> DependencyInjector {
         DependencyInjector(dependencies: dependencyCore) {
-            DependencyResolver { _ in LocationMock() }
-            DependencyResolver { _ in JourneyMock() }
+            DependencyResolver { _,_ in LocationMock() }
+            DependencyResolver { _,_ in JourneyMock() }
         }
     }
 
@@ -72,7 +72,7 @@ class DependencyInjectionTests: XCTestCase {
         // Given
         // WHEN
         var dependencies = factory().dependencies
-        dependencies.register(DependencyResolver { _ in ExecutableServiceMock() })
+        dependencies.register(DependencyResolver { _,_ in ExecutableServiceMock() })
 
         // THEN
         XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
@@ -82,7 +82,7 @@ class DependencyInjectionTests: XCTestCase {
         // Given
         // WHEN
         var dependencies = factory().dependencies
-        dependencies.register(ExecutableServiceMock.self) { _ in
+        dependencies.register(ExecutableServiceMock.self) { _,_ in
             ExecutableServiceMock()
         }
 
@@ -104,7 +104,7 @@ class DependencyInjectionTests: XCTestCase {
     func testUnregisterNotFoundService() throws {
         // Given
         var dependencies = factory().dependencies
-        dependencies.register(ExecutableServiceMock.self) { _ in
+        dependencies.register(ExecutableServiceMock.self) { _,_ in
             ExecutableServiceMock()
         }
 
@@ -113,39 +113,6 @@ class DependencyInjectionTests: XCTestCase {
 
         // THEN
         XCTAssertEqual(dependencies.dependenciesCount, 2)
-    }
-
-    func testCreateWithServiceType() throws {
-        // Given
-        // WHEN
-        let dependencies = factory().dependencies
-        let service = try dependencies.create(ExecutableServiceMock.self)
-
-        // THEN
-        XCTAssertEqual(String(describing: service.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
-    }
-
-    func testCreateDependency() throws {
-        // Given
-        var dependencies = factory().dependencies
-
-        // WHEN
-        let service = try dependencies.create(DependencyResolver { _ in ExecutableServiceMock() })
-
-        // THEN
-        XCTAssertEqual(String(describing: service.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
-    }
-
-    func testCreateWithTypeAndCompletion() throws {
-        // Given
-        // WHEN
-        let dependencies = factory().dependencies
-        let service = try dependencies.create { _ in
-            ExecutableServiceMock()
-        }
-
-        // THEN
-        XCTAssertEqual(String(describing: service.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
     }
 
     func testDescriptionWithProvider() throws {

@@ -1,9 +1,9 @@
 import Foundation
 
 public struct DependencyResolver {
-    public typealias ResolveBlock<T> = (Dependency) throws -> T
+    public typealias ResolveBlock<T> = (Dependency, Any...) throws -> T
 
-    public private(set) var value: Any!
+    private var value: Any!
 
     internal let key: DependencyKey
 
@@ -21,7 +21,16 @@ public struct DependencyResolver {
         self.resolveBlock = resolveBlock // Save block for future
     }
 
-    public mutating func resolve(dependencies: Dependency) throws {
-        value = try resolveBlock(dependencies)
+    public mutating func resolve(dependencies: Dependency, arguments: Any...) throws -> Any {
+        if isSingleton {
+            if let value = value {
+                return value
+            } else {
+                value = try resolveBlock(dependencies, arguments)
+                return value!
+            }
+        } else {
+            return try resolveBlock(dependencies, arguments)
+        }
     }
 }
