@@ -16,8 +16,8 @@ class DependencyInjectionPropertyWraperTests: XCTestCase {
     }
 
     private func factory(_ dependency: inout Dependency) {
-        dependency.register(JourneyService.self, completion: { _ in JourneyMock() })
-        dependency.register(LocationService.self, completion: { _ in LocationMock() })
+        dependency.register(JourneyService.self, completion: { _,_ in JourneyMock() })
+        dependency.register(LocationService.self, completion: { _,_ in LocationMock() })
     }
 
     // MARK: - Test using @Injection with dependencies
