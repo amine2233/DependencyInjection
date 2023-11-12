@@ -1,6 +1,6 @@
 import XCTest
 @testable import DependencyInjection
-@testable import DependencyInjectionPropertyWraper
+@testable import DependencyInjectionPropertyWrapper
 
 class EnvironmentParameterTests: XCTestCase {
     var dependencyCore: DependencyCore!

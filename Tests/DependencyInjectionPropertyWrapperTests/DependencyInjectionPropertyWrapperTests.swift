@@ -1,8 +1,8 @@
 import XCTest
 @testable import DependencyInjection
-@testable import DependencyInjectionPropertyWraper
+@testable import DependencyInjectionPropertyWrapper
 
-class DependencyInjectionPropertyWraperTests: XCTestCase {
+class DependencyInjectionPropertyWrapperTests: XCTestCase {
     var dependencyCore: Dependency!
 
     override func setUpWithError() throws {
@@ -216,5 +216,79 @@ class DependencyInjectionPropertyWraperTests: XCTestCase {
 
         // then
         XCTAssertFalse(expectedResult)
+    }
+
+    // MARK: PropertyWrapper using key
+
+    func testGetInjectionUsingKey() throws {
+        // given
+        let key = DependencyKey(rawValue: "execution")
+        dependencyCore[key] = ExecutableServiceMock()
+
+        @InjectionKey(key, dependencies: dependencyCore)
+        var executionService: ExecutableServiceMock
+
+        // when
+        executionService.exec()
+
+        // then
+        XCTAssertTrue(executionService.invokedExec)
+    }
+
+    func testSetInjectionUsingKey() throws {
+        // given
+        let key = DependencyKey(rawValue: "execution")
+        @InjectionKey(key, dependencies: dependencyCore)
+        var executionService: ExecutableServiceMock
+
+        // when
+        $executionService.wrappedValue = ExecutableServiceMock()
+        executionService.exec()
+
+        // then
+        XCTAssertTrue(executionService.invokedExec)
+    }
+
+    func testGetOptionalInjectionUsingKey() throws {
+        // given
+        let key = DependencyKey(rawValue: "execution")
+        dependencyCore[key] = ExecutableServiceMock()
+
+        @OptionalInjectionKey(key, dependencies: dependencyCore)
+        var executionService: ExecutableServiceMock?
+
+        // when
+        executionService?.exec()
+
+        // then
+        XCTAssertNotNil(executionService)
+    }
+
+    func testGetOptionalInjectionUsingKey_NilValue() throws {
+        // given
+        let key = DependencyKey(rawValue: "execution")
+
+        @OptionalInjectionKey(key, dependencies: dependencyCore)
+        var executionService: ExecutableServiceMock?
+
+        // when
+        executionService?.exec()
+
+        // then
+        XCTAssertNil(executionService)
+    }
+
+    func testSetOptionalInjectionUsingKey() throws {
+        // given
+        let key = DependencyKey(rawValue: "execution")
+        @OptionalInjectionKey(key, dependencies: dependencyCore)
+        var executionService: ExecutableServiceMock?
+
+        // when
+        $executionService.wrappedValue = ExecutableServiceMock()
+        executionService?.exec()
+
+        // then
+        XCTAssertNotNil(executionService)
     }
 }

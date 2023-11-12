@@ -208,7 +208,7 @@ extension DependencyEnvironment {
         ///
         ///     Environment.development.options.DATABASE_PORT = 3306
         ///     Environment.development.options.DATABASE_PORT // 3306
-        subscript<T>(dynamicMember member: DependencyEnvironmentKey) -> T? where T: LosslessStringConvertible {
+        public subscript<T>(dynamicMember member: DependencyEnvironmentKey) -> T? where T: LosslessStringConvertible {
             get {
                 guard let raw = _info[member], let value = raw as? T else { return nil }
                 return value
