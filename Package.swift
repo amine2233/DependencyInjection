@@ -11,8 +11,8 @@ let package = Package(
             name: "DependencyInjection",
             targets: ["DependencyInjection"]),
         .library(
-            name: "DependencyInjectionPropertyWraper",
-            targets: ["DependencyInjectionPropertyWraper"]),
+            name: "DependencyInjectionPropertyWrapper",
+            targets: ["DependencyInjectionPropertyWrapper"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -25,13 +25,13 @@ let package = Package(
             name: "DependencyInjection",
             dependencies: []),
         .target(
-            name: "DependencyInjectionPropertyWraper",
+            name: "DependencyInjectionPropertyWrapper",
             dependencies: ["DependencyInjection"]),
         .testTarget(
             name: "DependencyInjectionTests",
             dependencies: ["DependencyInjection"]),
         .testTarget(
-            name: "DependencyInjectionPropertyWraperTests",
-            dependencies: ["DependencyInjectionPropertyWraper"])
+            name: "DependencyInjectionPropertyWrapperTests",
+            dependencies: ["DependencyInjectionPropertyWrapper"])
     ]
 )

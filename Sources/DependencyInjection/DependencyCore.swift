@@ -281,3 +281,35 @@ extension DependencyCore {
         providers = providers.filter { $0.description != provider.description }
     }
 }
+
+extension DependencyCore {
+
+    /// Get or set service's value from the dependencies.
+    /// - Parameter keyPath: the dependency key
+    public subscript<T>(
+        _ keyPath: DependencyKey
+    ) -> T? {
+        get {
+            guard var dependencyResolver = dependencies[keyPath] else { return nil }
+            if !dependencyResolver.isSingleton {
+                try? dependencyResolver.resolve(dependencies: self)
+            }
+            return dependencyResolver.value as? T
+        }
+        mutating set(value) {
+            if value != nil {
+                let isSingleton = dependencies[keyPath]?.isSingleton ?? false
+                var dependencyResolver = DependencyResolver(
+                    isSingleton: isSingleton,
+                    resolveBlock: { _ in value }
+                )
+                if isSingleton {
+                    try? dependencyResolver.resolve(dependencies: self)
+                }
+                self.dependencies[keyPath] = dependencyResolver
+            } else {
+                self.dependencies.removeValue(forKey: keyPath)
+            }
+        }
+    }
+}

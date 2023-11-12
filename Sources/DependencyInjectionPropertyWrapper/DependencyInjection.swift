@@ -34,6 +34,45 @@ public struct Injection<Service> {
     }
 }
 
+/// A  property wrapper to resolve dependency values.
+///
+/// ```
+/// @Injection(locationServiceKey, dependencies: .dependencyCore)
+/// var locationService: LocationService
+/// ```
+///
+@propertyWrapper
+public struct InjectionKey<Service> {
+    private var key: DependencyKey
+    private var dependencies: DependencySubscript
+
+    /// Initialization
+    /// - Parameter dependencies: The dependency manager
+    public init(_ key: DependencyKey, dependencies: Dependency = DependencyInjector.default.dependencies) {
+        self.dependencies = dependencies
+        self.key = key
+    }
+
+    /// The property wrapper
+    public var wrappedValue: Service {
+        get { 
+            guard let service = dependencies[key] as Service? else {
+                fatalError("Can't resolve \(Service.self). Error: missing value")
+            }
+            return service
+        }
+        mutating set { 
+            dependencies[key] = newValue
+        }
+    }
+
+    /// The property wrapper
+    public var projectedValue: InjectionKey<Service> {
+        get { return self }
+        mutating set { self = newValue }
+    }
+}
+
 /// A  property wrapper to resolve optionaly the dependency values.
 ///
 /// ```
@@ -59,6 +98,42 @@ public struct OptionalInjection<Service> {
 
     /// The projected value
     public var projectedValue: OptionalInjection<Service> {
+        get { return self }
+        mutating set { self = newValue }
+    }
+}
+
+/// A  property wrapper to resolve dependency values.
+///
+/// ```
+/// @Injection(locationServiceKey, dependencies: .dependencyCore)
+/// var locationService: LocationService?
+/// ```
+///
+@propertyWrapper
+public struct OptionalInjectionKey<Service> {
+    private var key: DependencyKey
+    private var dependencies: DependencySubscript
+
+    /// Initialization
+    /// - Parameter dependencies: The dependency manager
+    public init(_ key: DependencyKey, dependencies: Dependency = DependencyInjector.default.dependencies) {
+        self.dependencies = dependencies
+        self.key = key
+    }
+
+    /// The property wrapper
+    public var wrappedValue: Service? {
+        get {
+            return dependencies[key] as Service?
+        }
+        mutating set {
+            dependencies[key] = newValue
+        }
+    }
+
+    /// The property wrapper
+    public var projectedValue: OptionalInjectionKey<Service> {
         get { return self }
         mutating set { self = newValue }
     }

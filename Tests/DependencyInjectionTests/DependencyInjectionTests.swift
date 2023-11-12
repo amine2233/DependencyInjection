@@ -148,6 +148,62 @@ class DependencyInjectionTests: XCTestCase {
         XCTAssertEqual(String(describing: service.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
     }
 
+
+    func test_Create_Using_Subscript_DependencyKey() throws {
+        // GIVEN
+        var dependencies = factory().dependencies
+
+        let key = DependencyKey(rawValue: "executable")
+
+        // WHEN
+        dependencies[key] = ExecutableServiceMock()
+
+        // THEN
+        XCTAssertEqual(String(describing: ExecutableServiceMock.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
+    }
+
+    func test_Create_Using_Subscript_DependencyKey_For_Singleton() throws {
+        // GIVEN
+        var dependencies = factory().dependencies
+        try dependencies.registerSingleton { _ -> ExecutableService in ExecutableServiceMock() }
+
+        let key = DependencyKey(rawValue: "ExecutableService")
+
+        // WHEN
+        dependencies[key] = ExecutableServiceMock()
+
+        // THEN
+        XCTAssertEqual(String(describing: ExecutableServiceMock.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
+    }
+
+    func test_Remove_Using_Subscript_DependencyKey() throws {
+        // GIVEN
+        var dependencies = factory().dependencies
+
+        let key = DependencyKey(rawValue: "executable")
+        dependencies[key] = ExecutableServiceMock()
+
+        // WHEN
+        dependencies[key] = nil as ExecutableServiceMock?
+
+        // THEN
+        XCTAssert(dependencies.dependenciesCount == 2)
+    }
+
+    func test_Get_Using_Subscript_DependencyKey() throws {
+        // GIVEN
+        var dependencies = factory().dependencies
+
+        let key = DependencyKey(rawValue: "executable")
+        dependencies[key] = ExecutableServiceMock()
+
+        // WHEN
+        let service = dependencies[key] as ExecutableServiceMock?
+
+        // THEN
+        XCTAssertNotNil(service)
+    }
+
     func testDescriptionWithProvider() throws {
         // Given
         let provider = ProviderMock()
@@ -185,6 +241,8 @@ class DependencyInjectionTests: XCTestCase {
         // THEN
         XCTAssertTrue(dependencies.description.contains("\n- \(DependencyKey(type: ExecutableServiceMock.self))"))
     }
+
+    // MARK: Providers Tests
 
     func testUnregisterProvider() throws {
         // Given

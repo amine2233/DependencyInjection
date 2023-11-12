@@ -15,8 +15,7 @@ extension HasDependencies {
     }
 }
 
-/// The singleton dependency container reference
-/// which can be reassigned to another container
+/// The singleton dependency container reference which can be reassigned to another container
 public struct DependencyInjector {
     /// The dependencies
     public var dependencies: Dependency

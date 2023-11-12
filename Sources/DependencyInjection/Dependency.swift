@@ -124,5 +124,9 @@ public protocol DependencyDescription: CustomStringConvertible {
     var providersCount: Int { get }
 }
 
+public protocol DependencySubscript {
+    subscript<T>(_ keyPath: DependencyKey) -> T? { get set }
+}
+
 /// The dependency protocol
-public typealias Dependency = DependencyRegister & DependencyCreate & DependencyUnregister & DependencyProvider & DependencyDescription & DependencyReslove & DependencySingleton & DependencyParameters
+public typealias Dependency = DependencyRegister & DependencyCreate & DependencyUnregister & DependencyProvider & DependencyDescription & DependencyReslove & DependencySingleton & DependencyParameters & DependencySubscript
