@@ -5,7 +5,7 @@ public struct DependencyResolver {
 
     public private(set) var value: Any!
 
-    internal let key: DependencyKey
+    let key: DependencyKey
 
     private let resolveBlock: ResolveBlock<Any>
 
@@ -15,7 +15,7 @@ public struct DependencyResolver {
         self.init(key: DependencyKey(type: T.self), isSingleton: isSingleton, resolveBlock: resolveBlock)
     }
 
-    internal init<T>(key: DependencyKey, isSingleton: Bool, resolveBlock: @escaping ResolveBlock<T>) {
+    init<T>(key: DependencyKey, isSingleton: Bool, resolveBlock: @escaping ResolveBlock<T>) {
         self.key = key
         self.isSingleton = isSingleton
         self.resolveBlock = resolveBlock // Save block for future
@@ -23,5 +23,10 @@ public struct DependencyResolver {
 
     public mutating func resolve(dependencies: Dependency) throws {
         value = try resolveBlock(dependencies)
+    }
+    
+    mutating func resolveDependency(dependencies: Dependency) throws -> DependencyResolver {
+        value = try resolveBlock(dependencies)
+        return self
     }
 }
