@@ -165,15 +165,48 @@ class DependencyInjectionTests: XCTestCase {
     func test_Create_Using_Subscript_DependencyKey_For_Singleton() throws {
         // GIVEN
         var dependencies = factory().dependencies
-        try dependencies.registerSingleton { _ -> ExecutableService in ExecutableServiceMock() }
-
-        let key = DependencyKey(rawValue: "ExecutableService")
 
         // WHEN
-        dependencies[key] = ExecutableServiceMock()
+        try dependencies.registerSingleton { _ -> ExecutableService in ExecutableServiceMock() }
 
         // THEN
-        XCTAssertEqual(String(describing: ExecutableServiceMock.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
+        XCTAssertNoThrow(try dependencies.resolve(ExecutableService.self))
+    }
+    
+    func test_Create_Using_Subscript_DependencyKey_For_SingletonWithService() throws {
+        // GIVEN
+        var dependencies = factory().dependencies
+
+        // WHEN
+        try dependencies.registerSingleton(ExecutableService.self) { _ -> ExecutableService in ExecutableServiceMock() }
+
+        // THEN
+        XCTAssertNoThrow(try dependencies.resolve(ExecutableService.self))
+    }
+    
+    func test_Create_Using_Subscript_DependencyKey_For_UnRegisterSingleton() throws {
+        // GIVEN
+        var dependencies = factory().dependencies
+        try dependencies.registerSingleton(ExecutableService.self) { _ -> ExecutableService in ExecutableServiceMock() }
+
+        // WHEN
+        dependencies.unregisterSingleton(ExecutableService.self)
+
+        // THEN
+        XCTAssertThrowsError(try dependencies.resolve(ExecutableService.self))
+    }
+    
+    func test_Create_Using_Subscript_DependencyKey_For_UnRegisterSingleton_with_key() throws {
+        // GIVEN
+        var dependencies = factory().dependencies
+        let key = DependencyKey(type: ExecutableService.self)
+        try dependencies.registerSingleton(ExecutableService.self) { _ -> ExecutableService in ExecutableServiceMock() }
+
+        // WHEN
+        dependencies.unregisterSingleton(key: key)
+
+        // THEN
+        XCTAssertThrowsError(try dependencies.resolve(ExecutableService.self))
     }
 
     func test_Remove_Using_Subscript_DependencyKey() throws {

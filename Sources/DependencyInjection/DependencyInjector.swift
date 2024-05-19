@@ -1,15 +1,22 @@
 import Foundation
 
+/// A protocol that defines a method for registering all services in a dependency container.
 public protocol DependencyRegistering {
+    /// Registers all services in the given dependency container.
+    ///
+    /// - Parameter dependencies: The dependency container in which to register the services.
     static func registerAllServices(in dependencies: inout Dependency)
 }
 
-/// Has dependencies
+/// A protocol that indicates that a type has dependencies.
 public protocol HasDependencies {
+    /// The dependency container.
     var dependencies: Dependency { get }
 }
 
+/// Default implementation for types conforming to `HasDependencies`.
 extension HasDependencies {
+    /// Provides access to the default dependency container.
     var dependencies: Dependency {
         DependencyInjector.default.dependencies
     }

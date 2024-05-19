@@ -138,6 +138,26 @@ extension DependencyCore {
     }
 }
 
+// MARK: - Register methods with operation
+
+extension DependencyCore {
+    /// Register class for using with resolve
+    /// - Parameters:
+    ///   - type: The type of the object you will register
+    ///   - completion: The completion
+    ///   - operation: The operation after registration
+    public mutating func registerOperation<T>(
+        _ type: T.Type,
+        completion: @escaping (Dependency) throws -> T,
+        operation: @escaping (T, Dependency) throws -> T
+    ) {
+        register(type, completion: { dependencies in
+            let result = try completion(dependencies)
+            return try operation(result, dependencies)
+        })
+    }
+}
+
 // MARK: - Factory methods
 
 extension DependencyCore {
@@ -240,6 +260,19 @@ extension DependencyCore {
         dependencies[identifier] = dependency
     }
 
+    /// Create a singleton
+    /// - Parameters:
+    ///   - type: The type of the object you will register
+    ///   - completion: The completion
+    public mutating func registerSingleton<T>(
+        _ type: T.Type,
+        completion: @escaping (Dependency) throws -> T
+    ) throws {
+        let identifier = DependencyKey(type: type)
+        var dependency = DependencyResolver(key: identifier, isSingleton: true, resolveBlock: completion)
+        dependencies[identifier] = try dependency.resolveDependency(dependencies: self)
+    }
+
     /// Create a singleton with class conform to protocol ```DependencyServiceType```
     /// - Parameter type: The type of the singleton
     /// - Returns: the singleton object
@@ -263,6 +296,26 @@ extension DependencyCore {
 
     public mutating func unregisterSingleton(key: DependencyKey) {
         dependencies.removeValue(forKey: key)
+    }
+}
+
+// MARK: - Register singleton methods with operation
+
+extension DependencyCore {
+    /// Register singleton class for using with resolve
+    /// - Parameters:
+    ///   - type: The type of the object you will register
+    ///   - completion: The completion
+    ///   - operation: The operation after registration
+    public mutating func registerSingletonOperation<T>(
+        _ type: T.Type,
+        completion: @escaping (Dependency) throws -> T,
+        operation: @escaping (T, Dependency) throws -> T
+    ) throws {
+        try registerSingleton(type, completion: { dependencies in
+            let result = try completion(dependencies)
+            return try operation(result, dependencies)
+        })
     }
 }
 

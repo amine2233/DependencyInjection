@@ -27,6 +27,20 @@ public protocol DependencyRegister {
     mutating func register<T>(key: DependencyKey, completion: @escaping (Dependency) throws -> T)
 }
 
+public protocol DependencyRegisterOperation {
+    /// Register singleton class for using with resolve
+    /// - Parameters:
+    ///   - type: The type of the object you will register
+    ///   - completion: The completion
+    ///   - operation: The operation after registration
+    mutating func registerOperation<T>(
+        _ type: T.Type,
+        completion: @escaping (Dependency) throws -> T,
+        operation: @escaping (T, Dependency) throws -> T
+    ) throws
+}
+
+
 public protocol DependencyCreate {
     // Create a unique object, this method not register class
     /// - Parameter completion: the completion to create a new object
@@ -83,6 +97,12 @@ public protocol DependencySingleton {
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
     mutating func registerSingleton<T>(completion: @escaping (Dependency) throws -> T) throws
+    
+    /// Create a singleton
+    /// - Parameters:
+    ///   - type: The type of the object you will register
+    ///   - completion: The completion
+    mutating func registerSingleton<T>(_ type: T.Type, completion: @escaping (Dependency) throws -> T) throws
 
 
     /// Create a singleton with class conform to protocol ```DependencyServiceType```
@@ -99,6 +119,20 @@ public protocol DependencySingleton {
     /// - Returns: the singleton you will remove
     mutating func unregisterSingleton(key: DependencyKey)
 }
+
+public protocol DependencySingletonOperation {
+    /// Register class for using with resolve
+    /// - Parameters:
+    ///   - type: The type of the object you will register
+    ///   - completion: The completion
+    ///   - operation: The operation after registration
+    mutating func registerSingletonOperation<T>(
+        _ type: T.Type,
+        completion: @escaping (Dependency) throws -> T,
+        operation: @escaping (T, Dependency) throws -> T
+    ) throws
+}
+
 
 public protocol DependencyProvider {
     /// Register provider
@@ -129,4 +163,4 @@ public protocol DependencySubscript {
 }
 
 /// The dependency protocol
-public typealias Dependency = DependencyRegister & DependencyCreate & DependencyUnregister & DependencyProvider & DependencyDescription & DependencyReslove & DependencySingleton & DependencyParameters & DependencySubscript
+public typealias Dependency = DependencyRegister & DependencyCreate & DependencyUnregister & DependencyProvider & DependencyDescription & DependencyReslove & DependencySingleton & DependencyParameters & DependencySubscript & DependencyRegisterOperation & DependencySingletonOperation
