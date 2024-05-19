@@ -11,6 +11,20 @@ import DependencyInjection
 /// Extension providing utility methods for automatically registering services with initializers.
 public extension DependencyRegister {
     
+    /// Registers a service with the dependency container.
+    ///
+    /// - Parameters:
+    ///   - service: The type of the service to register.
+    ///   - initializer: The instance of the service to register.
+    mutating func autoregister<Service>(
+        _ service: Service.Type,
+        initializer: Service
+    ) {
+        register(service, completion: { _ in
+            initializer
+        })
+    }
+    
     /// Automatically registers a service with no dependencies.
     ///
     /// - Parameters:
