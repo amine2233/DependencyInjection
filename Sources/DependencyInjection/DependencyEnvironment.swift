@@ -1,13 +1,31 @@
 import Foundation
 
+/// An enumeration representing possible errors related to dependency environment operations.
 public enum DependencyEnvironmentError: Error, Equatable {
+    /// Indicates that a string option was not found for the specified environment key.
+    ///
+    /// - Parameter key: The key for which the string option was not found.
     case notFoundStringOption(DependencyEnvironmentKey)
+
+    /// Indicates that an option was not found for the specified environment key.
+    ///
+    /// - Parameter key: The key for which the option was not found.
     case notFoundOption(DependencyEnvironmentKey)
+
+    /// Indicates that a parameter was not found for the specified environment key.
+    ///
+    /// - Parameter key: The key for which the parameter was not found.
     case notFoundParameter(DependencyEnvironmentKey)
+
+    /// Indicates that an environment was not found for the specified name.
+    ///
+    /// - Parameter name: The name of the environment that was not found.
     case notFoundEnvironment(String)
 }
 
+/// A struct representing an environment for dependency injection.
 public struct DependencyEnvironment: Equatable, RawRepresentable {
+    /// The raw value type for the `DependencyEnvironment`.
     public typealias RawValue = String
 
     /// An environment for deploying your application to consumers.
@@ -64,12 +82,16 @@ public struct DependencyEnvironment: Equatable, RawRepresentable {
     /// The options for this `Environment`.
     private var parameters: [DependencyEnvironmentKey: Any]
 
+    /// The raw value of the environment.
     public var rawValue: String {
         name
     }
 
-    // MARK: - Init
+    // MARK: Initilizer
 
+    /// Initializes a new `DependencyEnvironment` with the given raw value.
+    ///
+    /// - Parameter rawValue: The raw value of the environment.
     public init?(rawValue: String) {
         switch rawValue {
         case "production":
@@ -85,59 +107,114 @@ public struct DependencyEnvironment: Equatable, RawRepresentable {
     }
 
     /// Create a new `Environment`.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the environment.
+    ///   - arguments: The arguments passed to the environment, default is `CommandLine.arguments`.
+    ///   - options: A InfoPlist.
+    ///   - parameters: A dictionary of parameters for the environment, default is an empty dictionary.
+    public init(
+        name: String,
+        arguments: [String] = CommandLine.arguments,
+        options: InfoPlist,
+        parameters: [DependencyEnvironmentKey: Any] = [:]
+    ) {
+        self.name = name
+        self.arguments = arguments
+        self.options = options
+        self.parameters = parameters
+    }
+    
+    /// Create a new `Environment`.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the environment.
+    ///   - arguments: The arguments passed to the environment, default is `CommandLine.arguments`.
+    ///   - options: A dictionary of options for the environment, default is an empty dictionary.
+    ///   - parameters: A dictionary of parameters for the environment, default is an empty dictionary.
     public init(
         name: String,
         arguments: [String] = CommandLine.arguments,
         options: [DependencyEnvironmentKey: Any] = [:],
         parameters: [DependencyEnvironmentKey: Any] = [:]
     ) {
-        self.name = name
-        self.arguments = arguments
-        self.options = InfoPlist(info: options)
-        self.parameters = parameters
+        self.init(
+            name: name,
+            arguments: arguments,
+            options: InfoPlist(info: options),
+            parameters: parameters
+        )
     }
+    
 
-    // MARK: - Methods
-
-    /// Set a `String` option
+    // MARK: Public methods
+    
+    /// Sets a string option for the given key.
+    ///
+    /// - Parameters:
+    ///   - key: The key for the option.
+    ///   - value: The string value to set.
     public mutating func setStringOption(key: DependencyEnvironmentKey, value: String?) {
         options[dynamicMember: key] = value
     }
-
-    /// Set a generic option conforming to `LosslessStringConvertible`
+    
+    /// Sets an option for the given key.
+    ///
+    /// - Parameters:
+    ///   - key: The key for the option.
+    ///   - value: The value to set, which must conform to `LosslessStringConvertible`.
     mutating func setOption<T: LosslessStringConvertible>(key: DependencyEnvironmentKey, value: T?) {
         options[dynamicMember: key] = value
     }
-
-    /// Get a `String` option
+    
+    /// Retrieves a string option for the given key.
+    ///
+    /// - Parameter key: The key for the option.
+    /// - Throws: `DependencyEnvironmentError.notFoundOption` if the option is not found.
+    /// - Returns: The string value for the key.
     public func getStringOption(key: DependencyEnvironmentKey) throws -> String {
         guard let value = options[dynamicMember: key] else {
             throw DependencyEnvironmentError.notFoundOption(key)
         }
         return value
     }
-
-    /// Get a generic option implemented `LosslessStringConvertible`
+    
+    /// Retrieves an option for the given key.
+    ///
+    /// - Parameter key: The key for the option.
+    /// - Throws: `DependencyEnvironmentError.notFoundOption` if the option is not found.
+    /// - Returns: The value for the key, which must conform to `LosslessStringConvertible`.
     func getOption<T: LosslessStringConvertible>(key: DependencyEnvironmentKey) throws -> T {
         guard let value = options[dynamicMember: key] as? T else {
             throw DependencyEnvironmentError.notFoundOption(key)
         }
         return value
     }
-
-    /// Set a parameter
+    
+    /// Sets a parameter for the given key.
+    ///
+    /// - Parameters:
+    ///   - key: The key for the parameter.
+    ///   - value: The value to set.
     public mutating func setParameter<T>(key: DependencyEnvironmentKey, value: T?) {
         parameters[key] = value
     }
-
-    /// Get a generic parameter
+    
+    /// Retrieves a parameter for the given key.
+    ///
+    /// - Parameter key: The key for the parameter.
+    /// - Throws: `DependencyEnvironmentError.notFoundParameter` if the parameter is not found.
+    /// - Returns: The value for the key.
     public func getParameter<T>(key: DependencyEnvironmentKey) throws -> T {
-        guard let value = parameters[key] as? T else { throw DependencyEnvironmentError.notFoundParameter(key) }
+        guard let value = parameters[key] as? T else {
+            throw DependencyEnvironmentError.notFoundParameter(key)
+        }
         return value
     }
 }
 
 extension DependencyEnvironment: CustomStringConvertible {
+    /// A textual representation of the `DependencyEnvironment`.
     public var description: String {
         var desc: [String] = []
         desc.append("Environment: \(rawValue)")
@@ -149,11 +226,15 @@ extension DependencyEnvironment: CustomStringConvertible {
 #if swift(>=5.1)
 
 extension DependencyEnvironment {
-    @dynamicMemberLookup
-    public struct Process {
+    /// A struct representing information about the current process.
+    @dynamicMemberLookup public struct Process {
+        /// The underlying process information.
         private let _info: ProcessInfo
 
-        internal init(info: ProcessInfo = .processInfo) {
+        /// Initializes a new `Process` instance with the given process information.
+        ///
+        /// - Parameter info: The process information to use. Defaults to the current process information obtained from `ProcessInfo.processInfo`.
+        init(info: ProcessInfo = .processInfo) {
             _info = info
         }
 
@@ -196,11 +277,15 @@ extension DependencyEnvironment {
 }
 
 extension DependencyEnvironment {
-    @dynamicMemberLookup
-    public struct InfoPlist: CustomStringConvertible {
+    /// A struct that provides dynamic access to values in the Info.plist file.
+    @dynamicMemberLookup public struct InfoPlist: CustomStringConvertible {
+        /// The underlying dictionary holding Info.plist values.
         private var _info: [DependencyEnvironmentKey: Any]
 
-        internal init(info: [DependencyEnvironmentKey: Any]) {
+        /// Initializes a new `InfoPlist` instance with the given dictionary of Info.plist values.
+        ///
+        /// - Parameter info: A dictionary containing the Info.plist values.
+        init(info: [DependencyEnvironmentKey: Any]) {
             _info = info
         }
 
@@ -232,6 +317,7 @@ extension DependencyEnvironment {
             }
         }
 
+        /// Returns a string description of the Info.plist values.
         public var description: String {
             var desc: [String] = []
 
@@ -255,20 +341,33 @@ extension DependencyEnvironment {
 
 /// https://www.swiftbysundell.com/tips/combining-dynamic-member-lookup-with-key-paths/
 extension DependencyEnvironment {
-    @dynamicMemberLookup
-    public class Reference<Value> {
+    /// A class that holds a reference to a value, allowing for dynamic member lookup.
+    @dynamicMemberLookup public class Reference<Value> {
+        /// The value being referenced.
         fileprivate(set) var value: Value
 
+        /// Initializes a new `Reference` instance with the given value.
+        ///
+        /// - Parameter value: The value to be referenced.
         public init(value: Value) {
             self.value = value
         }
 
+        /// Provides dynamic member lookup to access properties of the referenced value using key paths.
+        ///
+        /// - Parameter keyPath: The key path to the desired property.
+        /// - Returns: The value at the specified key path.
         public subscript<T>(dynamicMember keyPath: KeyPath<Value, T>) -> T {
             value[keyPath: keyPath]
         }
     }
 
+    /// A final class that extends `Reference` to allow for mutable access to the referenced value's properties.
     public final class MutableReference<Value>: Reference<Value> {
+        /// Provides dynamic member lookup to access and modify properties of the referenced value using writable key paths.
+        ///
+        /// - Parameter keyPath: The writable key path to the desired property.
+        /// - Returns: The value at the specified key path.
         public subscript<T>(dynamicMember keyPath: WritableKeyPath<Value, T>) -> T {
             get { value[keyPath: keyPath] }
             set { value[keyPath: keyPath] = newValue }
