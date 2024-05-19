@@ -1,4 +1,4 @@
-# DependencyInjection & DependencyInjectionPropertyWraper
+# DependencyInjection & DependencyInjectionPropertyWraper & DependencyInjectionAutoRegistration
 
 ## Tests
 
