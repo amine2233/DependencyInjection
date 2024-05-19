@@ -2,8 +2,23 @@ import Foundation
 import DependencyInjection
 
 /// Extension providing utility methods for automatically registering singleton services with initializers.
-extension DependencySingleton {
+public extension DependencySingleton {
     
+    /// Registers a singleton service with the dependency container.
+    ///
+    /// - Parameters:
+    ///   - service: The type of the service to register.
+    ///   - initializer: The instance of the service to register as a singleton.
+    /// - Throws: Throws an error if the service cannot be registered.
+    mutating func autoregisterSingleton<Service>(
+        _ service: Service.Type,
+        initializer: Service
+    ) throws {
+        try self.registerSingleton(service, completion: { _ in
+            initializer
+        })
+    }
+
     /// Automatically registers a service with no dependencies.
     ///
     /// - Parameters:
