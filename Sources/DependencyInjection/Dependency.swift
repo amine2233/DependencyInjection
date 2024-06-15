@@ -40,7 +40,25 @@ public protocol DependencyRegisterOperation: Sendable {
     ) throws
 }
 
-public protocol DependencyUnregister: Sendable {
+
+public protocol DependencyCreate {
+    // Create a unique object, this method not register class
+    /// - Parameter completion: the completion to create a new object
+    /// - Returns: the new object
+    func create<T>(completion: (Dependency) throws -> T) throws -> T
+
+    /// Create a new object conform to protocol ```DependencyServiceType```, this method not register class
+    /// - Parameter type: The object you will create
+    /// - Returns: The new object
+    func create<T>(_ type: T.Type) throws -> T where T: DependencyServiceType
+
+    /// Create a new object, this method not register object
+    /// - Parameter dependency: The dependency object
+    /// - Returns: the new object
+    mutating func create(_ dependency: DependencyResolver) throws -> Any
+}
+
+public protocol DependencyUnregister {
     /// Unregister class
     /// - Parameter type: The type of the object you will unregister
     /// - Returns: the object removed
@@ -63,7 +81,19 @@ public protocol DependencyReslove: Sendable {
     func resolve<T>() throws -> T
 }
 
-public protocol DependencySingleton: Sendable {
+public protocol DependencySingleton {
+
+    /// Resolve singleton
+    /// - Returns: singleton object
+    @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
+    func singleton<T>() throws -> T
+
+    /// Resolve singleton
+    /// - Parameter key: The key of the object you will unregister
+    /// - Returns: singleton object
+    @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
+    func singleton<T>(key: DependencyKey) throws -> T
+
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
     mutating func registerSingleton<T>(completion: @escaping @Sendable (any Dependency) throws -> T) throws
