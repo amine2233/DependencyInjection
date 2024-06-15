@@ -51,6 +51,10 @@ let package = Package(
             dependencies: ["DependencyInjection"],
             swiftSettings: swiftSettings
         ),
+        .target(
+            name: "DependencyInjectionProperty",
+            dependencies: ["DependencyInjection"]
+        ),
         .testTarget(
             name: "DependencyInjectionTests",
             dependencies: ["DependencyInjection"],
