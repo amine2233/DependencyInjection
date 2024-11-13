@@ -5,7 +5,7 @@ public protocol DependencyParameters {
     var environment: DependencyEnvironment { get set }
 }
 
-public protocol DependencyRegister {
+public protocol DependencyRegister: Sendable {
     /// Register class for using with resolve
     /// - Parameters:
     ///   - type: The type of the object you will register
@@ -27,7 +27,7 @@ public protocol DependencyRegister {
     mutating func register<T>(key: DependencyKey, completion: @escaping (Dependency) throws -> T)
 }
 
-public protocol DependencyRegisterOperation {
+public protocol DependencyRegisterOperation: Sendable {
     /// Register singleton class for using with resolve
     /// - Parameters:
     ///   - type: The type of the object you will register
@@ -41,7 +41,7 @@ public protocol DependencyRegisterOperation {
 }
 
 
-public protocol DependencyCreate {
+public protocol DependencyCreate: Sendable {
     // Create a unique object, this method not register class
     /// - Parameter completion: the completion to create a new object
     /// - Returns: the new object
@@ -58,14 +58,14 @@ public protocol DependencyCreate {
     mutating func create(_ dependency: DependencyResolver) throws -> Any
 }
 
-public protocol DependencyUnregister {
+public protocol DependencyUnregister: Sendable {
     /// Unregister class
     /// - Parameter type: The type of the object you will unregister
     /// - Returns: the object removed
     mutating func unregister<T>(_ type: T.Type)
 }
 
-public protocol DependencyReslove {
+public protocol DependencyReslove: Sendable {
     /// Get a class who was registred or get a singleton
     /// - Parameter type: The type of the object you will reolve
     /// - Returns: The new object
@@ -81,7 +81,7 @@ public protocol DependencyReslove {
     func resolve<T>() throws -> T
 }
 
-public protocol DependencySingleton {
+public protocol DependencySingleton: Sendable {
 
     /// Resolve singleton
     /// - Returns: singleton object
@@ -120,7 +120,7 @@ public protocol DependencySingleton {
     mutating func unregisterSingleton(key: DependencyKey)
 }
 
-public protocol DependencySingletonOperation {
+public protocol DependencySingletonOperation: Sendable {
     /// Register class for using with resolve
     /// - Parameters:
     ///   - type: The type of the object you will register
@@ -134,7 +134,7 @@ public protocol DependencySingletonOperation {
 }
 
 
-public protocol DependencyProvider {
+public protocol DependencyProvider: Sendable {
     /// Register provider
     /// - Parameter provider: the provider you will add
     mutating func registerProvider(_ provider: Provider)
@@ -150,7 +150,7 @@ public protocol DependencyProvider {
     func didBoot() -> Self
 }
 
-public protocol DependencyDescription: CustomStringConvertible {
+public protocol DependencyDescription: Sendable, CustomStringConvertible {
     /// The number of the dependency
     var dependenciesCount: Int { get }
 
@@ -158,7 +158,7 @@ public protocol DependencyDescription: CustomStringConvertible {
     var providersCount: Int { get }
 }
 
-public protocol DependencySubscript {
+public protocol DependencySubscript: Sendable {
     subscript<T>(_ keyPath: DependencyKey) -> T? { get set }
 }
 

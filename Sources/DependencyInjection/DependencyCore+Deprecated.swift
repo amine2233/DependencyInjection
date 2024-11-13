@@ -31,7 +31,6 @@ extension DependencyCore {
     /// - Returns: the new object
     @available(*, deprecated, renamed: "factory")
     public mutating func create(_ dependency: DependencyResolver) throws -> Any {
-        var dependency = dependency
         try dependency.resolve(dependencies: self)
 
         guard let value = dependency.value else {

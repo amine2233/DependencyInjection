@@ -1,7 +1,7 @@
 import Foundation
 
 /// A struct responsible for resolving dependencies.
-public struct DependencyResolver {
+public final class DependencyResolver: @unchecked Sendable  {
     /// A typealias representing a closure that resolves a dependency.
     /// - Parameter Dependency: The dependency container.
     /// - Returns: The resolved dependency of type `T`.
@@ -24,7 +24,10 @@ public struct DependencyResolver {
     /// - Parameters:
     ///   - isSingleton: A Boolean value indicating whether the dependency is a singleton. Default is `false`.
     ///   - resolveBlock: The closure that resolves the dependency.
-    public init<T>(isSingleton: Bool = false, resolveBlock: @escaping ResolveBlock<T>) {
+    public convenience init<T>(
+        isSingleton: Bool = false,
+        resolveBlock: @escaping ResolveBlock<T>
+    ) {
         self.init(key: DependencyKey(type: T.self), isSingleton: isSingleton, resolveBlock: resolveBlock)
     }
 
@@ -34,7 +37,11 @@ public struct DependencyResolver {
     ///   - key: The key used to identify the dependency.
     ///   - isSingleton: A Boolean value indicating whether the dependency is a singleton.
     ///   - resolveBlock: The closure that resolves the dependency.
-    init<T>(key: DependencyKey, isSingleton: Bool, resolveBlock: @escaping ResolveBlock<T>) {
+    init<T>(
+        key: DependencyKey,
+        isSingleton: Bool,
+        resolveBlock: @escaping ResolveBlock<T>
+    ) {
         self.key = key
         self.isSingleton = isSingleton
         self.resolveBlock = resolveBlock
@@ -44,7 +51,7 @@ public struct DependencyResolver {
     ///
     /// - Parameter dependencies: The dependency container.
     /// - Throws: An error if the dependency cannot be resolved.
-    public mutating func resolve(dependencies: Dependency) throws {
+    public func resolve(dependencies: Dependency) throws {
         value = try resolveBlock(dependencies)
     }
     
@@ -53,7 +60,7 @@ public struct DependencyResolver {
     /// - Parameter dependencies: The dependency container.
     /// - Returns: The updated `DependencyResolver`.
     /// - Throws: An error if the dependency cannot be resolved.
-    mutating func resolveDependency(dependencies: Dependency) throws -> DependencyResolver {
+    func resolveDependency(dependencies: Dependency) throws -> DependencyResolver {
         value = try resolveBlock(dependencies)
         return self
     }

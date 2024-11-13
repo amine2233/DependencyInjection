@@ -179,7 +179,6 @@ extension DependencyCore {
     /// - Parameter dependency: The dependency object
     /// - Returns: the new object
     public mutating func factory(_ dependency: DependencyResolver) throws -> Any {
-        var dependency = dependency
         try dependency.resolve(dependencies: self)
 
         guard let value = dependency.value else {
@@ -218,7 +217,7 @@ extension DependencyCore {
     }
 
     public func resolve<T>(key: DependencyKey) throws -> T {
-        guard var dependency = dependencies[key] else {
+        guard let dependency = dependencies[key] else {
             throw DependencyError.notFound(name: key.rawValue)
         }
 
@@ -253,7 +252,7 @@ extension DependencyCore {
     /// - Returns: The singleton object
     public mutating func registerSingleton<T>(completion: @escaping (Dependency) throws -> T) throws {
         let identifier = DependencyKey(type: T.self)
-        var dependency = DependencyResolver(key: identifier, isSingleton: true, resolveBlock: completion)
+        let dependency = DependencyResolver(key: identifier, isSingleton: true, resolveBlock: completion)
 
         try dependency.resolve(dependencies: self)
 
@@ -269,7 +268,7 @@ extension DependencyCore {
         completion: @escaping (Dependency) throws -> T
     ) throws {
         let identifier = DependencyKey(type: type)
-        var dependency = DependencyResolver(key: identifier, isSingleton: true, resolveBlock: completion)
+        let dependency = DependencyResolver(key: identifier, isSingleton: true, resolveBlock: completion)
         dependencies[identifier] = try dependency.resolveDependency(dependencies: self)
     }
 
@@ -281,7 +280,7 @@ extension DependencyCore {
             try T.makeService(for: dependency)
         }
         let identifier = DependencyKey(type: T.self)
-        var dependency = DependencyResolver(key: identifier, isSingleton: true, resolveBlock: completion)
+        let dependency = DependencyResolver(key: identifier, isSingleton: true, resolveBlock: completion)
 
         try dependency.resolve(dependencies: self)
 
@@ -343,7 +342,7 @@ extension DependencyCore {
         _ keyPath: DependencyKey
     ) -> T? {
         get {
-            guard var dependencyResolver = dependencies[keyPath] else { return nil }
+            guard let dependencyResolver = dependencies[keyPath] else { return nil }
             if !dependencyResolver.isSingleton {
                 try? dependencyResolver.resolve(dependencies: self)
             }
@@ -352,7 +351,7 @@ extension DependencyCore {
         mutating set(value) {
             if value != nil {
                 let isSingleton = dependencies[keyPath]?.isSingleton ?? false
-                var dependencyResolver = DependencyResolver(
+                let dependencyResolver = DependencyResolver(
                     isSingleton: isSingleton,
                     resolveBlock: { _ in value }
                 )

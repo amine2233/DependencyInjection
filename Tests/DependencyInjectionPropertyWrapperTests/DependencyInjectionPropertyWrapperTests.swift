@@ -8,7 +8,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     override func setUpWithError() throws {
         dependencyCore = DependencyCore()
         factory(&dependencyCore)
-        factory(&DependencyInjector.default.dependencies)
+        //factory(&DependencyInjector.default.dependencies)
     }
 
     override func tearDownWithError() throws {

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Protocol defining lifecycle methods for a service.
-public protocol Provider: CustomStringConvertible {
+public protocol Provider: CustomStringConvertible, Sendable {
     // MARK: Description
     
     /// A string description of the service.

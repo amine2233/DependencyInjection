@@ -39,7 +39,7 @@ public struct EnvironmentInjection {
 /// ```
 ///
 @propertyWrapper
-public struct EnvironmentParameter<T> {
+public struct EnvironmentParameter<T: Sendable> {
     private let key: DependencyEnvironmentKey
     private var dependencies: Dependency
 

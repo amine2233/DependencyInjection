@@ -23,12 +23,12 @@ extension HasDependencies {
 }
 
 /// The singleton dependency container reference which can be reassigned to another container
-public struct DependencyInjector {
+public struct DependencyInjector: Sendable {
     /// The dependencies
     public var dependencies: Dependency
 
     /// The dependencyCore singleton
-    public static var `default` = DependencyInjector()
+    public static let `default` = DependencyInjector()
 
     @resultBuilder struct DependencyBuilder {
         static func buildBlock(_ dependency: DependencyResolver) -> DependencyResolver { dependency }

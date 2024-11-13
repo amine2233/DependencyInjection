@@ -1,7 +1,7 @@
 import Foundation
 
 /// A struct representing a key used to access dependencies stored in an environment.
-public struct DependencyEnvironmentKey: RawRepresentable, Hashable {
+public struct DependencyEnvironmentKey: RawRepresentable, Hashable, Sendable {
     /// The raw string value of the key.
     public let rawValue: String
 

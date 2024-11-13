@@ -7,18 +7,18 @@ public struct ProviderDefault: Provider {
     // MARK: Typealiases
 
     /// A closure type that resolves a dependency from a `DependencyProvider`.
-    public typealias ResolveBlock<T> = (DependencyProvider) -> T
+    public typealias ResolveBlock<T: Sendable> =  (@Sendable (DependencyProvider) -> T)
 
     // MARK: Properties
 
     /// The resolved value of the provider.
-    public private(set) var value: Any!
+    public private(set) var value: (any Sendable)!
 
     /// A description of the provider.
     public var description: String
 
     /// A closure used to resolve the dependency.
-    private let resolveBlock: ResolveBlock<Any>
+    private let resolveBlock: ResolveBlock<(any Sendable)>
 
     // MARK: Initializer
 
