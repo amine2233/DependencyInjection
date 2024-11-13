@@ -115,40 +115,6 @@ class DependencyInjectionTests: XCTestCase {
         XCTAssertEqual(dependencies.dependenciesCount, 2)
     }
 
-    func testCreateWithServiceType() throws {
-        // Given
-        // WHEN
-        let dependencies = factory().dependencies
-        let service = try dependencies.create(ExecutableServiceMock.self)
-
-        // THEN
-        XCTAssertEqual(String(describing: service.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
-    }
-
-    func testCreateDependency() throws {
-        // Given
-        var dependencies = factory().dependencies
-
-        // WHEN
-        let service = try dependencies.create(DependencyResolver { _ in ExecutableServiceMock() })
-
-        // THEN
-        XCTAssertEqual(String(describing: service.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
-    }
-
-    func testCreateWithTypeAndCompletion() throws {
-        // Given
-        // WHEN
-        let dependencies = factory().dependencies
-        let service = try dependencies.create { _ in
-            ExecutableServiceMock()
-        }
-
-        // THEN
-        XCTAssertEqual(String(describing: service.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
-    }
-
-
     func test_Create_Using_Subscript_DependencyKey() throws {
         // GIVEN
         var dependencies = factory().dependencies

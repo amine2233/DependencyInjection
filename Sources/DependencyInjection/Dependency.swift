@@ -10,7 +10,7 @@ public protocol DependencyRegister: Sendable {
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    mutating func register<T>(_ type: T.Type, completion: @escaping (Dependency) throws -> T)
+    mutating func register<T>(_ type: T.Type, completion: @escaping @Sendable (Dependency) throws -> T)
 
     /// Register class conform to protocol ```DependencyServiceType``` and use it with resolve
     /// - Parameter type: The `DependencyServiceType` type of the object you will register
@@ -24,7 +24,7 @@ public protocol DependencyRegister: Sendable {
     /// - Parameters:
     ///   - key: The dependency key of the object you will register
     ///   - completion: The completion
-    mutating func register<T>(key: DependencyKey, completion: @escaping (Dependency) throws -> T)
+    mutating func register<T>(key: DependencyKey, completion: @escaping @Sendable (Dependency) throws -> T)
 }
 
 public protocol DependencyRegisterOperation: Sendable {
@@ -35,27 +35,9 @@ public protocol DependencyRegisterOperation: Sendable {
     ///   - operation: The operation after registration
     mutating func registerOperation<T>(
         _ type: T.Type,
-        completion: @escaping (Dependency) throws -> T,
-        operation: @escaping (T, Dependency) throws -> T
+        completion: @escaping @Sendable (Dependency) throws -> T,
+        operation: @escaping @Sendable (T, Dependency) throws -> T
     ) throws
-}
-
-
-public protocol DependencyCreate: Sendable {
-    // Create a unique object, this method not register class
-    /// - Parameter completion: the completion to create a new object
-    /// - Returns: the new object
-    func create<T>(completion: (Dependency) throws -> T) throws -> T
-
-    /// Create a new object conform to protocol ```DependencyServiceType```, this method not register class
-    /// - Parameter type: The object you will create
-    /// - Returns: The new object
-    func create<T>(_ type: T.Type) throws -> T where T: DependencyServiceType
-
-    /// Create a new object, this method not register object
-    /// - Parameter dependency: The dependency object
-    /// - Returns: the new object
-    mutating func create(_ dependency: DependencyResolver) throws -> Any
 }
 
 public protocol DependencyUnregister: Sendable {
@@ -83,26 +65,15 @@ public protocol DependencyReslove: Sendable {
 
 public protocol DependencySingleton: Sendable {
 
-    /// Resolve singleton
-    /// - Returns: singleton object
-    @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
-    func singleton<T>() throws -> T
-
-    /// Resolve singleton
-    /// - Parameter key: The key of the object you will unregister
-    /// - Returns: singleton object
-    @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
-    func singleton<T>(key: DependencyKey) throws -> T
-
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
-    mutating func registerSingleton<T>(completion: @escaping (Dependency) throws -> T) throws
+    mutating func registerSingleton<T>(completion: @escaping @Sendable (Dependency) throws -> T) throws
     
     /// Create a singleton
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    mutating func registerSingleton<T>(_ type: T.Type, completion: @escaping (Dependency) throws -> T) throws
+    mutating func registerSingleton<T>(_ type: T.Type, completion: @escaping @Sendable (Dependency) throws -> T) throws
 
 
     /// Create a singleton with class conform to protocol ```DependencyServiceType```
@@ -128,8 +99,8 @@ public protocol DependencySingletonOperation: Sendable {
     ///   - operation: The operation after registration
     mutating func registerSingletonOperation<T>(
         _ type: T.Type,
-        completion: @escaping (Dependency) throws -> T,
-        operation: @escaping (T, Dependency) throws -> T
+        completion: @escaping @Sendable (Dependency) throws -> T,
+        operation: @escaping @Sendable (T, Dependency) throws -> T
     ) throws
 }
 
@@ -163,4 +134,4 @@ public protocol DependencySubscript: Sendable {
 }
 
 /// The dependency protocol
-public typealias Dependency = DependencyRegister & DependencyCreate & DependencyUnregister & DependencyProvider & DependencyDescription & DependencyReslove & DependencySingleton & DependencyParameters & DependencySubscript & DependencyRegisterOperation & DependencySingletonOperation
+public typealias Dependency = DependencyRegister & DependencyUnregister & DependencyProvider & DependencyDescription & DependencyReslove & DependencySingleton & DependencyParameters & DependencySubscript & DependencyRegisterOperation & DependencySingletonOperation

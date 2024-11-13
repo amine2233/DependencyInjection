@@ -10,7 +10,7 @@ public extension DependencySingleton {
     ///   - service: The type of the service to register.
     ///   - initializer: The instance of the service to register as a singleton.
     /// - Throws: Throws an error if the service cannot be registered.
-    mutating func autoregisterSingleton<Service>(
+    mutating func autoregisterSingleton<Service: Sendable>(
         _ service: Service.Type,
         initializer: Service
     ) throws {
@@ -26,7 +26,7 @@ public extension DependencySingleton {
     ///   - initializer: A closure that initializes and returns an instance of the service.
     mutating func autoregisterSingleton<Service>(
         _ service: Service.Type,
-        initializer: @escaping () -> Service
+        initializer: @escaping @Sendable () -> Service
     ) throws {
         try self.registerSingleton(service, completion: { _ in
             initializer()
@@ -40,7 +40,7 @@ public extension DependencySingleton {
     ///   - initializer: A closure that initializes and returns an instance of the service, taking one dependency as a parameter.
     mutating func autoregisterSingleton<Service, A>(
         _ service: Service.Type,
-        initializer: @escaping (A) -> Service
+        initializer: @escaping @Sendable (A) -> Service
     ) throws {
         try self.registerSingleton(service, completion: { dependency in
             initializer(try dependency.resolve(A.self))
@@ -54,7 +54,7 @@ public extension DependencySingleton {
     ///   - initializer: A closure that initializes and returns an instance of the service, taking two dependencies as parameters.
     mutating func autoregisterSingleton<Service, A, B>(
         _ service: Service.Type,
-        initializer: @escaping (A, B) -> Service
+        initializer: @escaping @Sendable (A, B) -> Service
     ) throws {
         try self.registerSingleton(service, completion: { dependency in
             initializer(
@@ -71,7 +71,7 @@ public extension DependencySingleton {
     ///   - initializer: A closure that initializes and returns an instance of the service, taking three dependencies as parameters.
     mutating func autoregisterSingleton<Service, A, B, C>(
         _ service: Service.Type,
-        initializer: @escaping (A, B, C) -> Service
+        initializer: @escaping @Sendable (A, B, C) -> Service
     ) throws {
         try self.registerSingleton(service, completion: { dependency in
             initializer(
@@ -89,7 +89,7 @@ public extension DependencySingleton {
     ///   - initializer: A closure that initializes and returns an instance of the service, taking four dependencies as parameters.
     mutating func autoregisterSingleton<Service, A, B, C, D>(
         _ service: Service.Type,
-        initializer: @escaping (A, B, C, D) -> Service
+        initializer: @escaping @Sendable (A, B, C, D) -> Service
     ) throws {
         try self.registerSingleton(service, completion: { dependency in
             initializer(
@@ -108,7 +108,7 @@ public extension DependencySingleton {
     ///   - initializer: A closure that initializes and returns an instance of the service, taking five dependencies as parameters.
     mutating func autoregisterSingleton<Service, A, B, C, D, E>(
         _ service: Service.Type,
-        initializer: @escaping (A, B, C, D, E) -> Service
+        initializer: @escaping @Sendable (A, B, C, D, E) -> Service
     ) throws {
         try self.registerSingleton(service, completion: { dependency in
             initializer(
@@ -128,7 +128,7 @@ public extension DependencySingleton {
     ///   - initializer: A closure that initializes and returns an instance of the service, taking six dependencies as parameters.
     mutating func autoregisterSingleton<Service, A, B, C, D, E, F>(
         _ service: Service.Type,
-        initializer: @escaping (A, B, C, D, E, F) -> Service
+        initializer: @escaping @Sendable (A, B, C, D, E, F) -> Service
     ) throws {
         try self.registerSingleton(service, completion: { dependency in
             initializer(
@@ -149,7 +149,7 @@ public extension DependencySingleton {
     ///   - initializer: A closure that initializes and returns an instance of the service, taking seven dependencies as parameters.
     mutating func autoregisterSingleton<Service, A, B, C, D, E, F, G>(
         _ service: Service.Type,
-        initializer: @escaping (A, B, C, D, E, F, G) -> Service
+        initializer: @escaping @Sendable (A, B, C, D, E, F, G) -> Service
     ) throws {
         try self.registerSingleton(service, completion: { dependency in
             initializer(
@@ -171,7 +171,7 @@ public extension DependencySingleton {
     ///   - initializer: A closure that initializes and returns an instance of the service, taking eight dependencies as parameters.
     mutating func autoregisterSingleton<Service, A, B, C, D, E, F, G, H>(
         _ service: Service.Type,
-        initializer: @escaping (A, B, C, D, E, F, G, H) -> Service
+        initializer: @escaping @Sendable (A, B, C, D, E, F, G, H) -> Service
     ) throws {
         try self.registerSingleton(service, completion: { dependency in
             initializer(
@@ -183,6 +183,55 @@ public extension DependencySingleton {
                 try dependency.resolve(F.self),
                 try dependency.resolve(G.self),
                 try dependency.resolve(H.self)
+            )
+        })
+    }
+    
+    /// Automatically registers a service with two dependencies.
+    ///
+    /// - Parameters:
+    ///   - service: The type of the service to register.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight dependencies as parameters.
+    mutating func autoregisterSingleton<Service, A, B, C, D, E, F, G, H, I>(
+        _ service: Service.Type,
+        initializer: @escaping @Sendable (A, B, C, D, E, F, G, H, I) -> Service
+    ) throws {
+        try self.registerSingleton(service, completion: { dependency in
+            initializer(
+                try dependency.resolve(A.self),
+                try dependency.resolve(B.self),
+                try dependency.resolve(C.self),
+                try dependency.resolve(D.self),
+                try dependency.resolve(E.self),
+                try dependency.resolve(F.self),
+                try dependency.resolve(G.self),
+                try dependency.resolve(H.self),
+                try dependency.resolve(I.self)
+            )
+        })
+    }
+    
+    /// Automatically registers a service with two dependencies.
+    ///
+    /// - Parameters:
+    ///   - service: The type of the service to register.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight dependencies as parameters.
+    mutating func autoregisterSingleton<Service, A, B, C, D, E, F, G, H, I, J>(
+        _ service: Service.Type,
+        initializer: @escaping @Sendable (A, B, C, D, E, F, G, H, I, J) -> Service
+    ) throws {
+        try self.registerSingleton(service, completion: { dependency in
+            initializer(
+                try dependency.resolve(A.self),
+                try dependency.resolve(B.self),
+                try dependency.resolve(C.self),
+                try dependency.resolve(D.self),
+                try dependency.resolve(E.self),
+                try dependency.resolve(F.self),
+                try dependency.resolve(G.self),
+                try dependency.resolve(H.self),
+                try dependency.resolve(I.self),
+                try dependency.resolve(J.self)
             )
         })
     }
