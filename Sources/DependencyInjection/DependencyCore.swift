@@ -230,7 +230,7 @@ extension DependencyCore {
             try dependency.resolve(dependencies: self)
         }
 
-        guard let object = dependency.value as? T else {
+        guard let object = try? dependency.value() as? T else {
             throw DependencyError.notResolved(name: key.rawValue)
         }
 
@@ -350,7 +350,7 @@ extension DependencyCore {
             if !dependencyResolver.isSingleton {
                 try? dependencyResolver.resolve(dependencies: self)
             }
-            return dependencyResolver.value as? T
+            return try? dependencyResolver.value() as? T
         }
         mutating set(value) {
             if value != nil {

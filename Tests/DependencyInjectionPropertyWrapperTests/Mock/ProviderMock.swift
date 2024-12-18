@@ -1,7 +1,7 @@
 import DependencyInjection
 import Foundation
 
-class ProviderMock: Provider, @unchecked Sendable {
+final class ProviderMock: Provider, @unchecked Sendable {
     var invokedDescriptionGetter = false
     var invokedDescriptionGetterCount = 0
     var stubbedDescription: String! = ""

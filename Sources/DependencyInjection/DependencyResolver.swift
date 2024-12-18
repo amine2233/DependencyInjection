@@ -1,6 +1,6 @@
 import Foundation
 
-public enum DependencyResolverError: Error {
+enum DependencyResolverError: Error {
     case notResolved
 }
 
@@ -10,17 +10,17 @@ public final class DependencyResolver: Sendable {
     /// - Parameter Dependency: The dependency container.
     /// - Returns: The resolved dependency of type `T`.
     public typealias ResolveBlock<T: Sendable> = @Sendable (any Dependency) throws -> T
-    
+
     private final class Storage: @unchecked Sendable {
-        var block: (any Sendable)??
-        
+        var block: (any Sendable)?
+
         init(block: (any Sendable)? = nil) {
             self.block = block
         }
     }
-    
-    private let storage: Storage = Storage()
-    
+
+    private let storage: Storage = .init()
+
     /// The resolved dependency value.
     private var block: (any Sendable)? {
         get { storage.block }
@@ -31,7 +31,7 @@ public final class DependencyResolver: Sendable {
     let key: DependencyKey
 
     /// The closure that resolves the dependency.
-    private let resolveBlock: ResolveBlock<(any Sendable)>
+    private let resolveBlock: ResolveBlock<any Sendable>
 
     /// A flag indicating whether the dependency is a singleton.
     let isSingleton: Bool
@@ -54,7 +54,7 @@ public final class DependencyResolver: Sendable {
     ///   - key: The key used to identify the dependency.
     ///   - isSingleton: A Boolean value indicating whether the dependency is a singleton.
     ///   - resolveBlock: The closure that resolves the dependency.
-    init<T: Sendable>(
+    public init<T: Sendable>(
         key: DependencyKey,
         isSingleton: Bool,
         resolveBlock: @escaping @Sendable ResolveBlock<T>
@@ -77,11 +77,11 @@ public final class DependencyResolver: Sendable {
     /// - Parameter dependencies: The dependency container.
     /// - Returns: The updated `DependencyResolver`.
     /// - Throws: An error if the dependency cannot be resolved.
-    func resolveDependency(dependencies: any Dependency) throws -> DependencyResolver {
+    public func resolveDependency(dependencies: any Dependency) throws -> DependencyResolver {
         block = try resolveBlock(dependencies)
         return self
     }
-    
+
     public func value() throws -> (any Sendable) {
         guard let block else {
             throw DependencyResolverError.notResolved
@@ -89,7 +89,3 @@ public final class DependencyResolver: Sendable {
         return block
     }
 }
-
-@available(*, unavailable)
-extension DependencyResolver: Sendable { }
-
