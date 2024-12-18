@@ -1,7 +1,7 @@
 import Foundation
 
 /// An error type representing issues encountered during dependency resolution.
-public enum DependencyResolverError: Error {
+public enum DependencyResolverError: Error, Equatable {
     /// Indicates that a dependency could not be resolved.
     case notResolved
     case parameterNotResolved(service: String, type: String)
