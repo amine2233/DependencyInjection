@@ -1,13 +1,15 @@
 import DependencyInjection
 
-protocol ExecutableService {
+protocol ExecutableService: Sendable {
     func exec()
 }
 
-final class ExecutableServiceMock: ExecutableService {
-
+final class ExecutableServiceMock: ExecutableService, @unchecked Sendable {
     var invokedExec = false
     var invokedExecCount = 0
+    
+    @Sendable
+    init() {}
 
     func exec() {
         invokedExec = true
@@ -16,7 +18,7 @@ final class ExecutableServiceMock: ExecutableService {
 }
 
 extension ExecutableServiceMock: DependencyServiceType {
-    static func makeService(for container: Dependency) throws -> ExecutableServiceMock {
+    static func makeService(for container: any Dependency) throws -> ExecutableServiceMock {
         ExecutableServiceMock()
     }
 }

@@ -1,16 +1,16 @@
 import Foundation
 
-public protocol DependencyParameters {
+public protocol DependencyParameters: Sendable {
     /// The environment parameter
     var environment: DependencyEnvironment { get set }
 }
 
-public protocol DependencyRegister {
+public protocol DependencyRegister: Sendable {
     /// Register class for using with resolve
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    mutating func register<T>(_ type: T.Type, completion: @escaping (Dependency) throws -> T)
+    mutating func register<T>(_ type: T.Type, completion: @escaping @Sendable (any Dependency) throws -> T)
 
     /// Register class conform to protocol ```DependencyServiceType``` and use it with resolve
     /// - Parameter type: The `DependencyServiceType` type of the object you will register
@@ -18,16 +18,16 @@ public protocol DependencyRegister {
 
     /// Register the dependency
     /// - Parameter dependency: The dependency
-    mutating func register(_ dependency: DependencyResolver)
+    mutating func register(_ dependency: any DependencyResolver)
 
     /// Register class for using with resolve
     /// - Parameters:
     ///   - key: The dependency key of the object you will register
     ///   - completion: The completion
-    mutating func register<T>(key: DependencyKey, completion: @escaping (Dependency) throws -> T)
+    mutating func register<T>(key: DependencyKey, completion: @escaping @Sendable (any Dependency) throws -> T)
 }
 
-public protocol DependencyRegisterOperation {
+public protocol DependencyRegisterOperation: Sendable {
     /// Register singleton class for using with resolve
     /// - Parameters:
     ///   - type: The type of the object you will register
@@ -35,37 +35,19 @@ public protocol DependencyRegisterOperation {
     ///   - operation: The operation after registration
     mutating func registerOperation<T>(
         _ type: T.Type,
-        completion: @escaping (Dependency) throws -> T,
-        operation: @escaping (T, Dependency) throws -> T
+        completion: @escaping @Sendable (any Dependency) throws -> T,
+        operation: @escaping @Sendable (T, any Dependency) throws -> T
     ) throws
 }
 
-
-public protocol DependencyCreate {
-    // Create a unique object, this method not register class
-    /// - Parameter completion: the completion to create a new object
-    /// - Returns: the new object
-    func create<T>(completion: (Dependency) throws -> T) throws -> T
-
-    /// Create a new object conform to protocol ```DependencyServiceType```, this method not register class
-    /// - Parameter type: The object you will create
-    /// - Returns: The new object
-    func create<T>(_ type: T.Type) throws -> T where T: DependencyServiceType
-
-    /// Create a new object, this method not register object
-    /// - Parameter dependency: The dependency object
-    /// - Returns: the new object
-    mutating func create(_ dependency: DependencyResolver) throws -> Any
-}
-
-public protocol DependencyUnregister {
+public protocol DependencyUnregister: Sendable {
     /// Unregister class
     /// - Parameter type: The type of the object you will unregister
     /// - Returns: the object removed
     mutating func unregister<T>(_ type: T.Type)
 }
 
-public protocol DependencyReslove {
+public protocol DependencyReslove: Sendable {
     /// Get a class who was registred or get a singleton
     /// - Parameter type: The type of the object you will reolve
     /// - Returns: The new object
@@ -81,29 +63,16 @@ public protocol DependencyReslove {
     func resolve<T>() throws -> T
 }
 
-public protocol DependencySingleton {
-
-    /// Resolve singleton
-    /// - Returns: singleton object
-    @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
-    func singleton<T>() throws -> T
-
-    /// Resolve singleton
-    /// - Parameter key: The key of the object you will unregister
-    /// - Returns: singleton object
-    @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
-    func singleton<T>(key: DependencyKey) throws -> T
-
+public protocol DependencySingleton: Sendable {
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
-    mutating func registerSingleton<T>(completion: @escaping (Dependency) throws -> T) throws
-    
+    mutating func registerSingleton<T>(completion: @escaping @Sendable (any Dependency) throws -> T) throws
+
     /// Create a singleton
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    mutating func registerSingleton<T>(_ type: T.Type, completion: @escaping (Dependency) throws -> T) throws
-
+    mutating func registerSingleton<T>(_ type: T.Type, completion: @escaping @Sendable (any Dependency) throws -> T) throws
 
     /// Create a singleton with class conform to protocol ```DependencyServiceType```
     /// - Parameter type: The type of the singleton
@@ -120,7 +89,7 @@ public protocol DependencySingleton {
     mutating func unregisterSingleton(key: DependencyKey)
 }
 
-public protocol DependencySingletonOperation {
+public protocol DependencySingletonOperation: Sendable {
     /// Register class for using with resolve
     /// - Parameters:
     ///   - type: The type of the object you will register
@@ -128,29 +97,29 @@ public protocol DependencySingletonOperation {
     ///   - operation: The operation after registration
     mutating func registerSingletonOperation<T>(
         _ type: T.Type,
-        completion: @escaping (Dependency) throws -> T,
-        operation: @escaping (T, Dependency) throws -> T
+        completion: @escaping @Sendable (any Dependency) throws -> T,
+        operation: @escaping @Sendable (T, any Dependency) throws -> T
     ) throws
 }
 
-
-public protocol DependencyProvider {
+public protocol DependencyProvider: Sendable {
     /// Register provider
     /// - Parameter provider: the provider you will add
-    mutating func registerProvider(_ provider: Provider)
+    mutating func registerProvider(_ provider: any Provider)
 
     /// Unregister provider
     /// - Parameter provider: the provider you will unregister
-    mutating func unregisterProvider(_ provider: Provider)
+    mutating func unregisterProvider(_ provider: any Provider)
 
     // MARK: Startup and Endup provider configuration
+
     func willBoot() -> Self
     func willShutdown() -> Self
     func didEnterBackground() -> Self
     func didBoot() -> Self
 }
 
-public protocol DependencyDescription: CustomStringConvertible {
+public protocol DependencyDescription: Sendable, CustomStringConvertible {
     /// The number of the dependency
     var dependenciesCount: Int { get }
 
@@ -158,9 +127,9 @@ public protocol DependencyDescription: CustomStringConvertible {
     var providersCount: Int { get }
 }
 
-public protocol DependencySubscript {
+public protocol DependencySubscript: Sendable {
     subscript<T>(_ keyPath: DependencyKey) -> T? { get set }
 }
 
 /// The dependency protocol
-public typealias Dependency = DependencyRegister & DependencyCreate & DependencyUnregister & DependencyProvider & DependencyDescription & DependencyReslove & DependencySingleton & DependencyParameters & DependencySubscript & DependencyRegisterOperation & DependencySingletonOperation
+public typealias Dependency = DependencyDescription & DependencyParameters & DependencyProvider & DependencyRegister & DependencyRegisterOperation & DependencyReslove & DependencySingleton & DependencySingletonOperation & DependencySubscript & DependencyUnregister

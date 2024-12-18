@@ -1,194 +1,235 @@
-//
-//  DependencyAutoRegistration.swift
-//  
-//
-//  Created by amine on 18/05/2024.
-//
-
-import Foundation
 import DependencyInjection
+import Foundation
 
 /// Extension providing utility methods for automatically registering services with initializers.
-public extension DependencyRegister {
-    
+extension DependencyRegister {
     /// Registers a service with the dependency container.
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: The instance of the service to register.
-    mutating func autoregister<Service>(
+    public mutating func autoregister<Service: Sendable>(
         _ service: Service.Type,
         initializer: Service
     ) {
-        register(service, completion: { _ in
+        register(service, completion: { @Sendable _ in
             initializer
         })
     }
-    
+
     /// Automatically registers a service with no dependencies.
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service.
-    mutating func autoregister<Service>(
+    public mutating func autoregister<Service>(
         _ service: Service.Type,
-        initializer: @escaping () -> Service
+        initializer: @escaping @Sendable () -> Service
     ) {
-        self.register(service, completion: { _ in
+        register(service, completion: { _ in
             initializer()
         })
     }
-    
+
     /// Automatically registers a service with one dependency.
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service, taking one dependency as a parameter.
-    mutating func autoregister<Service, A>(
+    public mutating func autoregister<Service, A>(
         _ service: Service.Type,
-        initializer: @escaping (A) -> Service
+        initializer: @escaping @Sendable (A) -> Service
     ) {
-        self.register(service, completion: { dependency in
-            initializer(try dependency.resolve(A.self))
+        register(service, completion: { dependency in
+            try initializer(dependency.resolve(A.self))
         })
     }
-    
+
     /// Automatically registers a service with two dependencies.
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service, taking two dependencies as parameters.
-    mutating func autoregister<Service, A, B>(
+    public mutating func autoregister<Service, A, B>(
         _ service: Service.Type,
-        initializer: @escaping (A, B) -> Service
+        initializer: @escaping @Sendable (A, B) -> Service
     ) {
-        self.register(service, completion: { dependency in
-            initializer(
-                try dependency.resolve(A.self),
-                try dependency.resolve(B.self)
+        register(service, completion: { dependency in
+            try initializer(
+                dependency.resolve(A.self),
+                dependency.resolve(B.self)
             )
         })
     }
-    
+
     /// Automatically registers a service with two dependencies.
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service, taking three dependencies as parameters.
-    mutating func autoregister<Service, A, B, C>(
+    public mutating func autoregister<Service, A, B, C>(
         _ service: Service.Type,
-        initializer: @escaping (A, B, C) -> Service
+        initializer: @escaping @Sendable (A, B, C) -> Service
     ) {
-        self.register(service, completion: { dependency in
-            initializer(
-                try dependency.resolve(A.self),
-                try dependency.resolve(B.self),
-                try dependency.resolve(C.self)
+        register(service, completion: { dependency in
+            try initializer(
+                dependency.resolve(A.self),
+                dependency.resolve(B.self),
+                dependency.resolve(C.self)
             )
         })
     }
-    
+
     /// Automatically registers a service with two dependencies.
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service, taking four dependencies as parameters.
-    mutating func autoregister<Service, A, B, C, D>(
+    public mutating func autoregister<Service, A, B, C, D>(
         _ service: Service.Type,
-        initializer: @escaping (A, B, C, D) -> Service
+        initializer: @escaping @Sendable (A, B, C, D) -> Service
     ) {
-        self.register(service, completion: { dependency in
-            initializer(
-                try dependency.resolve(A.self),
-                try dependency.resolve(B.self),
-                try dependency.resolve(C.self),
-                try dependency.resolve(D.self)
+        register(service, completion: { dependency in
+            try initializer(
+                dependency.resolve(A.self),
+                dependency.resolve(B.self),
+                dependency.resolve(C.self),
+                dependency.resolve(D.self)
             )
         })
     }
-    
+
     /// Automatically registers a service with two dependencies.
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service, taking five dependencies as parameters.
-    mutating func autoregister<Service, A, B, C, D, E>(
+    public mutating func autoregister<Service, A, B, C, D, E>(
         _ service: Service.Type,
-        initializer: @escaping (A, B, C, D, E) -> Service
+        initializer: @escaping @Sendable (A, B, C, D, E) -> Service
     ) {
-        self.register(service, completion: { dependency in
-            initializer(
-                try dependency.resolve(A.self),
-                try dependency.resolve(B.self),
-                try dependency.resolve(C.self),
-                try dependency.resolve(D.self),
-                try dependency.resolve(E.self)
+        register(service, completion: { dependency in
+            try initializer(
+                dependency.resolve(A.self),
+                dependency.resolve(B.self),
+                dependency.resolve(C.self),
+                dependency.resolve(D.self),
+                dependency.resolve(E.self)
             )
         })
     }
-    
+
     /// Automatically registers a service with two dependencies.
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service, taking six dependencies as parameters.
-    mutating func autoregister<Service, A, B, C, D, E, F>(
+    public mutating func autoregister<Service, A, B, C, D, E, F>(
         _ service: Service.Type,
-        initializer: @escaping (A, B, C, D, E, F) -> Service
+        initializer: @escaping @Sendable (A, B, C, D, E, F) -> Service
     ) {
-        self.register(service, completion: { dependency in
-            initializer(
-                try dependency.resolve(A.self),
-                try dependency.resolve(B.self),
-                try dependency.resolve(C.self),
-                try dependency.resolve(D.self),
-                try dependency.resolve(E.self),
-                try dependency.resolve(F.self)
+        register(service, completion: { dependency in
+            try initializer(
+                dependency.resolve(A.self),
+                dependency.resolve(B.self),
+                dependency.resolve(C.self),
+                dependency.resolve(D.self),
+                dependency.resolve(E.self),
+                dependency.resolve(F.self)
             )
         })
     }
-    
+
     /// Automatically registers a service with two dependencies.
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service, taking seven dependencies as parameters.
-    mutating func autoregister<Service, A, B, C, D, E, F, G>(
+    public mutating func autoregister<Service, A, B, C, D, E, F, G>(
         _ service: Service.Type,
-        initializer: @escaping (A, B, C, D, E, F, G) -> Service
+        initializer: @escaping @Sendable (A, B, C, D, E, F, G) -> Service
     ) {
-        self.register(service, completion: { dependency in
-            initializer(
-                try dependency.resolve(A.self),
-                try dependency.resolve(B.self),
-                try dependency.resolve(C.self),
-                try dependency.resolve(D.self),
-                try dependency.resolve(E.self),
-                try dependency.resolve(F.self),
-                try dependency.resolve(G.self)
+        register(service, completion: { dependency in
+            try initializer(
+                dependency.resolve(A.self),
+                dependency.resolve(B.self),
+                dependency.resolve(C.self),
+                dependency.resolve(D.self),
+                dependency.resolve(E.self),
+                dependency.resolve(F.self),
+                dependency.resolve(G.self)
             )
         })
     }
-    
+
     /// Automatically registers a service with two dependencies.
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service, taking eight dependencies as parameters.
-    mutating func autoregister<Service, A, B, C, D, E, F, G, H>(
+    public mutating func autoregister<Service, A, B, C, D, E, F, G, H>(
         _ service: Service.Type,
-        initializer: @escaping (A, B, C, D, E, F, G, H) -> Service
+        initializer: @escaping @Sendable (A, B, C, D, E, F, G, H) -> Service
     ) {
-        self.register(service, completion: { dependency in
-            initializer(
-                try dependency.resolve(A.self),
-                try dependency.resolve(B.self),
-                try dependency.resolve(C.self),
-                try dependency.resolve(D.self),
-                try dependency.resolve(E.self),
-                try dependency.resolve(F.self),
-                try dependency.resolve(G.self),
-                try dependency.resolve(H.self)
+        register(service, completion: { dependency in
+            try initializer(
+                dependency.resolve(A.self),
+                dependency.resolve(B.self),
+                dependency.resolve(C.self),
+                dependency.resolve(D.self),
+                dependency.resolve(E.self),
+                dependency.resolve(F.self),
+                dependency.resolve(G.self),
+                dependency.resolve(H.self)
+            )
+        })
+    }
+
+    /// Automatically registers a service with two dependencies.
+    ///
+    /// - Parameters:
+    ///   - service: The type of the service to register.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight dependencies as parameters.
+    public mutating func autoregister<Service, A, B, C, D, E, F, G, H, I>(
+        _ service: Service.Type,
+        initializer: @escaping @Sendable (A, B, C, D, E, F, G, H, I) -> Service
+    ) {
+        register(service, completion: { dependency in
+            try initializer(
+                dependency.resolve(A.self),
+                dependency.resolve(B.self),
+                dependency.resolve(C.self),
+                dependency.resolve(D.self),
+                dependency.resolve(E.self),
+                dependency.resolve(F.self),
+                dependency.resolve(G.self),
+                dependency.resolve(H.self),
+                dependency.resolve(I.self)
+            )
+        })
+    }
+
+    /// Automatically registers a service with two dependencies.
+    ///
+    /// - Parameters:
+    ///   - service: The type of the service to register.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight dependencies as parameters.
+    public mutating func autoregister<Service, A, B, C, D, E, F, G, H, I, J>(
+        _ service: Service.Type,
+        initializer: @escaping @Sendable (A, B, C, D, E, F, G, H, I, J) -> Service
+    ) {
+        register(service, completion: { dependency in
+            try initializer(
+                dependency.resolve(A.self),
+                dependency.resolve(B.self),
+                dependency.resolve(C.self),
+                dependency.resolve(D.self),
+                dependency.resolve(E.self),
+                dependency.resolve(F.self),
+                dependency.resolve(G.self),
+                dependency.resolve(H.self),
+                dependency.resolve(I.self),
+                dependency.resolve(J.self)
             )
         })
     }

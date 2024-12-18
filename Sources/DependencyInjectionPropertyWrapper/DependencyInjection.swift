@@ -13,7 +13,7 @@ public struct Injection<Service> {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
         do {
             self.service = try dependencies.resolve()
         } catch {
@@ -23,13 +23,13 @@ public struct Injection<Service> {
 
     /// The property wrapper
     public var wrappedValue: Service {
-        get { return service }
+        get { service }
         mutating set { service = newValue }
     }
 
     /// The property wrapper
     public var projectedValue: Injection<Service> {
-        get { return self }
+        get { self }
         mutating set { self = newValue }
     }
 }
@@ -44,31 +44,31 @@ public struct Injection<Service> {
 @propertyWrapper
 public struct InjectionKey<Service> {
     private var key: DependencyKey
-    private var dependencies: DependencySubscript
+    private var dependencies: any DependencySubscript
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(_ key: DependencyKey, dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(_ key: DependencyKey, dependencies: any Dependency = DependencyInjector.default.dependencies) {
         self.dependencies = dependencies
         self.key = key
     }
 
     /// The property wrapper
     public var wrappedValue: Service {
-        get { 
+        get {
             guard let service = dependencies[key] as Service? else {
                 fatalError("Can't resolve \(Service.self). Error: missing value")
             }
             return service
         }
-        mutating set { 
+        mutating set {
             dependencies[key] = newValue
         }
     }
 
     /// The property wrapper
     public var projectedValue: InjectionKey<Service> {
-        get { return self }
+        get { self }
         mutating set { self = newValue }
     }
 }
@@ -86,19 +86,19 @@ public struct OptionalInjection<Service> {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
         self.service = try? dependencies.resolve(Service.self)
     }
 
     /// The property wrapper
     public var wrappedValue: Service? {
-        get { return service }
+        get { service }
         mutating set { service = newValue }
     }
 
     /// The projected value
     public var projectedValue: OptionalInjection<Service> {
-        get { return self }
+        get { self }
         mutating set { self = newValue }
     }
 }
@@ -113,11 +113,14 @@ public struct OptionalInjection<Service> {
 @propertyWrapper
 public struct OptionalInjectionKey<Service> {
     private var key: DependencyKey
-    private var dependencies: DependencySubscript
+    private var dependencies: any DependencySubscript
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(_ key: DependencyKey, dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(
+        _ key: DependencyKey,
+        dependencies: any Dependency = DependencyInjector.default.dependencies
+    ) {
         self.dependencies = dependencies
         self.key = key
     }
@@ -125,7 +128,7 @@ public struct OptionalInjectionKey<Service> {
     /// The property wrapper
     public var wrappedValue: Service? {
         get {
-            return dependencies[key] as Service?
+            dependencies[key] as Service?
         }
         mutating set {
             dependencies[key] = newValue
@@ -134,7 +137,7 @@ public struct OptionalInjectionKey<Service> {
 
     /// The property wrapper
     public var projectedValue: OptionalInjectionKey<Service> {
-        get { return self }
+        get { self }
         mutating set { self = newValue }
     }
 }
@@ -150,17 +153,17 @@ public struct OptionalInjectionKey<Service> {
 public struct LazyInjection<Service> {
     private(set) var isInitialized: Bool = false
     private var service: Service!
-    private let dependencies: Dependency
+    private let dependencies: any Dependency
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
         self.dependencies = dependencies
     }
 
     /// Test if we have already initialized the dependency
     public var isEmpty: Bool {
-        return service == nil
+        service == nil
     }
 
     /// The property wrapper
@@ -184,14 +187,14 @@ public struct LazyInjection<Service> {
 
     /// The projected value
     public var projectedValue: LazyInjection<Service> {
-        get { return self }
+        get { self }
         mutating set { self = newValue }
     }
 
     /// release the dependency or just set it empty internaly
     public mutating func release() {
-        self.service = nil
-        self.isInitialized = false
+        service = nil
+        isInitialized = false
     }
 }
 
@@ -206,17 +209,17 @@ public struct LazyInjection<Service> {
 public struct WeakLazyInjection<Service> {
     private(set) var isInitialized: Bool = false
     private var service: Service?
-    private let dependencies: Dependency
+    private let dependencies: any Dependency
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
         self.dependencies = dependencies
     }
 
     /// Test if we have already initialized the dependency
     public var isEmpty: Bool {
-        return service == nil
+        service == nil
     }
 
     /// The property wrapper
@@ -236,14 +239,14 @@ public struct WeakLazyInjection<Service> {
 
     /// The projected value
     public var projectedValue: WeakLazyInjection<Service> {
-        get { return self }
+        get { self }
         mutating set { self = newValue }
     }
 
     /// release the dependency or just set it empty internaly
     public mutating func release() {
-        self.service = nil
-        self.isInitialized = false
+        service = nil
+        isInitialized = false
     }
 }
 
@@ -271,13 +274,13 @@ public struct ObjectInjection<Service>: DynamicProperty where Service: Observabl
 
     /// The property wrapper
     public var wrappedValue: Service {
-        get { return service }
+        get { service }
         mutating set { service = newValue }
     }
 
     /// The property wrapper
     public var projectedValue: ObjectInjection<Service>.Wrapper {
-        return self.$service
+        $service
     }
 }
 

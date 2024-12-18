@@ -35,3 +35,7 @@ Carthage/Build
 # Other files
 core
 .build
+
+Mintfile
+Makefile
+.mise.toml

@@ -1,5 +1,5 @@
-import Foundation
 import DependencyInjection
+import Foundation
 
 /// The dependency environment.
 ///
@@ -9,24 +9,24 @@ import DependencyInjection
 /// ```
 ///
 @propertyWrapper
-public struct EnvironmentInjection {
-    private var dependencies: Dependency
+public struct EnvironmentInjection: Sendable {
+    private var dependencies: any Dependency
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
         self.dependencies = dependencies
     }
 
     /// The property wrapper
     public var wrappedValue: DependencyEnvironment {
-        get { return dependencies.environment }
+        get { dependencies.environment }
         mutating set { dependencies.environment = newValue }
     }
 
     /// The property wrapper
     public var projectedValue: EnvironmentInjection {
-        get { return self }
+        get { self }
         mutating set { self = newValue }
     }
 }
@@ -39,16 +39,16 @@ public struct EnvironmentInjection {
 /// ```
 ///
 @propertyWrapper
-public struct EnvironmentParameter<T> {
+public struct EnvironmentParameter<T: Sendable>: Sendable {
     private let key: DependencyEnvironmentKey
-    private var dependencies: Dependency
+    private var dependencies: any Dependency
 
     /// Initialization
     /// - Parameter key: The environment parameter key
     /// - Parameter dependencies: The dependency manager
     public init(
         key: DependencyEnvironmentKey,
-        dependencies: Dependency = DependencyInjector.default.dependencies
+        dependencies: any Dependency = DependencyInjector.default.dependencies
     ) {
         self.key = key
         self.dependencies = dependencies
@@ -56,13 +56,13 @@ public struct EnvironmentParameter<T> {
 
     /// The property wrapper
     public var wrappedValue: T? {
-        get { return try? dependencies.environment.getParameter(key: key) }
+        get { try? dependencies.environment.getParameter(key: key) }
         mutating set { dependencies.environment.setParameter(key: key, value: newValue) }
     }
 
     /// The property wrapper
     public var projectedValue: EnvironmentParameter {
-        get { return self }
+        get { self }
         mutating set { self = newValue }
     }
 }
@@ -76,16 +76,16 @@ public struct EnvironmentParameter<T> {
 /// ```
 ///
 @propertyWrapper
-public struct EnvironmentStringOption {
+public struct EnvironmentStringOption: Sendable {
     private let key: DependencyEnvironmentKey
-    private var dependencies: Dependency
+    private var dependencies: any Dependency
 
     /// Initialization
     /// - Parameter key: The environment parameter key
     /// - Parameter dependencies: The dependency manager
     public init(
         key: DependencyEnvironmentKey,
-        dependencies: Dependency = DependencyInjector.default.dependencies
+        dependencies: any Dependency = DependencyInjector.default.dependencies
     ) {
         self.key = key
         self.dependencies = dependencies
@@ -93,13 +93,13 @@ public struct EnvironmentStringOption {
 
     /// The property wrapper
     public var wrappedValue: String? {
-        get { return try? dependencies.environment.getStringOption(key: key) }
+        get { try? dependencies.environment.getStringOption(key: key) }
         mutating set { dependencies.environment.setStringOption(key: key, value: newValue) }
     }
 
     /// The property wrapper
     public var projectedValue: EnvironmentStringOption {
-        get { return self }
+        get { self }
         mutating set { self = newValue }
     }
 }

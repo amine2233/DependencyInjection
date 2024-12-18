@@ -15,8 +15,8 @@ class EnvironmentTests: XCTestCase {
     }
 
     func factory() {
-        dependencyCore.register(JourneyService.self, completion: { _ in JourneyMock() })
-        dependencyCore.register(LocationService.self, completion: { _ in LocationMock() })
+        dependencyCore.register((any JourneyService).self, completion: { _ in JourneyMock() })
+        dependencyCore.register((any LocationService).self, completion: { _ in LocationMock() })
     }
 
     func testGetDependencyEnvironment() throws {

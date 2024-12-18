@@ -2,7 +2,6 @@ import XCTest
 @testable import DependencyInjection
 
 class DependencyInjectionTests: XCTestCase {
-
     var dependencyCore: DependencyCore!
 
     override func setUpWithError() throws {
@@ -15,8 +14,8 @@ class DependencyInjectionTests: XCTestCase {
 
     func factory() -> DependencyInjector {
         DependencyInjector(dependencies: dependencyCore) {
-            DependencyResolver { _ in LocationMock() }
-            DependencyResolver { _ in JourneyMock() }
+            DependencyResolverFactory.build { _ in LocationMock() }
+            DependencyResolverFactory.build { _ in JourneyMock() }
         }
     }
 
@@ -28,7 +27,6 @@ class DependencyInjectionTests: XCTestCase {
         // THEN
         XCTAssertNoThrow(try dependencies.resolve(LocationMock.self))
         XCTAssertNoThrow(try dependencies.resolve() as JourneyMock)
-
     }
 
     func testResolve() throws {
@@ -72,7 +70,7 @@ class DependencyInjectionTests: XCTestCase {
         // Given
         // WHEN
         var dependencies = factory().dependencies
-        dependencies.register(DependencyResolver { _ in ExecutableServiceMock() })
+        dependencies.register(DependencyResolverFactory.build { _ in ExecutableServiceMock() })
 
         // THEN
         XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
@@ -115,40 +113,6 @@ class DependencyInjectionTests: XCTestCase {
         XCTAssertEqual(dependencies.dependenciesCount, 2)
     }
 
-    func testCreateWithServiceType() throws {
-        // Given
-        // WHEN
-        let dependencies = factory().dependencies
-        let service = try dependencies.create(ExecutableServiceMock.self)
-
-        // THEN
-        XCTAssertEqual(String(describing: service.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
-    }
-
-    func testCreateDependency() throws {
-        // Given
-        var dependencies = factory().dependencies
-
-        // WHEN
-        let service = try dependencies.create(DependencyResolver { _ in ExecutableServiceMock() })
-
-        // THEN
-        XCTAssertEqual(String(describing: service.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
-    }
-
-    func testCreateWithTypeAndCompletion() throws {
-        // Given
-        // WHEN
-        let dependencies = factory().dependencies
-        let service = try dependencies.create { _ in
-            ExecutableServiceMock()
-        }
-
-        // THEN
-        XCTAssertEqual(String(describing: service.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
-    }
-
-
     func test_Create_Using_Subscript_DependencyKey() throws {
         // GIVEN
         var dependencies = factory().dependencies
@@ -167,46 +131,46 @@ class DependencyInjectionTests: XCTestCase {
         var dependencies = factory().dependencies
 
         // WHEN
-        try dependencies.registerSingleton { _ -> ExecutableService in ExecutableServiceMock() }
+        try dependencies.registerSingleton { _ -> (any ExecutableService) in ExecutableServiceMock() }
 
         // THEN
-        XCTAssertNoThrow(try dependencies.resolve(ExecutableService.self))
+        XCTAssertNoThrow(try dependencies.resolve((any ExecutableService).self))
     }
-    
+
     func test_Create_Using_Subscript_DependencyKey_For_SingletonWithService() throws {
         // GIVEN
         var dependencies = factory().dependencies
 
         // WHEN
-        try dependencies.registerSingleton(ExecutableService.self) { _ -> ExecutableService in ExecutableServiceMock() }
+        try dependencies.registerSingleton((any ExecutableService).self) { _ -> (any ExecutableService) in ExecutableServiceMock() }
 
         // THEN
-        XCTAssertNoThrow(try dependencies.resolve(ExecutableService.self))
+        XCTAssertNoThrow(try dependencies.resolve((any ExecutableService).self))
     }
-    
+
     func test_Create_Using_Subscript_DependencyKey_For_UnRegisterSingleton() throws {
         // GIVEN
         var dependencies = factory().dependencies
-        try dependencies.registerSingleton(ExecutableService.self) { _ -> ExecutableService in ExecutableServiceMock() }
+        try dependencies.registerSingleton((any ExecutableService).self) { _ -> (any ExecutableService) in ExecutableServiceMock() }
 
         // WHEN
-        dependencies.unregisterSingleton(ExecutableService.self)
+        dependencies.unregisterSingleton((any ExecutableService).self)
 
         // THEN
-        XCTAssertThrowsError(try dependencies.resolve(ExecutableService.self))
+        XCTAssertThrowsError(try dependencies.resolve((any ExecutableService).self))
     }
-    
+
     func test_Create_Using_Subscript_DependencyKey_For_UnRegisterSingleton_with_key() throws {
         // GIVEN
         var dependencies = factory().dependencies
-        let key = DependencyKey(type: ExecutableService.self)
-        try dependencies.registerSingleton(ExecutableService.self) { _ -> ExecutableService in ExecutableServiceMock() }
+        let key = DependencyKey(type: (any ExecutableService).self)
+        try dependencies.registerSingleton((any ExecutableService).self) { _ -> (any ExecutableService) in ExecutableServiceMock() }
 
         // WHEN
         dependencies.unregisterSingleton(key: key)
 
         // THEN
-        XCTAssertThrowsError(try dependencies.resolve(ExecutableService.self))
+        XCTAssertThrowsError(try dependencies.resolve((any ExecutableService).self))
     }
 
     func test_Remove_Using_Subscript_DependencyKey() throws {
@@ -242,9 +206,13 @@ class DependencyInjectionTests: XCTestCase {
         let provider = ProviderMock()
         provider.stubbedDescription = String(describing: ProviderMock.self)
         // WHEN
-        let di = DependencyInjector(dependencies: dependencyCore) { () -> [DependencyResolver] in
+        let di = DependencyInjector(
+            dependencies: dependencyCore
+        ) { () -> [any DependencyResolver] in
+            // swiftformat:disable:next redundantReturn
             return []
-        } _: { () -> [Provider] in
+        } _: { () -> [any Provider] in
+            // swiftformat:disable:next redundantReturn
             return [ProviderDefault { _ in provider }]
         }
 

@@ -1,7 +1,7 @@
 import Foundation
 
 /// An enumeration representing possible errors related to dependency environment operations.
-public enum DependencyEnvironmentError: Error, Equatable {
+public enum DependencyEnvironmentError: Error, Equatable, Sendable {
     /// Indicates that a string option was not found for the specified environment key.
     ///
     /// - Parameter key: The key for which the string option was not found.
@@ -24,7 +24,7 @@ public enum DependencyEnvironmentError: Error, Equatable {
 }
 
 /// A struct representing an environment for dependency injection.
-public struct DependencyEnvironment: Equatable, RawRepresentable {
+public struct DependencyEnvironment: Equatable, RawRepresentable, Sendable {
     /// The raw value type for the `DependencyEnvironment`.
     public typealias RawValue = String
 
@@ -80,7 +80,7 @@ public struct DependencyEnvironment: Equatable, RawRepresentable {
     public var options: InfoPlist
 
     /// The options for this `Environment`.
-    private var parameters: [DependencyEnvironmentKey: Any]
+    private var parameters: [DependencyEnvironmentKey: any Sendable]
 
     /// The raw value of the environment.
     public var rawValue: String {
@@ -117,14 +117,14 @@ public struct DependencyEnvironment: Equatable, RawRepresentable {
         name: String,
         arguments: [String] = CommandLine.arguments,
         options: InfoPlist,
-        parameters: [DependencyEnvironmentKey: Any] = [:]
+        parameters: [DependencyEnvironmentKey: any Sendable] = [:]
     ) {
         self.name = name
         self.arguments = arguments
         self.options = options
         self.parameters = parameters
     }
-    
+
     /// Create a new `Environment`.
     ///
     /// - Parameters:
@@ -135,8 +135,8 @@ public struct DependencyEnvironment: Equatable, RawRepresentable {
     public init(
         name: String,
         arguments: [String] = CommandLine.arguments,
-        options: [DependencyEnvironmentKey: Any] = [:],
-        parameters: [DependencyEnvironmentKey: Any] = [:]
+        options: [DependencyEnvironmentKey: any Sendable] = [:],
+        parameters: [DependencyEnvironmentKey: any Sendable] = [:]
     ) {
         self.init(
             name: name,
@@ -145,10 +145,9 @@ public struct DependencyEnvironment: Equatable, RawRepresentable {
             parameters: parameters
         )
     }
-    
 
     // MARK: Public methods
-    
+
     /// Sets a string option for the given key.
     ///
     /// - Parameters:
@@ -157,16 +156,16 @@ public struct DependencyEnvironment: Equatable, RawRepresentable {
     public mutating func setStringOption(key: DependencyEnvironmentKey, value: String?) {
         options[dynamicMember: key] = value
     }
-    
+
     /// Sets an option for the given key.
     ///
     /// - Parameters:
     ///   - key: The key for the option.
     ///   - value: The value to set, which must conform to `LosslessStringConvertible`.
-    mutating func setOption<T: LosslessStringConvertible>(key: DependencyEnvironmentKey, value: T?) {
+    mutating func setOption<T: LosslessStringConvertible & Sendable>(key: DependencyEnvironmentKey, value: T?) {
         options[dynamicMember: key] = value
     }
-    
+
     /// Retrieves a string option for the given key.
     ///
     /// - Parameter key: The key for the option.
@@ -178,7 +177,7 @@ public struct DependencyEnvironment: Equatable, RawRepresentable {
         }
         return value
     }
-    
+
     /// Retrieves an option for the given key.
     ///
     /// - Parameter key: The key for the option.
@@ -190,16 +189,16 @@ public struct DependencyEnvironment: Equatable, RawRepresentable {
         }
         return value
     }
-    
+
     /// Sets a parameter for the given key.
     ///
     /// - Parameters:
     ///   - key: The key for the parameter.
     ///   - value: The value to set.
-    public mutating func setParameter<T>(key: DependencyEnvironmentKey, value: T?) {
+    public mutating func setParameter<T: Sendable>(key: DependencyEnvironmentKey, value: T?) {
         parameters[key] = value
     }
-    
+
     /// Retrieves a parameter for the given key.
     ///
     /// - Parameter key: The key for the parameter.
@@ -227,7 +226,8 @@ extension DependencyEnvironment: CustomStringConvertible {
 
 extension DependencyEnvironment {
     /// A struct representing information about the current process.
-    @dynamicMemberLookup public struct Process {
+    @dynamicMemberLookup
+    public struct Process: Sendable {
         /// The underlying process information.
         private let _info: ProcessInfo
 
@@ -235,7 +235,7 @@ extension DependencyEnvironment {
         ///
         /// - Parameter info: The process information to use. Defaults to the current process information obtained from `ProcessInfo.processInfo`.
         init(info: ProcessInfo = .processInfo) {
-            _info = info
+            self._info = info
         }
 
         /// Gets a variable's value from the process' environment, and converts it to generic type `T`.
@@ -278,28 +278,29 @@ extension DependencyEnvironment {
 
 extension DependencyEnvironment {
     /// A struct that provides dynamic access to values in the Info.plist file.
-    @dynamicMemberLookup public struct InfoPlist: CustomStringConvertible {
+    @dynamicMemberLookup
+    public struct InfoPlist: CustomStringConvertible, Sendable {
         /// The underlying dictionary holding Info.plist values.
-        private var _info: [DependencyEnvironmentKey: Any]
+        private var _info: [DependencyEnvironmentKey: any Sendable]
 
         /// Initializes a new `InfoPlist` instance with the given dictionary of Info.plist values.
         ///
         /// - Parameter info: A dictionary containing the Info.plist values.
-        init(info: [DependencyEnvironmentKey: Any]) {
-            _info = info
+        init(info: [DependencyEnvironmentKey: any Sendable]) {
+            self._info = info
         }
 
         /// Gets a variable's value from the process' environment, and converts it to generic type `T`.
         ///
         ///     Environment.development.options.DATABASE_PORT = 3306
         ///     Environment.development.options.DATABASE_PORT // 3306
-        public subscript<T>(dynamicMember member: DependencyEnvironmentKey) -> T? where T: LosslessStringConvertible {
+        public subscript<T: Sendable>(dynamicMember member: DependencyEnvironmentKey) -> T? where T: LosslessStringConvertible {
             get {
                 guard let raw = _info[member], let value = raw as? T else { return nil }
                 return value
             }
             mutating set(value) {
-                self._info[member] = value as Any
+                self._info[member] = value
             }
         }
 
@@ -313,7 +314,7 @@ extension DependencyEnvironment {
                 return value
             }
             mutating set(value) {
-                self._info[member] = value as Any
+                self._info[member] = value
             }
         }
 
@@ -326,11 +327,11 @@ extension DependencyEnvironment {
                 desc.append("<none>")
             } else {
                 for (id, value) in _info {
-                    #if DEBUG
+#if DEBUG
                     desc.append("- \(id): \(value)")
-                    #else
+#else
                     desc.append("- \(id): **************")
-                    #endif
+#endif
                 }
             }
 
@@ -342,7 +343,8 @@ extension DependencyEnvironment {
 /// https://www.swiftbysundell.com/tips/combining-dynamic-member-lookup-with-key-paths/
 extension DependencyEnvironment {
     /// A class that holds a reference to a value, allowing for dynamic member lookup.
-    @dynamicMemberLookup public class Reference<Value> {
+    @dynamicMemberLookup
+    public class Reference<Value: Sendable>: @unchecked Sendable {
         /// The value being referenced.
         fileprivate(set) var value: Value
 
@@ -363,7 +365,7 @@ extension DependencyEnvironment {
     }
 
     /// A final class that extends `Reference` to allow for mutable access to the referenced value's properties.
-    public final class MutableReference<Value>: Reference<Value> {
+    public final class MutableReference<Value: Sendable>: Reference<Value>, @unchecked Sendable {
         /// Provides dynamic member lookup to access and modify properties of the referenced value using writable key paths.
         ///
         /// - Parameter keyPath: The writable key path to the desired property.

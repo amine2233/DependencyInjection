@@ -7,5 +7,5 @@ public protocol DependencyServiceType {
     /// - Parameter container: The dependency container from which to resolve dependencies.
     /// - Returns: An instance of the service type.
     /// - Throws: An error if the service could not be created.
-    static func makeService(for container: Dependency) throws -> Self
+    static func makeService(for container: any Dependency) throws -> Self
 }

@@ -3,21 +3,21 @@ import XCTest
 @testable import DependencyInjectionPropertyWrapper
 
 class DependencyInjectionPropertyWrapperTests: XCTestCase {
-    var dependencyCore: Dependency!
+    var dependencyCore: (any Dependency)!
 
     override func setUpWithError() throws {
         dependencyCore = DependencyCore()
         factory(&dependencyCore)
-        factory(&DependencyInjector.default.dependencies)
+        // factory(&DependencyInjector.default.dependencies)
     }
 
     override func tearDownWithError() throws {
         dependencyCore = nil
     }
 
-    private func factory(_ dependency: inout Dependency) {
-        dependency.register(JourneyService.self, completion: { _ in JourneyMock() })
-        dependency.register(LocationService.self, completion: { _ in LocationMock() })
+    private func factory(_ dependency: inout any Dependency) {
+        dependency.register((any JourneyService).self, completion: { _ in JourneyMock() })
+        dependency.register((any LocationService).self, completion: { _ in LocationMock() })
     }
 
     // MARK: - Test using @Injection with dependencies
@@ -25,7 +25,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testGetInjection() throws {
         // given
         @Injection(dependencies: dependencyCore)
-        var journeyService: JourneyService
+        var journeyService: any JourneyService
 
         // when
         journeyService.start()
@@ -37,7 +37,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testSetInjection() throws {
         // given
         @Injection(dependencies: dependencyCore)
-        var journeyService: JourneyService
+        var journeyService: any JourneyService
 
         // when
         journeyService.start()
@@ -50,7 +50,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testGetOptionalInjection() throws {
         // given
         @OptionalInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService?
+        var journeyService: (any JourneyService)?
 
         // when
         journeyService?.start()
@@ -62,7 +62,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testSetOptionalInjection() throws {
         // given
         @OptionalInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService?
+        var journeyService: (any JourneyService)?
 
         // when
         journeyService?.start()
@@ -75,7 +75,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testGetLazyInjection() throws {
         // given
         @LazyInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService
+        var journeyService: any JourneyService
 
         // when
         journeyService.start()
@@ -87,7 +87,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testSetLazyInjection() throws {
         // given
         @LazyInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService
+        var journeyService: any JourneyService
 
         // when
         journeyService.start()
@@ -100,7 +100,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testLazyInjection() throws {
         // given
         @LazyInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService
+        var journeyService: any JourneyService
 
         // when
         // then
@@ -110,7 +110,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testReleasetLazyInjection() throws {
         // given
         @LazyInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService
+        var journeyService: any JourneyService
 
         // when
         journeyService.start()
@@ -123,7 +123,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testIsEmptyLazyInjection() throws {
         // given
         @LazyInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService
+        var journeyService: any JourneyService
 
         // when
         let expectedResult = $journeyService.isEmpty
@@ -135,7 +135,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testIsNotEmptyLazyInjection() throws {
         // given
         @LazyInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService
+        var journeyService: any JourneyService
 
         // when
         journeyService.start()
@@ -148,7 +148,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testGetWeakLazyInjection() throws {
         // given
         @WeakLazyInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService?
+        var journeyService: (any JourneyService)?
 
         // when
         journeyService?.start()
@@ -160,7 +160,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testSetWeakLazyInjection() throws {
         // given
         @WeakLazyInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService?
+        var journeyService: (any JourneyService)?
 
         // when
         journeyService?.start()
@@ -173,7 +173,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testWeakLazyInjection() throws {
         // given
         @WeakLazyInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService?
+        var journeyService: (any JourneyService)?
 
         // when
         // then
@@ -183,7 +183,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testReleasetWeakLazyInjection() throws {
         // given
         @WeakLazyInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService?
+        var journeyService: (any JourneyService)?
 
         // when
         journeyService?.start()
@@ -196,7 +196,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testIsEmptyWeakLazyInjection() throws {
         // given
         @WeakLazyInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService?
+        var journeyService: (any JourneyService)?
 
         // when
         let expectedResult = $journeyService.isEmpty
@@ -208,7 +208,7 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testIsNotEmptyWeakLazyInjection() throws {
         // given
         @WeakLazyInjection(dependencies: dependencyCore)
-        var journeyService: JourneyService?
+        var journeyService: (any JourneyService)?
 
         // when
         journeyService?.start()
