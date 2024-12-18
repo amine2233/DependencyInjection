@@ -24,7 +24,7 @@ public struct ProviderDefault: Provider {
     /// Initializes a new provider with a resolution block.
     ///
     /// - Parameter block: A closure that resolves the dependency from the `DependencyProvider`.
-    public init<T: Provider>(_ block: @escaping @Sendable ResolveBlock<T>) {
+    public init<T: Provider>(_ block: @escaping ResolveBlock<T>) {
         self.resolveBlock = block // Save block for future
         self.description = String(describing: T.self)
     }

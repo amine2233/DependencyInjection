@@ -127,7 +127,7 @@ private struct DependencyResolverDefault: DependencyResolver {
     ///   - resolveBlock: The closure that resolves the dependency.
     init<T: Sendable>(
         isSingleton: Bool = false,
-        resolveBlock: @escaping @Sendable ResolveBlock<T>
+        resolveBlock: @escaping ResolveBlock<T>
     ) {
         self.init(
             key: DependencyKey(type: T.self),
@@ -145,7 +145,7 @@ private struct DependencyResolverDefault: DependencyResolver {
     init<T: Sendable>(
         key: DependencyKey,
         isSingleton: Bool,
-        resolveBlock: @escaping @Sendable ResolveBlock<T>
+        resolveBlock: @escaping ResolveBlock<T>
     ) {
         self.key = key
         self.isSingleton = isSingleton
