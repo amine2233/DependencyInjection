@@ -32,8 +32,8 @@ public struct DependencyInjector: Sendable {
 
     @resultBuilder
     struct DependencyBuilder {
-        static func buildBlock(_ dependency: DependencyResolver) -> DependencyResolver { dependency }
-        static func buildBlock(_ dependencies: DependencyResolver...) -> [DependencyResolver] { dependencies }
+        static func buildBlock(_ dependency: any DependencyResolver) -> any DependencyResolver { dependency }
+        static func buildBlock(_ dependencies: any DependencyResolver...) -> [any DependencyResolver] { dependencies }
     }
 
     @resultBuilder
@@ -66,7 +66,7 @@ public struct DependencyInjector: Sendable {
     ///   - providers: to add `Provider` manually
     public init(
         dependencies: any Dependency = DependencyCore(),
-        @DependencyBuilder _ block: () -> [DependencyResolver] = { [] },
+        @DependencyBuilder _ block: () -> [any DependencyResolver] = { [] },
         @ProviderBuilder _ providers: () -> [any Provider] = { [] }
     ) {
         self.init(dependencies: dependencies)
@@ -81,7 +81,7 @@ public struct DependencyInjector: Sendable {
     ///   - providers: to add  one `Provider` manually
     public init(
         dependencies: any Dependency = DependencyCore(),
-        @DependencyBuilder _ dependency: () -> DependencyResolver,
+        @DependencyBuilder _ dependency: () -> any DependencyResolver,
         @ProviderBuilder _ provider: () -> any Provider
     ) {
         self.init(dependencies: dependencies)
@@ -178,13 +178,13 @@ public struct DependencyInjector: Sendable {
 
     /// Register dependencies using `DependencyResolver`
     /// - Parameter register: The callback contain an array of `DependencyResolver`
-    public mutating func registers(@DependencyBuilder _ block: () -> [DependencyResolver] = { [] }) {
+    public mutating func registers(@DependencyBuilder _ block: () -> [any DependencyResolver] = { [] }) {
         block().forEach { dependencies.register($0) }
     }
 
     /// Register dependency using `DependencyResolver`
     /// - Parameter register: The callback contain a `DependencyResolver`
-    public mutating func register(@DependencyBuilder _ dependency: () -> DependencyResolver) {
+    public mutating func register(@DependencyBuilder _ dependency: () -> any DependencyResolver) {
         dependencies.register(dependency())
     }
 

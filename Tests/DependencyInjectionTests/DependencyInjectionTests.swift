@@ -14,8 +14,8 @@ class DependencyInjectionTests: XCTestCase {
 
     func factory() -> DependencyInjector {
         DependencyInjector(dependencies: dependencyCore) {
-            DependencyResolver { _ in LocationMock() }
-            DependencyResolver { _ in JourneyMock() }
+            DependencyResolverFactory.build { _ in LocationMock() }
+            DependencyResolverFactory.build { _ in JourneyMock() }
         }
     }
 
@@ -70,7 +70,7 @@ class DependencyInjectionTests: XCTestCase {
         // Given
         // WHEN
         var dependencies = factory().dependencies
-        dependencies.register(DependencyResolver { _ in ExecutableServiceMock() })
+        dependencies.register(DependencyResolverFactory.build { _ in ExecutableServiceMock() })
 
         // THEN
         XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
@@ -208,7 +208,7 @@ class DependencyInjectionTests: XCTestCase {
         // WHEN
         let di = DependencyInjector(
             dependencies: dependencyCore
-        ) { () -> [DependencyResolver] in
+        ) { () -> [any DependencyResolver] in
             // swiftformat:disable:next redundantReturn
             return []
         } _: { () -> [any Provider] in

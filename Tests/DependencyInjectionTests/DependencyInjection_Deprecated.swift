@@ -14,8 +14,8 @@ class DependencyInjection_DeprecatedTests: XCTestCase {
 
     func factory() -> DependencyInjector {
         DependencyInjector(dependencies: dependencyCore) {
-            DependencyResolver { _ in LocationMock() }
-            DependencyResolver { _ in JourneyMock() }
+            DependencyResolverFactory.build { _ in LocationMock() }
+            DependencyResolverFactory.build { _ in JourneyMock() }
         }
     }
 

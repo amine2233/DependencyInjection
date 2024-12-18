@@ -18,7 +18,7 @@ public protocol DependencyRegister: Sendable {
 
     /// Register the dependency
     /// - Parameter dependency: The dependency
-    mutating func register(_ dependency: DependencyResolver)
+    mutating func register(_ dependency: any DependencyResolver)
 
     /// Register class for using with resolve
     /// - Parameters:
