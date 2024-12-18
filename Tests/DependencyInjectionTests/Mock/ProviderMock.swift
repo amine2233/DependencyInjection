@@ -1,5 +1,5 @@
-import Foundation
 import DependencyInjection
+import Foundation
 
 final class ProviderMock: Provider, @unchecked Sendable {
     var invokedDescriptionGetter = false

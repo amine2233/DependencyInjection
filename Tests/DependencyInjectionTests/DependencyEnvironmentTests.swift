@@ -1,5 +1,5 @@
-@testable import DependencyInjection
 import XCTest
+@testable import DependencyInjection
 
 class DependencyEnvironmentTests: XCTestCase {
     func testDevelopmentCreation() {
@@ -41,8 +41,8 @@ class DependencyEnvironmentTests: XCTestCase {
     }
 
     func testProcessGeneric() {
-        DependencyEnvironment.process.DATABASE_PORT = 5432
-        XCTAssertEqual(DependencyEnvironment.process.DATABASE_PORT, 5432)
+        DependencyEnvironment.process.DATABASE_PORT = 5_432
+        XCTAssertEqual(DependencyEnvironment.process.DATABASE_PORT, 5_432)
         DependencyEnvironment.process.DATABASE_PORT = nil
         XCTAssertNil(DependencyEnvironment.process.DATABASE_PORT)
     }
@@ -83,7 +83,7 @@ class DependencyEnvironmentTests: XCTestCase {
     }
 
     func testOptionGeneric() throws {
-        let urlPort = 8080
+        let urlPort = 8_080
         var environment = DependencyEnvironment.development
         environment.setOption(key: "URL_PORT", value: urlPort)
         XCTAssertEqual(environment.options.URL_PORT, urlPort)
@@ -138,7 +138,7 @@ class DependencyEnvironmentTests: XCTestCase {
 
     func xtestGetOption() throws {
         // given
-        let urlPort: Int = 8080
+        let urlPort = 8_080
         var environment = DependencyEnvironment.development
         let key = DependencyEnvironmentKey(rawValue: "URL_PORT")
         environment.setOption(key: key, value: urlPort)

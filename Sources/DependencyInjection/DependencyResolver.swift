@@ -1,7 +1,7 @@
 import Foundation
 
 /// A struct responsible for resolving dependencies.
-public final class DependencyResolver: @unchecked Sendable  {
+public final class DependencyResolver: @unchecked Sendable {
     /// A typealias representing a closure that resolves a dependency.
     /// - Parameter Dependency: The dependency container.
     /// - Returns: The resolved dependency of type `T`.
@@ -26,7 +26,7 @@ public final class DependencyResolver: @unchecked Sendable  {
     ///   - resolveBlock: The closure that resolves the dependency.
     public convenience init<T>(
         isSingleton: Bool = false,
-        resolveBlock: @escaping ResolveBlock<T>
+        resolveBlock: @escaping @Sendable ResolveBlock<T>
     ) {
         self.init(key: DependencyKey(type: T.self), isSingleton: isSingleton, resolveBlock: resolveBlock)
     }
@@ -40,7 +40,7 @@ public final class DependencyResolver: @unchecked Sendable  {
     init<T>(
         key: DependencyKey,
         isSingleton: Bool,
-        resolveBlock: @escaping ResolveBlock<T>
+        resolveBlock: @escaping @Sendable ResolveBlock<T>
     ) {
         self.key = key
         self.isSingleton = isSingleton
@@ -54,7 +54,7 @@ public final class DependencyResolver: @unchecked Sendable  {
     public func resolve(dependencies: any Dependency) throws {
         value = try resolveBlock(dependencies)
     }
-    
+
     /// Resolves the dependency and returns the updated `DependencyResolver`.
     ///
     /// - Parameter dependencies: The dependency container.

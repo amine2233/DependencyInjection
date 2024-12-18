@@ -18,6 +18,6 @@ extension DependencyEnvironmentKey: ExpressibleByStringLiteral {
     ///
     /// - Parameter value: The string literal value of the key.
     public init(stringLiteral value: String) {
-        rawValue = value
+        self.rawValue = value
     }
 }

@@ -2,7 +2,14 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 import PackageDescription
 
-let swiftSettings: [PackageDescription.SwiftSetting] = [.enableUpcomingFeature("ExistentialAny")]
+let swiftSettings: [PackageDescription.SwiftSetting] = [
+    .unsafeFlags(["-require-explicit-sendable"]),
+    .enableUpcomingFeature("ExistentialAny"),
+    .enableExperimentalFeature("SuppressedAssociatedTypes"),
+    .enableExperimentalFeature("StrictConcurrency")
+    // .enableExperimentalFeature("AccessLevelOnImport"),
+    // .enableUpcomingFeature("InternalImportsByDefault"),
+]
 
 let package = Package(
     name: "DependencyInjection",
@@ -11,13 +18,16 @@ let package = Package(
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(
             name: "DependencyInjection",
-            targets: ["DependencyInjection"]),
+            targets: ["DependencyInjection"]
+        ),
         .library(
             name: "DependencyInjectionPropertyWrapper",
-            targets: ["DependencyInjectionPropertyWrapper"]),
+            targets: ["DependencyInjectionPropertyWrapper"]
+        ),
         .library(
             name: "DependencyInjectionAutoRegistration",
-            targets: ["DependencyInjectionAutoRegistration"]),
+            targets: ["DependencyInjectionAutoRegistration"]
+        )
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.

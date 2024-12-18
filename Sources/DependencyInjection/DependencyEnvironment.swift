@@ -124,7 +124,7 @@ public struct DependencyEnvironment: Equatable, RawRepresentable, Sendable {
         self.options = options
         self.parameters = parameters
     }
-    
+
     /// Create a new `Environment`.
     ///
     /// - Parameters:
@@ -145,10 +145,9 @@ public struct DependencyEnvironment: Equatable, RawRepresentable, Sendable {
             parameters: parameters
         )
     }
-    
 
     // MARK: Public methods
-    
+
     /// Sets a string option for the given key.
     ///
     /// - Parameters:
@@ -157,7 +156,7 @@ public struct DependencyEnvironment: Equatable, RawRepresentable, Sendable {
     public mutating func setStringOption(key: DependencyEnvironmentKey, value: String?) {
         options[dynamicMember: key] = value
     }
-    
+
     /// Sets an option for the given key.
     ///
     /// - Parameters:
@@ -166,7 +165,7 @@ public struct DependencyEnvironment: Equatable, RawRepresentable, Sendable {
     mutating func setOption<T: LosslessStringConvertible & Sendable>(key: DependencyEnvironmentKey, value: T?) {
         options[dynamicMember: key] = value
     }
-    
+
     /// Retrieves a string option for the given key.
     ///
     /// - Parameter key: The key for the option.
@@ -178,7 +177,7 @@ public struct DependencyEnvironment: Equatable, RawRepresentable, Sendable {
         }
         return value
     }
-    
+
     /// Retrieves an option for the given key.
     ///
     /// - Parameter key: The key for the option.
@@ -190,7 +189,7 @@ public struct DependencyEnvironment: Equatable, RawRepresentable, Sendable {
         }
         return value
     }
-    
+
     /// Sets a parameter for the given key.
     ///
     /// - Parameters:
@@ -199,7 +198,7 @@ public struct DependencyEnvironment: Equatable, RawRepresentable, Sendable {
     public mutating func setParameter<T: Sendable>(key: DependencyEnvironmentKey, value: T?) {
         parameters[key] = value
     }
-    
+
     /// Retrieves a parameter for the given key.
     ///
     /// - Parameter key: The key for the parameter.
@@ -227,7 +226,8 @@ extension DependencyEnvironment: CustomStringConvertible {
 
 extension DependencyEnvironment {
     /// A struct representing information about the current process.
-    @dynamicMemberLookup public struct Process {
+    @dynamicMemberLookup
+    public struct Process {
         /// The underlying process information.
         private let _info: ProcessInfo
 
@@ -235,7 +235,7 @@ extension DependencyEnvironment {
         ///
         /// - Parameter info: The process information to use. Defaults to the current process information obtained from `ProcessInfo.processInfo`.
         init(info: ProcessInfo = .processInfo) {
-            _info = info
+            self._info = info
         }
 
         /// Gets a variable's value from the process' environment, and converts it to generic type `T`.
@@ -278,7 +278,8 @@ extension DependencyEnvironment {
 
 extension DependencyEnvironment {
     /// A struct that provides dynamic access to values in the Info.plist file.
-    @dynamicMemberLookup public struct InfoPlist: CustomStringConvertible, Sendable {
+    @dynamicMemberLookup
+    public struct InfoPlist: CustomStringConvertible, Sendable {
         /// The underlying dictionary holding Info.plist values.
         private var _info: [DependencyEnvironmentKey: any Sendable]
 
@@ -286,7 +287,7 @@ extension DependencyEnvironment {
         ///
         /// - Parameter info: A dictionary containing the Info.plist values.
         init(info: [DependencyEnvironmentKey: any Sendable]) {
-            _info = info
+            self._info = info
         }
 
         /// Gets a variable's value from the process' environment, and converts it to generic type `T`.
@@ -326,11 +327,11 @@ extension DependencyEnvironment {
                 desc.append("<none>")
             } else {
                 for (id, value) in _info {
-                    #if DEBUG
+#if DEBUG
                     desc.append("- \(id): \(value)")
-                    #else
+#else
                     desc.append("- \(id): **************")
-                    #endif
+#endif
                 }
             }
 
@@ -342,7 +343,8 @@ extension DependencyEnvironment {
 /// https://www.swiftbysundell.com/tips/combining-dynamic-member-lookup-with-key-paths/
 extension DependencyEnvironment {
     /// A class that holds a reference to a value, allowing for dynamic member lookup.
-    @dynamicMemberLookup public class Reference<Value> {
+    @dynamicMemberLookup
+    public class Reference<Value> {
         /// The value being referenced.
         fileprivate(set) var value: Value
 

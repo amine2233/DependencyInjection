@@ -5,7 +5,6 @@ protocol ExecutableService {
 }
 
 final class ExecutableServiceMock: ExecutableService {
-
     var invokedExec = false
     var invokedExecCount = 0
 

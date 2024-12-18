@@ -46,7 +46,6 @@ class EnvironmentStringOptionTests: XCTestCase {
 
         // then
         XCTAssertEqual(expectedOption, updatedOption)
-
     }
 
     func testGetEnvironmentStringOptionWithDynamicMemberLookup() throws {
@@ -77,7 +76,6 @@ class EnvironmentStringOptionTests: XCTestCase {
 
         // then
         XCTAssertEqual(expectedOption, update_database_port)
-
     }
 }
 

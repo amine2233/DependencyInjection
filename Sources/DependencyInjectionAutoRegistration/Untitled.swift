@@ -1,5 +1,5 @@
-import Foundation
 import DependencyInjection
+import Foundation
 
 extension DependencyRegister {
     /// Automatically registers a service with no dependencies.
@@ -11,11 +11,11 @@ extension DependencyRegister {
         _ service: Service.Type,
         factory: Factory0<Service>
     ) {
-        self.register(service, completion: { _ in
+        register(service, completion: { _ in
             factory()
         })
     }
-    
+
     /// Automatically registers a service with no dependencies.
     ///
     /// - Parameters:
@@ -25,11 +25,11 @@ extension DependencyRegister {
         _ service: Service.Type,
         factory: Factory1<Service, A>
     ) {
-        self.register(service, completion: { dependency in
+        register(service, completion: { dependency in
             try factory(dependency.resolve())
         })
     }
-    
+
     /// Automatically registers a service with no dependencies.
     ///
     /// - Parameters:
@@ -39,14 +39,14 @@ extension DependencyRegister {
         _ service: Service.Type,
         factory: Factory2<Service, A, B>
     ) {
-        self.register(service, completion: { dependency in
+        register(service, completion: { dependency in
             try factory(
                 dependency.resolve(),
                 dependency.resolve()
             )
         })
     }
-    
+
     /// Automatically registers a service with no dependencies.
     ///
     /// - Parameters:
@@ -56,7 +56,7 @@ extension DependencyRegister {
         _ service: Service.Type,
         factory: Factory3<Service, A, B, C>
     ) {
-        self.register(service, completion: { dependency in
+        register(service, completion: { dependency in
             try factory(
                 dependency.resolve(),
                 dependency.resolve(),
@@ -64,7 +64,7 @@ extension DependencyRegister {
             )
         })
     }
-    
+
     /// Automatically registers a service with no dependencies.
     ///
     /// - Parameters:
@@ -74,7 +74,7 @@ extension DependencyRegister {
         _ service: Service.Type,
         factory: Factory4<Service, A, B, C, D>
     ) {
-        self.register(service, completion: { dependency in
+        register(service, completion: { dependency in
             try factory(
                 dependency.resolve(),
                 dependency.resolve(),
@@ -83,7 +83,7 @@ extension DependencyRegister {
             )
         })
     }
-    
+
     /// Automatically registers a service with no dependencies.
     ///
     /// - Parameters:
@@ -93,7 +93,7 @@ extension DependencyRegister {
         _ service: Service.Type,
         factory: Factory5<Service, A, B, C, D, E>
     ) {
-        self.register(service, completion: { dependency in
+        register(service, completion: { dependency in
             try factory(
                 dependency.resolve(),
                 dependency.resolve(),
@@ -125,7 +125,7 @@ public struct Factory0<Service>: Sendable {
 
 public struct Factory1<Service, A>: Sendable {
     private let builder: @Sendable (A) -> Service
-    
+
     init(builder: @escaping @Sendable (A) -> Service) {
         self.builder = builder
     }

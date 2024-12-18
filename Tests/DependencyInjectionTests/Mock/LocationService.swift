@@ -1,11 +1,5 @@
-//
-//  File.swift
-//  
-//
-//  Created by Amine Bensalah on 22/12/2020.
-//
-
 import Foundation
+
 // import Combine
 
 protocol LocationService {
@@ -15,7 +9,6 @@ protocol LocationService {
 }
 
 class LocationMock: LocationService {
-
     // private let timer = Timer.publish(every: 1, on: RunLoop.main, in: .default) // 1
     // private let subject = PassthroughSubject<Location, Never>() // 2
     // private var cancellables = Set<AnyCancellable>()

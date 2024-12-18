@@ -2,7 +2,6 @@ import XCTest
 @testable import DependencyInjection
 
 class DependencyInjectionTests: XCTestCase {
-
     var dependencyCore: DependencyCore!
 
     override func setUpWithError() throws {
@@ -28,7 +27,6 @@ class DependencyInjectionTests: XCTestCase {
         // THEN
         XCTAssertNoThrow(try dependencies.resolve(LocationMock.self))
         XCTAssertNoThrow(try dependencies.resolve() as JourneyMock)
-
     }
 
     func testResolve() throws {
@@ -138,7 +136,7 @@ class DependencyInjectionTests: XCTestCase {
         // THEN
         XCTAssertNoThrow(try dependencies.resolve((any ExecutableService).self))
     }
-    
+
     func test_Create_Using_Subscript_DependencyKey_For_SingletonWithService() throws {
         // GIVEN
         var dependencies = factory().dependencies
@@ -149,7 +147,7 @@ class DependencyInjectionTests: XCTestCase {
         // THEN
         XCTAssertNoThrow(try dependencies.resolve((any ExecutableService).self))
     }
-    
+
     func test_Create_Using_Subscript_DependencyKey_For_UnRegisterSingleton() throws {
         // GIVEN
         var dependencies = factory().dependencies
@@ -161,7 +159,7 @@ class DependencyInjectionTests: XCTestCase {
         // THEN
         XCTAssertThrowsError(try dependencies.resolve((any ExecutableService).self))
     }
-    
+
     func test_Create_Using_Subscript_DependencyKey_For_UnRegisterSingleton_with_key() throws {
         // GIVEN
         var dependencies = factory().dependencies
@@ -208,9 +206,13 @@ class DependencyInjectionTests: XCTestCase {
         let provider = ProviderMock()
         provider.stubbedDescription = String(describing: ProviderMock.self)
         // WHEN
-        let di = DependencyInjector(dependencies: dependencyCore) { () -> [DependencyResolver] in
+        let di = DependencyInjector(
+            dependencies: dependencyCore
+        ) { () -> [DependencyResolver] in
+            // swiftformat:disable:next redundantReturn
             return []
         } _: { () -> [any Provider] in
+            // swiftformat:disable:next redundantReturn
             return [ProviderDefault { _ in provider }]
         }
 

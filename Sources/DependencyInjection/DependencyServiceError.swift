@@ -12,12 +12,12 @@ public enum DependencyError: Error, Equatable {
     ///
     /// - Parameter name: The name of the missing singleton dependency.
     case notFoundSingleton(name: String)
-    
+
     /// Error indicating that a dependency could not be found.
     ///
     /// - Parameter name: The name of the missing dependency.
     case notFound(name: String)
-    
+
     /// Error indicating that a dependency could not be resolved.
     ///
     /// - Parameter name: The name of the unresolved dependency.
@@ -31,12 +31,12 @@ extension DependencyError: LocalizedError {
     /// - Returns: A string describing the failure reason.
     public var failureReason: String? {
         switch self {
-        case .notFoundSingleton(let name):
-            return "Singleton dependency not found: \(name)"
-        case .notFound(let name):
-            return "Dependency not found: \(name)"
-        case .notResolved(let name):
-            return "Dependency not resolved: \(name)"
+        case let .notFoundSingleton(name):
+            "Singleton dependency not found: \(name)"
+        case let .notFound(name):
+            "Dependency not found: \(name)"
+        case let .notResolved(name):
+            "Dependency not resolved: \(name)"
         }
     }
 }

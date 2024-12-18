@@ -64,17 +64,15 @@ public protocol DependencyReslove: Sendable {
 }
 
 public protocol DependencySingleton: Sendable {
-
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
     mutating func registerSingleton<T>(completion: @escaping @Sendable (any Dependency) throws -> T) throws
-    
+
     /// Create a singleton
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
     mutating func registerSingleton<T>(_ type: T.Type, completion: @escaping @Sendable (any Dependency) throws -> T) throws
-
 
     /// Create a singleton with class conform to protocol ```DependencyServiceType```
     /// - Parameter type: The type of the singleton
@@ -104,7 +102,6 @@ public protocol DependencySingletonOperation: Sendable {
     ) throws
 }
 
-
 public protocol DependencyProvider: Sendable {
     /// Register provider
     /// - Parameter provider: the provider you will add
@@ -115,6 +112,7 @@ public protocol DependencyProvider: Sendable {
     mutating func unregisterProvider(_ provider: any Provider)
 
     // MARK: Startup and Endup provider configuration
+
     func willBoot() -> Self
     func willShutdown() -> Self
     func didEnterBackground() -> Self
@@ -134,4 +132,4 @@ public protocol DependencySubscript: Sendable {
 }
 
 /// The dependency protocol
-public typealias Dependency = DependencyRegister & DependencyUnregister & DependencyProvider & DependencyDescription & DependencyReslove & DependencySingleton & DependencyParameters & DependencySubscript & DependencyRegisterOperation & DependencySingletonOperation
+public typealias Dependency = DependencyDescription & DependencyParameters & DependencyProvider & DependencyRegister & DependencyRegisterOperation & DependencyReslove & DependencySingleton & DependencySingletonOperation & DependencySubscript & DependencyUnregister

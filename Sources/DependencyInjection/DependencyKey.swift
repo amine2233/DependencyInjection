@@ -18,7 +18,7 @@ extension DependencyKey: ExpressibleByStringLiteral {
     ///
     /// - Parameter value: The string literal value of the key.
     public init(stringLiteral value: String) {
-        rawValue = value
+        self.rawValue = value
     }
 }
 
@@ -32,6 +32,6 @@ extension DependencyKey {
     ///
     /// - Parameter type: The type of the dependency.
     public init<T>(type: T.Type) {
-        rawValue = String(describing: type.self)
+        self.rawValue = String(describing: type.self)
     }
 }

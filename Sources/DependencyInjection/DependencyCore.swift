@@ -18,7 +18,6 @@ import Foundation
 ///
 ///
 public struct DependencyCore: Dependency {
-
     /// The environment parameter
     public var environment: DependencyEnvironment
 
@@ -83,25 +82,25 @@ public struct DependencyCore: Dependency {
 
     /// Provider will boot
     public func willBoot() -> Self {
-        _ = self.providers.map { $0.willBoot(self) }
+        _ = providers.map { $0.willBoot(self) }
         return self
     }
 
     /// Provider did boot
-    public func didBoot() -> Self  {
-        _ = self.providers.map { $0.didBoot(self) }
+    public func didBoot() -> Self {
+        _ = providers.map { $0.didBoot(self) }
         return self
     }
 
     /// Provider will shutdown
-    public func willShutdown() -> Self  {
-        _ = self.providers.map { $0.willShutdown(self) }
+    public func willShutdown() -> Self {
+        _ = providers.map { $0.willShutdown(self) }
         return self
     }
 
     /// Provider did enter on background
-    public func didEnterBackground() -> Self  {
-        _ = self.providers.map { $0.didEnterBackground(self) }
+    public func didEnterBackground() -> Self {
+        _ = providers.map { $0.didEnterBackground(self) }
         return self
     }
 }
@@ -250,7 +249,7 @@ extension DependencyCore {
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
     /// - Returns: The singleton object
-    public mutating func registerSingleton<T>(completion: @escaping (any Dependency) throws -> T) throws {
+    public mutating func registerSingleton<T>(completion: @escaping @Sendable (any Dependency) throws -> T) throws {
         let identifier = DependencyKey(type: T.self)
         let dependency = DependencyResolver(key: identifier, isSingleton: true, resolveBlock: completion)
 
@@ -265,7 +264,7 @@ extension DependencyCore {
     ///   - completion: The completion
     public mutating func registerSingleton<T>(
         _ type: T.Type,
-        completion: @escaping (any Dependency) throws -> T
+        completion: @escaping @Sendable (any Dependency) throws -> T
     ) throws {
         let identifier = DependencyKey(type: type)
         let dependency = DependencyResolver(key: identifier, isSingleton: true, resolveBlock: completion)
@@ -308,8 +307,8 @@ extension DependencyCore {
     ///   - operation: The operation after registration
     public mutating func registerSingletonOperation<T>(
         _ type: T.Type,
-        completion: @escaping (any Dependency) throws -> T,
-        operation: @escaping (T, any Dependency) throws -> T
+        completion: @escaping @Sendable (any Dependency) throws -> T,
+        operation: @escaping @Sendable (T, any Dependency) throws -> T
     ) throws {
         try registerSingleton(type, completion: { dependencies in
             let result = try completion(dependencies)
@@ -335,7 +334,6 @@ extension DependencyCore {
 }
 
 extension DependencyCore {
-
     /// Get or set service's value from the dependencies.
     /// - Parameter keyPath: the dependency key
     public subscript<T>(

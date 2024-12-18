@@ -3,11 +3,10 @@ import Foundation
 /// A default implementation of a provider that conforms to the `Provider` protocol.
 /// It manages the resolution and lifecycle of dependencies.
 public struct ProviderDefault: Provider {
-
     // MARK: Typealiases
 
     /// A closure type that resolves a dependency from a `DependencyProvider`.
-    public typealias ResolveBlock<T: Sendable> =  (@Sendable (any DependencyProvider) -> T)
+    public typealias ResolveBlock<T: Sendable> = @Sendable (any DependencyProvider) -> T
 
     // MARK: Properties
 
@@ -18,14 +17,14 @@ public struct ProviderDefault: Provider {
     public var description: String
 
     /// A closure used to resolve the dependency.
-    private let resolveBlock: ResolveBlock<(any Sendable)>
+    private let resolveBlock: ResolveBlock<any Sendable>
 
     // MARK: Initializer
 
     /// Initializes a new provider with a resolution block.
     ///
     /// - Parameter block: A closure that resolves the dependency from the `DependencyProvider`.
-    public init<T: Provider>(_ block: @escaping ResolveBlock<T>) {
+    public init<T: Provider>(_ block: @escaping @Sendable ResolveBlock<T>) {
         self.resolveBlock = block // Save block for future
         self.description = String(describing: T.self)
     }

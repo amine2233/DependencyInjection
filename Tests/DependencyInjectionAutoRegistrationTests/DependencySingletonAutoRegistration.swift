@@ -4,17 +4,17 @@ import XCTest
 
 final class DependencySingletonAutoRegistration: XCTestCase {
     var dependencyCore: (any Dependency)!
-    
+
     override func setUpWithError() throws {
         dependencyCore = DependencyCore()
     }
-    
+
     override func tearDownWithError() throws {
         dependencyCore = nil
     }
-        
+
     // MARK: - Test using @Injection with dependencies
-    
+
     func test_AutoRegistration() throws {
         // GIVEN
 
@@ -27,7 +27,7 @@ final class DependencySingletonAutoRegistration: XCTestCase {
         // THEN
         XCTAssertNoThrow(try dependencyCore.resolve((any JourneyService).self) as! JourneyMock)
     }
-    
+
     func test_AutoRegistration_with_two_paramaters() throws {
         // GIVEN
         dependencyCore.autoregister((any JourneyService).self, initializer: JourneyMock.init)

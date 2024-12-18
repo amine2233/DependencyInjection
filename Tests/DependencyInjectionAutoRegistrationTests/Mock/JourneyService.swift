@@ -5,7 +5,6 @@ protocol JourneyService {
 }
 
 class JourneyMock: JourneyService {
-
     var invokedStart = false
     var invokedStartCount = 0
 
