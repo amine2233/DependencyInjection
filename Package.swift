@@ -2,6 +2,8 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 import PackageDescription
 
+let swiftSettings: [PackageDescription.SwiftSetting] = [.enableUpcomingFeature("ExistentialAny")]
+
 let package = Package(
     name: "DependencyInjection",
     platforms: [.iOS(.v13), .macOS(.v10_15), .watchOS(.v6), .tvOS(.v13), .visionOS(.v1)],
@@ -26,23 +28,34 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "DependencyInjection",
-            dependencies: []),
+            dependencies: [],
+            swiftSettings: swiftSettings
+        ),
         .target(
             name: "DependencyInjectionPropertyWrapper",
-            dependencies: ["DependencyInjection"]),
+            dependencies: ["DependencyInjection"],
+            swiftSettings: swiftSettings
+        ),
         .target(
             name: "DependencyInjectionAutoRegistration",
-            dependencies: ["DependencyInjection"]
+            dependencies: ["DependencyInjection"],
+            swiftSettings: swiftSettings
         ),
         .testTarget(
             name: "DependencyInjectionTests",
-            dependencies: ["DependencyInjection"]),
+            dependencies: ["DependencyInjection"],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "DependencyInjectionPropertyWrapperTests",
-            dependencies: ["DependencyInjectionPropertyWrapper"]),
+            dependencies: ["DependencyInjectionPropertyWrapper"],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "DependencyInjectionAutoRegistrationTests",
-            dependencies: ["DependencyInjectionAutoRegistration"])
+            dependencies: ["DependencyInjectionAutoRegistration"],
+            swiftSettings: swiftSettings
+        )
     ],
-    swiftLanguageVersions: [.version("6")]
+    swiftLanguageModes: [.v6, .v5]
 )

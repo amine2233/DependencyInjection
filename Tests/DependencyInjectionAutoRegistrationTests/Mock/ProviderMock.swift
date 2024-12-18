@@ -14,10 +14,10 @@ class ProviderMock: Provider, @unchecked Sendable {
 
     var invokedWillBoot = false
     var invokedWillBootCount = 0
-    var invokedWillBootParameters: (container: DependencyProvider, Void)?
-    var invokedWillBootParametersList = [(container: DependencyProvider, Void)]()
+    var invokedWillBootParameters: (container: any DependencyProvider, Void)?
+    var invokedWillBootParametersList = [(container: any DependencyProvider, Void)]()
 
-    func willBoot(_ container: DependencyProvider) {
+    func willBoot(_ container: any DependencyProvider) {
         invokedWillBoot = true
         invokedWillBootCount += 1
         invokedWillBootParameters = (container, ())
@@ -26,10 +26,10 @@ class ProviderMock: Provider, @unchecked Sendable {
 
     var invokedDidBoot = false
     var invokedDidBootCount = 0
-    var invokedDidBootParameters: (container: DependencyProvider, Void)?
-    var invokedDidBootParametersList = [(container: DependencyProvider, Void)]()
+    var invokedDidBootParameters: (container: any DependencyProvider, Void)?
+    var invokedDidBootParametersList = [(container: any DependencyProvider, Void)]()
 
-    func didBoot(_ container: DependencyProvider) {
+    func didBoot(_ container: any DependencyProvider) {
         invokedDidBoot = true
         invokedDidBootCount += 1
         invokedDidBootParameters = (container, ())
@@ -38,10 +38,10 @@ class ProviderMock: Provider, @unchecked Sendable {
 
     var invokedDidEnterBackground = false
     var invokedDidEnterBackgroundCount = 0
-    var invokedDidEnterBackgroundParameters: (container: DependencyProvider, Void)?
-    var invokedDidEnterBackgroundParametersList = [(container: DependencyProvider, Void)]()
+    var invokedDidEnterBackgroundParameters: (container: any DependencyProvider, Void)?
+    var invokedDidEnterBackgroundParametersList = [(container: any DependencyProvider, Void)]()
 
-    func didEnterBackground(_ container: DependencyProvider) {
+    func didEnterBackground(_ container: any DependencyProvider) {
         invokedDidEnterBackground = true
         invokedDidEnterBackgroundCount += 1
         invokedDidEnterBackgroundParameters = (container, ())
@@ -50,10 +50,10 @@ class ProviderMock: Provider, @unchecked Sendable {
 
     var invokedWillShutdown = false
     var invokedWillShutdownCount = 0
-    var invokedWillShutdownParameters: (container: DependencyProvider, Void)?
-    var invokedWillShutdownParametersList = [(container: DependencyProvider, Void)]()
+    var invokedWillShutdownParameters: (container: any DependencyProvider, Void)?
+    var invokedWillShutdownParametersList = [(container: any DependencyProvider, Void)]()
 
-    func willShutdown(_ container: DependencyProvider) {
+    func willShutdown(_ container: any DependencyProvider) {
         invokedWillShutdown = true
         invokedWillShutdownCount += 1
         invokedWillShutdownParameters = (container, ())

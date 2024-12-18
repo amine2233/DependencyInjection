@@ -5,19 +5,19 @@ public protocol DependencyRegistering {
     /// Registers all services in the given dependency container.
     ///
     /// - Parameter dependencies: The dependency container in which to register the services.
-    static func registerAllServices(in dependencies: inout Dependency)
+    static func registerAllServices(in dependencies: inout any Dependency)
 }
 
 /// A protocol that indicates that a type has dependencies.
 public protocol HasDependencies {
     /// The dependency container.
-    var dependencies: Dependency { get }
+    var dependencies: any Dependency { get }
 }
 
 /// Default implementation for types conforming to `HasDependencies`.
 extension HasDependencies {
     /// Provides access to the default dependency container.
-    var dependencies: Dependency {
+    var dependencies: any Dependency {
         DependencyInjector.default.dependencies
     }
 }
@@ -25,7 +25,7 @@ extension HasDependencies {
 /// The singleton dependency container reference which can be reassigned to another container
 public struct DependencyInjector: Sendable {
     /// The dependencies
-    public var dependencies: Dependency
+    public var dependencies: any Dependency
 
     /// The dependencyCore singleton
     public static let `default` = DependencyInjector()
@@ -36,22 +36,22 @@ public struct DependencyInjector: Sendable {
     }
 
     @resultBuilder struct ProviderBuilder {
-        static func buildBlock(_ dependency: Provider) -> Provider { dependency }
-        static func buildBlock(_ dependencies: Provider...) -> [Provider] { dependencies }
+        static func buildBlock(_ dependency: any Provider) -> any Provider { dependency }
+        static func buildBlock(_ dependencies: any Provider...) -> [any Provider] { dependencies }
     }
 
     @resultBuilder struct DependencyRegisteringBuilder {
-        static func buildBlock(_ components: DependencyRegistering.Type...) -> [DependencyRegistering.Type] {
+        static func buildBlock(_ components: any DependencyRegistering.Type...) -> [any DependencyRegistering.Type] {
             components
         }
-        static func buildBlock(_ component: DependencyRegistering.Type) -> DependencyRegistering.Type {
+        static func buildBlock(_ component: any DependencyRegistering.Type) -> any DependencyRegistering.Type {
             component
         }
     }
 
     /// Create a new dependency injection
     /// - Parameter dependencies: The dependencies
-    public init(dependencies: Dependency = DependencyCore()) {
+    public init(dependencies: any Dependency = DependencyCore()) {
         self.dependencies = dependencies
     }
 
@@ -60,9 +60,9 @@ public struct DependencyInjector: Sendable {
     ///   - dependencies: The dependencies
     ///   - block: to add `DependencyResolver` manually
     ///   - providers: to add `Provider` manually
-    public init(dependencies: Dependency = DependencyCore(),
+    public init(dependencies: any Dependency = DependencyCore(),
         @DependencyBuilder _ block: () -> [DependencyResolver] = { [] },
-        @ProviderBuilder _ providers: () -> [Provider] = { [] }
+        @ProviderBuilder _ providers: () -> [any Provider] = { [] }
     ) {
         self.init(dependencies: dependencies)
         block().forEach { self.dependencies.register($0) }
@@ -74,9 +74,9 @@ public struct DependencyInjector: Sendable {
     ///   - dependencies: The dependencies
     ///   - block: to add one `DependencyResolver` manually
     ///   - providers: to add  one `Provider` manually
-    public init(dependencies: Dependency = DependencyCore(),
+    public init(dependencies: any Dependency = DependencyCore(),
         @DependencyBuilder _ dependency:  () -> DependencyResolver,
-        @ProviderBuilder _ provider:  () -> Provider
+        @ProviderBuilder _ provider:  () -> any Provider
     ) {
         self.init(dependencies: dependencies)
         self.dependencies.register(dependency())
@@ -87,7 +87,7 @@ public struct DependencyInjector: Sendable {
     /// - Parameters:
     ///   - dependencies: The dependencies
     ///   - register: The registration
-    public init(dependencies: Dependency = DependencyCore(), register: DependencyRegistering.Type) {
+    public init(dependencies: any Dependency = DependencyCore(), register: any DependencyRegistering.Type) {
         self.init(dependencies: dependencies)
         register.registerAllServices(in: &self.dependencies)
     }
@@ -97,8 +97,8 @@ public struct DependencyInjector: Sendable {
     ///   - dependencies: The dependencies
     ///   - register: register one register type using resultBuilder
     public init(
-        dependencies: Dependency = DependencyCore(),
-        @DependencyRegisteringBuilder _ register: () -> DependencyRegistering.Type
+        dependencies: any Dependency = DependencyCore(),
+        @DependencyRegisteringBuilder _ register: () -> any DependencyRegistering.Type
     ) {
         self.init(dependencies: dependencies)
         register().registerAllServices(in: &self.dependencies)
@@ -109,8 +109,8 @@ public struct DependencyInjector: Sendable {
     ///   - dependencies: The dependencies
     ///   - registers: registers many register type using resultBuilder
     public init(
-        dependencies: Dependency = DependencyCore(),
-        @DependencyRegisteringBuilder _ registers: () -> [DependencyRegistering.Type]
+        dependencies: any Dependency = DependencyCore(),
+        @DependencyRegisteringBuilder _ registers: () -> [any DependencyRegistering.Type]
     ) {
         self.init(dependencies: dependencies)
         registers().forEach { $0.registerAllServices(in: &self.dependencies) }
@@ -120,14 +120,14 @@ public struct DependencyInjector: Sendable {
 
     /// Register dependency
     /// - Parameter register: The register type
-    public mutating func register(type register: DependencyRegistering.Type) {
+    public mutating func register(type register: any DependencyRegistering.Type) {
         register.registerAllServices(in: &self.dependencies)
     }
 
     /// Register dependency using result builder
     /// - Parameter register: The callback contain the registration type
     public mutating func register(
-        @DependencyRegisteringBuilder _ register: () -> DependencyRegistering.Type
+        @DependencyRegisteringBuilder _ register: () -> any DependencyRegistering.Type
     ) {
         register().registerAllServices(in: &self.dependencies)
     }
@@ -135,7 +135,7 @@ public struct DependencyInjector: Sendable {
     /// Register dependencies using result builder
     /// - Parameter register: The callback contain the registration types
     public mutating func registers(
-        @DependencyRegisteringBuilder _ registers: () -> [DependencyRegistering.Type]
+        @DependencyRegisteringBuilder _ registers: () -> [any DependencyRegistering.Type]
     ) {
         registers().forEach { $0.registerAllServices(in: &self.dependencies) }
     }
@@ -144,7 +144,7 @@ public struct DependencyInjector: Sendable {
 
     /// Register dependency for preview
     /// - Parameter register: The register type
-    public mutating func preview(type register: DependencyRegistering.Type) {
+    public mutating func preview(type register: any DependencyRegistering.Type) {
         if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
             register.registerAllServices(in: &self.dependencies)
         }
@@ -152,7 +152,7 @@ public struct DependencyInjector: Sendable {
 
     /// Register dependency for preview using result builder
     /// - Parameter register: The callback contain the registration type
-    public mutating func preview(@DependencyRegisteringBuilder _ preview: () -> DependencyRegistering.Type) {
+    public mutating func preview(@DependencyRegisteringBuilder _ preview: () -> any DependencyRegistering.Type) {
         if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
             preview().registerAllServices(in: &self.dependencies)
         }
@@ -161,7 +161,7 @@ public struct DependencyInjector: Sendable {
     /// Register dependencies  for preview using result builder
     /// - Parameter register: The callback contain the registration types
     public mutating func previews(
-        @DependencyRegisteringBuilder _ registers: () -> [DependencyRegistering.Type]
+        @DependencyRegisteringBuilder _ registers: () -> [any DependencyRegistering.Type]
     ) {
         if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
             registers().forEach { $0.registerAllServices(in: &self.dependencies) }
@@ -186,13 +186,13 @@ public struct DependencyInjector: Sendable {
 
     /// Register providers using `Provider`
     /// - Parameter register: The callback contain an array of `Provider`
-    public mutating func providers(@ProviderBuilder _ providers: () -> [Provider] = { [] }) {
+    public mutating func providers(@ProviderBuilder _ providers: () -> [any Provider] = { [] }) {
         providers().forEach { self.dependencies.registerProvider($0) }
     }
 
     /// Register dependency using `Provider`
     /// - Parameter register: The callback contain a `Provider`
-    public mutating func provider(@ProviderBuilder _ provider:  () -> Provider) {
+    public mutating func provider(@ProviderBuilder _ provider:  () -> any Provider) {
         self.dependencies.registerProvider(provider())
     }
 }

@@ -36,7 +36,7 @@ public struct DependencyCore: Dependency {
     private var dependencies: [DependencyKey: DependencyResolver]
 
     /// The providers container
-    private var providers: [Provider]
+    private var providers: [any Provider]
 
     /// The description of the container
     public var description: String {
@@ -74,7 +74,7 @@ public struct DependencyCore: Dependency {
     public init(
         environment: DependencyEnvironment = .production,
         dependencies: [DependencyKey: DependencyResolver] = [:],
-        providers: [Provider] = []
+        providers: [any Provider] = []
     ) {
         self.environment = environment
         self.dependencies = dependencies
@@ -113,14 +113,14 @@ extension DependencyCore {
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    public mutating func register<T>(_ type: T.Type, completion: @escaping (Dependency) throws -> T) {
+    public mutating func register<T>(_ type: T.Type, completion: @escaping @Sendable (any Dependency) throws -> T) {
         register(key: DependencyKey(type: type), completion: completion)
     }
 
     /// Register class conform to protocol ```DependencyServiceType``` and use it with resolve
     /// - Parameter type: The `DependencyServiceType` type of the object you will register
     public mutating func register<T>(_ type: T.Type) where T: DependencyServiceType {
-        let completion = { (container: Dependency) in
+        let completion = { (container: any Dependency) in
             try T.makeService(for: container)
         }
         let identifier = DependencyKey(type: type)
@@ -133,7 +133,7 @@ extension DependencyCore {
         dependencies[dependency.key] = dependency
     }
 
-    public mutating func register<T>(key: DependencyKey, completion: @escaping (Dependency) throws -> T) {
+    public mutating func register<T>(key: DependencyKey, completion: @escaping @Sendable (any Dependency) throws -> T) {
         dependencies[key] = DependencyResolver(key: key, isSingleton: false, resolveBlock: completion)
     }
 }
@@ -148,8 +148,8 @@ extension DependencyCore {
     ///   - operation: The operation after registration
     public mutating func registerOperation<T>(
         _ type: T.Type,
-        completion: @escaping (Dependency) throws -> T,
-        operation: @escaping (T, Dependency) throws -> T
+        completion: @escaping @Sendable (any Dependency) throws -> T,
+        operation: @escaping @Sendable (T, any Dependency) throws -> T
     ) {
         register(type, completion: { dependencies in
             let result = try completion(dependencies)
@@ -164,7 +164,7 @@ extension DependencyCore {
     /// Create a unique object, this method not register class
     /// - Parameter completion: the completion to create a new object
     /// - Returns: the new object
-    public func factory<T>(completion: (Dependency) throws -> T) throws -> T {
+    public func factory<T>(completion: @Sendable (any Dependency) throws -> T) throws -> T {
         try completion(self)
     }
 
@@ -250,7 +250,7 @@ extension DependencyCore {
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
     /// - Returns: The singleton object
-    public mutating func registerSingleton<T>(completion: @escaping (Dependency) throws -> T) throws {
+    public mutating func registerSingleton<T>(completion: @escaping (any Dependency) throws -> T) throws {
         let identifier = DependencyKey(type: T.self)
         let dependency = DependencyResolver(key: identifier, isSingleton: true, resolveBlock: completion)
 
@@ -265,7 +265,7 @@ extension DependencyCore {
     ///   - completion: The completion
     public mutating func registerSingleton<T>(
         _ type: T.Type,
-        completion: @escaping (Dependency) throws -> T
+        completion: @escaping (any Dependency) throws -> T
     ) throws {
         let identifier = DependencyKey(type: type)
         let dependency = DependencyResolver(key: identifier, isSingleton: true, resolveBlock: completion)
@@ -276,7 +276,7 @@ extension DependencyCore {
     /// - Parameter type: The type of the singleton
     /// - Returns: the singleton object
     public mutating func registerSingleton<T: DependencyServiceType>(_ type: T.Type) throws {
-        let completion: (Dependency) throws -> T = { dependency in
+        let completion: (any Dependency) throws -> T = { dependency in
             try T.makeService(for: dependency)
         }
         let identifier = DependencyKey(type: T.self)
@@ -308,8 +308,8 @@ extension DependencyCore {
     ///   - operation: The operation after registration
     public mutating func registerSingletonOperation<T>(
         _ type: T.Type,
-        completion: @escaping (Dependency) throws -> T,
-        operation: @escaping (T, Dependency) throws -> T
+        completion: @escaping (any Dependency) throws -> T,
+        operation: @escaping (T, any Dependency) throws -> T
     ) throws {
         try registerSingleton(type, completion: { dependencies in
             let result = try completion(dependencies)
@@ -323,13 +323,13 @@ extension DependencyCore {
 extension DependencyCore {
     /// Register provider
     /// - Parameter provider: the provider you will add
-    public mutating func registerProvider(_ provider: Provider) {
+    public mutating func registerProvider(_ provider: any Provider) {
         providers.append(provider)
     }
 
     /// Unregister provider
     /// - Parameter provider: the provider you will unregister
-    public mutating func unregisterProvider(_ provider: Provider) {
+    public mutating func unregisterProvider(_ provider: any Provider) {
         providers = providers.filter { $0.description != provider.description }
     }
 }

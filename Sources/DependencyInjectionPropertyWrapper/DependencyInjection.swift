@@ -13,7 +13,7 @@ public struct Injection<Service> {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
         do {
             self.service = try dependencies.resolve()
         } catch {
@@ -44,11 +44,11 @@ public struct Injection<Service> {
 @propertyWrapper
 public struct InjectionKey<Service> {
     private var key: DependencyKey
-    private var dependencies: DependencySubscript
+    private var dependencies: any DependencySubscript
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(_ key: DependencyKey, dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(_ key: DependencyKey, dependencies: any Dependency = DependencyInjector.default.dependencies) {
         self.dependencies = dependencies
         self.key = key
     }
@@ -86,7 +86,7 @@ public struct OptionalInjection<Service> {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
         self.service = try? dependencies.resolve(Service.self)
     }
 
@@ -113,11 +113,14 @@ public struct OptionalInjection<Service> {
 @propertyWrapper
 public struct OptionalInjectionKey<Service> {
     private var key: DependencyKey
-    private var dependencies: DependencySubscript
+    private var dependencies: any DependencySubscript
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(_ key: DependencyKey, dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(
+        _ key: DependencyKey,
+        dependencies: any Dependency = DependencyInjector.default.dependencies
+    ) {
         self.dependencies = dependencies
         self.key = key
     }
@@ -150,11 +153,11 @@ public struct OptionalInjectionKey<Service> {
 public struct LazyInjection<Service> {
     private(set) var isInitialized: Bool = false
     private var service: Service!
-    private let dependencies: Dependency
+    private let dependencies: any Dependency
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
         self.dependencies = dependencies
     }
 
@@ -206,11 +209,11 @@ public struct LazyInjection<Service> {
 public struct WeakLazyInjection<Service> {
     private(set) var isInitialized: Bool = false
     private var service: Service?
-    private let dependencies: Dependency
+    private let dependencies: any Dependency
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
         self.dependencies = dependencies
     }
 

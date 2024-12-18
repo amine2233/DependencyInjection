@@ -5,7 +5,7 @@ public final class DependencyResolver: @unchecked Sendable  {
     /// A typealias representing a closure that resolves a dependency.
     /// - Parameter Dependency: The dependency container.
     /// - Returns: The resolved dependency of type `T`.
-    public typealias ResolveBlock<T> = (Dependency) throws -> T
+    public typealias ResolveBlock<T> = (any Dependency) throws -> T
 
     /// The resolved dependency value.
     public private(set) var value: Any!
@@ -51,7 +51,7 @@ public final class DependencyResolver: @unchecked Sendable  {
     ///
     /// - Parameter dependencies: The dependency container.
     /// - Throws: An error if the dependency cannot be resolved.
-    public func resolve(dependencies: Dependency) throws {
+    public func resolve(dependencies: any Dependency) throws {
         value = try resolveBlock(dependencies)
     }
     
@@ -60,7 +60,7 @@ public final class DependencyResolver: @unchecked Sendable  {
     /// - Parameter dependencies: The dependency container.
     /// - Returns: The updated `DependencyResolver`.
     /// - Throws: An error if the dependency cannot be resolved.
-    func resolveDependency(dependencies: Dependency) throws -> DependencyResolver {
+    func resolveDependency(dependencies: any Dependency) throws -> DependencyResolver {
         value = try resolveBlock(dependencies)
         return self
     }

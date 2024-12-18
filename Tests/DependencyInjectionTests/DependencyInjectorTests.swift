@@ -2,7 +2,7 @@ import XCTest
 @testable import DependencyInjection
 
 struct DependencyRegisteringTest: DependencyRegistering {
-    static func registerAllServices(in dependencies: inout Dependency) {
+    static func registerAllServices(in dependencies: inout any Dependency) {
         dependencies.register(ExecutableServiceMock.self)
     }
 }

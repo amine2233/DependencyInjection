@@ -10,11 +10,11 @@ import DependencyInjection
 ///
 @propertyWrapper
 public struct EnvironmentInjection {
-    private var dependencies: Dependency
+    private var dependencies: any Dependency
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
         self.dependencies = dependencies
     }
 
@@ -41,14 +41,14 @@ public struct EnvironmentInjection {
 @propertyWrapper
 public struct EnvironmentParameter<T: Sendable> {
     private let key: DependencyEnvironmentKey
-    private var dependencies: Dependency
+    private var dependencies: any Dependency
 
     /// Initialization
     /// - Parameter key: The environment parameter key
     /// - Parameter dependencies: The dependency manager
     public init(
         key: DependencyEnvironmentKey,
-        dependencies: Dependency = DependencyInjector.default.dependencies
+        dependencies: any Dependency = DependencyInjector.default.dependencies
     ) {
         self.key = key
         self.dependencies = dependencies
@@ -78,14 +78,14 @@ public struct EnvironmentParameter<T: Sendable> {
 @propertyWrapper
 public struct EnvironmentStringOption {
     private let key: DependencyEnvironmentKey
-    private var dependencies: Dependency
+    private var dependencies: any Dependency
 
     /// Initialization
     /// - Parameter key: The environment parameter key
     /// - Parameter dependencies: The dependency manager
     public init(
         key: DependencyEnvironmentKey,
-        dependencies: Dependency = DependencyInjector.default.dependencies
+        dependencies: any Dependency = DependencyInjector.default.dependencies
     ) {
         self.key = key
         self.dependencies = dependencies

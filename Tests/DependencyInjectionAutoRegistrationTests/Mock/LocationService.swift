@@ -14,10 +14,10 @@ protocol LocationService {
 
 class LocationServiceMock: LocationService {
     
-    private let executableService: ExecutableService
-    private let journeyService: JourneyService
+    private let executableService: any ExecutableService
+    private let journeyService: any JourneyService
 
-    init(executableService: ExecutableService, journeyService: JourneyService) {
+    init(executableService: any ExecutableService, journeyService: any JourneyService) {
         self.executableService = executableService
         self.journeyService = journeyService
     }

@@ -10,7 +10,7 @@ public protocol DependencyRegister: Sendable {
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    mutating func register<T>(_ type: T.Type, completion: @escaping @Sendable (Dependency) throws -> T)
+    mutating func register<T>(_ type: T.Type, completion: @escaping @Sendable (any Dependency) throws -> T)
 
     /// Register class conform to protocol ```DependencyServiceType``` and use it with resolve
     /// - Parameter type: The `DependencyServiceType` type of the object you will register
@@ -24,7 +24,7 @@ public protocol DependencyRegister: Sendable {
     /// - Parameters:
     ///   - key: The dependency key of the object you will register
     ///   - completion: The completion
-    mutating func register<T>(key: DependencyKey, completion: @escaping @Sendable (Dependency) throws -> T)
+    mutating func register<T>(key: DependencyKey, completion: @escaping @Sendable (any Dependency) throws -> T)
 }
 
 public protocol DependencyRegisterOperation: Sendable {
@@ -35,8 +35,8 @@ public protocol DependencyRegisterOperation: Sendable {
     ///   - operation: The operation after registration
     mutating func registerOperation<T>(
         _ type: T.Type,
-        completion: @escaping @Sendable (Dependency) throws -> T,
-        operation: @escaping @Sendable (T, Dependency) throws -> T
+        completion: @escaping @Sendable (any Dependency) throws -> T,
+        operation: @escaping @Sendable (T, any Dependency) throws -> T
     ) throws
 }
 
@@ -67,13 +67,13 @@ public protocol DependencySingleton: Sendable {
 
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
-    mutating func registerSingleton<T>(completion: @escaping @Sendable (Dependency) throws -> T) throws
+    mutating func registerSingleton<T>(completion: @escaping @Sendable (any Dependency) throws -> T) throws
     
     /// Create a singleton
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    mutating func registerSingleton<T>(_ type: T.Type, completion: @escaping @Sendable (Dependency) throws -> T) throws
+    mutating func registerSingleton<T>(_ type: T.Type, completion: @escaping @Sendable (any Dependency) throws -> T) throws
 
 
     /// Create a singleton with class conform to protocol ```DependencyServiceType```
@@ -99,8 +99,8 @@ public protocol DependencySingletonOperation: Sendable {
     ///   - operation: The operation after registration
     mutating func registerSingletonOperation<T>(
         _ type: T.Type,
-        completion: @escaping @Sendable (Dependency) throws -> T,
-        operation: @escaping @Sendable (T, Dependency) throws -> T
+        completion: @escaping @Sendable (any Dependency) throws -> T,
+        operation: @escaping @Sendable (T, any Dependency) throws -> T
     ) throws
 }
 
@@ -108,11 +108,11 @@ public protocol DependencySingletonOperation: Sendable {
 public protocol DependencyProvider: Sendable {
     /// Register provider
     /// - Parameter provider: the provider you will add
-    mutating func registerProvider(_ provider: Provider)
+    mutating func registerProvider(_ provider: any Provider)
 
     /// Unregister provider
     /// - Parameter provider: the provider you will unregister
-    mutating func unregisterProvider(_ provider: Provider)
+    mutating func unregisterProvider(_ provider: any Provider)
 
     // MARK: Startup and Endup provider configuration
     func willBoot() -> Self

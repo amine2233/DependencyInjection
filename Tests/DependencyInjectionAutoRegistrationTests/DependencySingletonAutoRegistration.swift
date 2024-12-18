@@ -3,7 +3,7 @@ import XCTest
 @testable import DependencyInjectionAutoRegistration
 
 final class DependencySingletonAutoRegistration: XCTestCase {
-    var dependencyCore: Dependency!
+    var dependencyCore: (any Dependency)!
     
     override func setUpWithError() throws {
         dependencyCore = DependencyCore()
@@ -20,26 +20,26 @@ final class DependencySingletonAutoRegistration: XCTestCase {
 
         // WHEN
         try dependencyCore.autoregisterSingleton(
-            JourneyService.self,
+            (any JourneyService).self,
             initializer: JourneyMock.init
         )
 
         // THEN
-        XCTAssertNoThrow(try dependencyCore.resolve(JourneyService.self) as! JourneyMock)
+        XCTAssertNoThrow(try dependencyCore.resolve((any JourneyService).self) as! JourneyMock)
     }
     
     func test_AutoRegistration_with_two_paramaters() throws {
         // GIVEN
-        dependencyCore.autoregister(JourneyService.self, initializer: JourneyMock.init)
-        dependencyCore.autoregister(ExecutableService.self, initializer: ExecutableServiceMock.init)
+        dependencyCore.autoregister((any JourneyService).self, initializer: JourneyMock.init)
+        dependencyCore.autoregister((any ExecutableService).self, initializer: ExecutableServiceMock.init)
 
         // WHEN
         try dependencyCore.autoregisterSingleton(
-            LocationService.self,
+            (any LocationService).self,
             initializer: LocationServiceMock.init
         )
 
         // THEN
-        XCTAssertNoThrow(try dependencyCore.resolve(LocationService.self) as! LocationServiceMock)
+        XCTAssertNoThrow(try dependencyCore.resolve((any LocationService).self) as! LocationServiceMock)
     }
 }
