@@ -66,6 +66,5 @@ let package = Package(
             dependencies: ["DependencyInjectionAutoRegistration"],
             swiftSettings: swiftSettings
         )
-    ],
-    swiftLanguageModes: [.v6, .v5]
+    ]
 )
