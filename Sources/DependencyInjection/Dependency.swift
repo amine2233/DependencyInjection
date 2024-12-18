@@ -40,7 +40,7 @@ public protocol DependencyRegisterOperation: Sendable {
     ) throws
 }
 
-public protocol DependencyUnregister: Sendable {
+public protocol DependencyUnregister {
     /// Unregister class
     /// - Parameter type: The type of the object you will unregister
     /// - Returns: the object removed
@@ -63,7 +63,18 @@ public protocol DependencyReslove: Sendable {
     func resolve<T>() throws -> T
 }
 
-public protocol DependencySingleton: Sendable {
+public protocol DependencySingleton {
+    /// Resolve singleton
+    /// - Returns: singleton object
+    @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
+    func singleton<T>() throws -> T
+
+    /// Resolve singleton
+    /// - Parameter key: The key of the object you will unregister
+    /// - Returns: singleton object
+    @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
+    func singleton<T>(key: DependencyKey) throws -> T
+
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
     mutating func registerSingleton<T>(completion: @escaping @Sendable (any Dependency) throws -> T) throws
@@ -128,7 +139,7 @@ public protocol DependencyDescription: Sendable, CustomStringConvertible {
 }
 
 public protocol DependencySubscript: Sendable {
-    subscript<T>(_ keyPath: DependencyKey) -> T? { get set }
+    subscript<T: Sendable>(_ keyPath: DependencyKey) -> T? { get set }
 }
 
 /// The dependency protocol

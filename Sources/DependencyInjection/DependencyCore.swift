@@ -32,10 +32,10 @@ public struct DependencyCore: Dependency {
     }
 
     /// The dependencies container
-    private var dependencies: [DependencyKey: any DependencyResolver]
+    package var dependencies: [DependencyKey: any DependencyResolver]
 
     /// The providers container
-    private var providers: [any Provider]
+    package var providers: [any Provider]
 
     /// The description of the container
     public var description: String {
