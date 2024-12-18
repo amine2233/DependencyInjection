@@ -42,7 +42,7 @@ public struct Injection<Service> {
 /// ```
 ///
 @propertyWrapper
-public struct InjectionKey<Service> {
+public struct InjectionKey<Service: Sendable> {
     private var key: DependencyKey
     private var dependencies: any DependencySubscript
 
@@ -111,7 +111,7 @@ public struct OptionalInjection<Service> {
 /// ```
 ///
 @propertyWrapper
-public struct OptionalInjectionKey<Service> {
+public struct OptionalInjectionKey<Service: Sendable> {
     private var key: DependencyKey
     private var dependencies: any DependencySubscript
 
@@ -150,7 +150,7 @@ public struct OptionalInjectionKey<Service> {
 /// ```
 ///
 @propertyWrapper
-public struct LazyInjection<Service> {
+public struct LazyInjection<Service: Sendable> {
     private(set) var isInitialized: Bool = false
     private var service: Service!
     private let dependencies: any Dependency

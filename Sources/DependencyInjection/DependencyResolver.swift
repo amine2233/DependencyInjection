@@ -4,6 +4,7 @@ import Foundation
 public enum DependencyResolverError: Error {
     /// Indicates that a dependency could not be resolved.
     case notResolved
+    case parameterNotResolved(service: String, type: String)
 }
 
 /// A protocol representing a dependency resolver.
@@ -12,7 +13,7 @@ public enum DependencyResolverError: Error {
 public protocol DependencyResolver: Sendable {
     /// The key used to identify the dependency.
     var key: DependencyKey { get }
-    
+
     /// A flag indicating whether the dependency is a singleton.
     var isSingleton: Bool { get }
 
@@ -21,7 +22,9 @@ public protocol DependencyResolver: Sendable {
     /// - Parameter dependencies: The dependency container.
     /// - Throws: An error if the dependency cannot be resolved.
     mutating func resolve(dependencies: any Dependency) throws
-    
+
+    mutating func setParameters(contentOf sequences: [any Sendable])
+
     /// Get the value inside the
     func value() throws -> (any Sendable)
 }
@@ -36,13 +39,14 @@ extension DependencyResolver {
         try resolve(dependencies: dependencies)
         return self
     }
+
+    mutating func setParameters(contentOf sequences: [any Sendable]) {}
 }
 
 /// A factory for creating `DependencyResolver` instances, which are responsible for resolving dependencies.
 ///
 /// The `DependencyResolverFactory` provides methods to build `DependencyResolver` objects, which can be used to manage dependency resolution, optionally with singleton behavior.
 public enum DependencyResolverFactory: Sendable {
-
     /// Creates a `DependencyResolver` with the given key and resolution block.
     ///
     /// - Parameters:
@@ -92,7 +96,7 @@ private struct DependencyResolverDefault: DependencyResolver {
         init(block: (any Sendable)? = nil) {
             self.block = block
         }
-        
+
         func copy() -> Storage {
             Storage(
                 block: block
@@ -162,7 +166,7 @@ private struct DependencyResolverDefault: DependencyResolver {
         }
         return block
     }
-    
+
     private mutating func ensureUniqueness() {
         guard !isKnownUniquelyReferenced(&storage) else { return }
         storage = storage.copy()

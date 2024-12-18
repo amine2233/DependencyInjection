@@ -21,6 +21,10 @@ let package = Package(
             targets: ["DependencyInjection"]
         ),
         .library(
+            name: "DependencyInjectionProperty",
+            targets: ["DependencyInjectionProperty"]
+        ),
+        .library(
             name: "DependencyInjectionPropertyWrapper",
             targets: ["DependencyInjectionPropertyWrapper"]
         ),
@@ -68,6 +72,11 @@ let package = Package(
         .testTarget(
             name: "DependencyInjectionAutoRegistrationTests",
             dependencies: ["DependencyInjectionAutoRegistration"],
+            swiftSettings: swiftSettings
+        ),
+        .testTarget(
+            name: "DependencyInjectionPropertyTests",
+            dependencies: ["DependencyInjectionProperty"],
             swiftSettings: swiftSettings
         )
     ],

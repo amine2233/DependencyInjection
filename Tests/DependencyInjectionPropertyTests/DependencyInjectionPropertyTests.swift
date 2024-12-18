@@ -24,7 +24,7 @@ final class DependencyInjectionPropertyTests: XCTestCase {
             LocationMock(stubbedValue: value)
         }
         let argument = "test_pass_value"
-        
+
         // WHEN
         let dependencies = try dependencyCore.resolver(LocationMock.self, argument: argument)
 

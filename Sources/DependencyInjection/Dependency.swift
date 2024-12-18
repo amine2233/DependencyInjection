@@ -64,7 +64,6 @@ public protocol DependencyReslove: Sendable {
 }
 
 public protocol DependencySingleton {
-
     /// Resolve singleton
     /// - Returns: singleton object
     @available(*, deprecated, message: "replaced by resolve", renamed: "resolve")
@@ -140,7 +139,7 @@ public protocol DependencyDescription: Sendable, CustomStringConvertible {
 }
 
 public protocol DependencySubscript: Sendable {
-    subscript<T>(_ keyPath: DependencyKey) -> T? { get set }
+    subscript<T: Sendable>(_ keyPath: DependencyKey) -> T? { get set }
 }
 
 /// The dependency protocol

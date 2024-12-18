@@ -1,26 +1,19 @@
-//
-//  File.swift
-//  
-//
-//  Created by Amine Bensalah on 22/12/2020.
-//
-
 import Foundation
+
 // import Combine
 
-protocol LocationService {
+protocol LocationService: Sendable {
     var value: String { get }
     typealias Location = (Double, Double)
     // var location: AnyPublisher<Location, Never> { get }
     func start()
 }
 
-final class LocationMock: LocationService {
-
+final class LocationMock: LocationService, @unchecked Sendable {
     init(stubbedValue: String) {
         self.stubbedValue = stubbedValue
     }
-    
+
     var invokedValueGetter = false
     var invokedValueGetterCount = 0
     var stubbedValue: String! = ""
