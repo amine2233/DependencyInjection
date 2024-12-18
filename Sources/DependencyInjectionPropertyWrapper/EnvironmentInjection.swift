@@ -9,7 +9,7 @@ import Foundation
 /// ```
 ///
 @propertyWrapper
-public struct EnvironmentInjection {
+public struct EnvironmentInjection: Sendable {
     private var dependencies: any Dependency
 
     /// Initialization
@@ -39,7 +39,7 @@ public struct EnvironmentInjection {
 /// ```
 ///
 @propertyWrapper
-public struct EnvironmentParameter<T: Sendable> {
+public struct EnvironmentParameter<T: Sendable>: Sendable {
     private let key: DependencyEnvironmentKey
     private var dependencies: any Dependency
 
@@ -76,7 +76,7 @@ public struct EnvironmentParameter<T: Sendable> {
 /// ```
 ///
 @propertyWrapper
-public struct EnvironmentStringOption {
+public struct EnvironmentStringOption: Sendable {
     private let key: DependencyEnvironmentKey
     private var dependencies: any Dependency
 

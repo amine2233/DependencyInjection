@@ -227,7 +227,7 @@ extension DependencyEnvironment: CustomStringConvertible {
 extension DependencyEnvironment {
     /// A struct representing information about the current process.
     @dynamicMemberLookup
-    public struct Process {
+    public struct Process: Sendable {
         /// The underlying process information.
         private let _info: ProcessInfo
 
@@ -344,7 +344,7 @@ extension DependencyEnvironment {
 extension DependencyEnvironment {
     /// A class that holds a reference to a value, allowing for dynamic member lookup.
     @dynamicMemberLookup
-    public class Reference<Value> {
+    public class Reference<Value: Sendable>: @unchecked Sendable {
         /// The value being referenced.
         fileprivate(set) var value: Value
 
@@ -365,7 +365,7 @@ extension DependencyEnvironment {
     }
 
     /// A final class that extends `Reference` to allow for mutable access to the referenced value's properties.
-    public final class MutableReference<Value>: Reference<Value> {
+    public final class MutableReference<Value: Sendable>: Reference<Value>, @unchecked Sendable {
         /// Provides dynamic member lookup to access and modify properties of the referenced value using writable key paths.
         ///
         /// - Parameter keyPath: The writable key path to the desired property.

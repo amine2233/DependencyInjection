@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol DependencyParameters {
+public protocol DependencyParameters: Sendable {
     /// The environment parameter
     var environment: DependencyEnvironment { get set }
 }
