@@ -1,12 +1,15 @@
 import Foundation
 
-protocol JourneyService {
+protocol JourneyService: Sendable {
     func start()
 }
 
-class JourneyMock: JourneyService {
+final class JourneyMock: JourneyService, @unchecked Sendable {
     var invokedStart = false
     var invokedStartCount = 0
+    
+    @Sendable
+    init() {}
 
     func start() {
         invokedStart = true
