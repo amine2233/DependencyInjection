@@ -112,14 +112,17 @@ extension DependencyCore {
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    public mutating func register<T>(_ type: T.Type, completion: @escaping @Sendable (any Dependency) throws -> T) {
+    public mutating func register<T: Sendable>(
+        _ type: T.Type,
+        completion: @escaping @Sendable (any Dependency) throws -> T
+    ) {
         register(key: DependencyKey(type: type), completion: completion)
     }
 
     /// Register class conform to protocol ```DependencyServiceType``` and use it with resolve
     /// - Parameter type: The `DependencyServiceType` type of the object you will register
-    public mutating func register<T>(_ type: T.Type) where T: DependencyServiceType {
-        let completion = { (container: any Dependency) in
+    public mutating func register<T: Sendable>(_ type: T.Type) where T: DependencyServiceType {
+        let completion = { @Sendable (container: any Dependency) in
             try T.makeService(for: container)
         }
         let identifier = DependencyKey(type: type)
@@ -132,7 +135,10 @@ extension DependencyCore {
         dependencies[dependency.key] = dependency
     }
 
-    public mutating func register<T>(key: DependencyKey, completion: @escaping @Sendable (any Dependency) throws -> T) {
+    public mutating func register<T: Sendable>(
+        key: DependencyKey,
+        completion: @escaping @Sendable (any Dependency) throws -> T
+    ) {
         dependencies[key] = DependencyResolver(key: key, isSingleton: false, resolveBlock: completion)
     }
 }
@@ -145,7 +151,7 @@ extension DependencyCore {
     ///   - type: The type of the object you will register
     ///   - completion: The completion
     ///   - operation: The operation after registration
-    public mutating func registerOperation<T>(
+    public mutating func registerOperation<T: Sendable>(
         _ type: T.Type,
         completion: @escaping @Sendable (any Dependency) throws -> T,
         operation: @escaping @Sendable (T, any Dependency) throws -> T
@@ -163,14 +169,14 @@ extension DependencyCore {
     /// Create a unique object, this method not register class
     /// - Parameter completion: the completion to create a new object
     /// - Returns: the new object
-    public func factory<T>(completion: @Sendable (any Dependency) throws -> T) throws -> T {
+    public func factory<T: Sendable>(completion: @Sendable (any Dependency) throws -> T) throws -> T {
         try completion(self)
     }
 
     /// Create a new object conform to protocol ```DependencyServiceType```, this method not register class
     /// - Parameter _: The object you will create
     /// - Returns: The new object
-    public func factory<T>(_ type: T.Type) throws -> T where T: DependencyServiceType {
+    public func factory<T: Sendable>(_ type: T.Type) throws -> T where T: DependencyServiceType {
         try type.makeService(for: self)
     }
 
@@ -180,7 +186,7 @@ extension DependencyCore {
     public mutating func factory(_ dependency: DependencyResolver) throws -> Any {
         try dependency.resolve(dependencies: self)
 
-        guard let value = dependency.value else {
+        guard let value = try? dependency.value() else {
             throw DependencyError.notResolved(name: dependency.key.rawValue)
         }
         return value
@@ -237,19 +243,19 @@ extension DependencyCore {
 extension DependencyCore {
     /// Resolve singleton
     /// - Returns: singleton object
-    public func singleton<T>() throws -> T {
+    public func singleton<T: Sendable>() throws -> T {
         let identifier = DependencyKey(type: T.self)
         return try singleton(key: identifier)
     }
 
-    public func singleton<T>(key: DependencyKey) throws -> T {
+    public func singleton<T: Sendable>(key: DependencyKey) throws -> T {
         try resolve(key: key)
     }
 
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
     /// - Returns: The singleton object
-    public mutating func registerSingleton<T>(completion: @escaping @Sendable (any Dependency) throws -> T) throws {
+    public mutating func registerSingleton<T: Sendable>(completion: @escaping @Sendable (any Dependency) throws -> T) throws {
         let identifier = DependencyKey(type: T.self)
         let dependency = DependencyResolver(key: identifier, isSingleton: true, resolveBlock: completion)
 
@@ -262,7 +268,7 @@ extension DependencyCore {
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    public mutating func registerSingleton<T>(
+    public mutating func registerSingleton<T: Sendable>(
         _ type: T.Type,
         completion: @escaping @Sendable (any Dependency) throws -> T
     ) throws {
@@ -274,8 +280,8 @@ extension DependencyCore {
     /// Create a singleton with class conform to protocol ```DependencyServiceType```
     /// - Parameter type: The type of the singleton
     /// - Returns: the singleton object
-    public mutating func registerSingleton<T: DependencyServiceType>(_ type: T.Type) throws {
-        let completion: (any Dependency) throws -> T = { dependency in
+    public mutating func registerSingleton<T: DependencyServiceType & Sendable>(_ type: T.Type) throws {
+        let completion: @Sendable (any Dependency) throws -> T = { @Sendable dependency in
             try T.makeService(for: dependency)
         }
         let identifier = DependencyKey(type: T.self)
@@ -305,7 +311,7 @@ extension DependencyCore {
     ///   - type: The type of the object you will register
     ///   - completion: The completion
     ///   - operation: The operation after registration
-    public mutating func registerSingletonOperation<T>(
+    public mutating func registerSingletonOperation<T: Sendable>(
         _ type: T.Type,
         completion: @escaping @Sendable (any Dependency) throws -> T,
         operation: @escaping @Sendable (T, any Dependency) throws -> T
@@ -336,7 +342,7 @@ extension DependencyCore {
 extension DependencyCore {
     /// Get or set service's value from the dependencies.
     /// - Parameter keyPath: the dependency key
-    public subscript<T>(
+    public subscript<T: Sendable>(
         _ keyPath: DependencyKey
     ) -> T? {
         get {
