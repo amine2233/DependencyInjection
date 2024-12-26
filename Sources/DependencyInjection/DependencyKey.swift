@@ -35,3 +35,37 @@ extension DependencyKey {
         self.rawValue = String(describing: type.self)
     }
 }
+
+public struct DependencyTypeKey: Hashable, Sendable, CustomStringConvertible {
+    let type: String
+    let key: DependencyKey?
+    
+    public var description: String {
+        var _name = type
+        if let key {
+            _name += "-(\(key.rawValue))"
+        }
+        return _name
+    }
+    
+    public init<T>(type: T.Type, key: DependencyKey? = nil) {
+        self.type = String(describing: type.self)
+        self.key = key
+    }
+    
+    public init(type: String, key: DependencyKey? = nil) {
+        self.type = type
+        self.key = key
+    }
+    
+    public init(key: DependencyKey) {
+        self.type = key.rawValue
+        self.key = nil
+    }
+}
+
+extension DependencyTypeKey {
+    public func asDependencyKey() -> DependencyKey {
+        DependencyKey(rawValue: type)
+    }
+}

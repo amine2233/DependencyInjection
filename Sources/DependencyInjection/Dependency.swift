@@ -10,11 +10,36 @@ public protocol DependencyRegister: Sendable {
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    mutating func register<T>(_ type: T.Type, completion: @escaping @Sendable (any Dependency) throws -> T)
+    mutating func register<T: Sendable>(
+        _ type: T.Type,
+        completion: @escaping @Sendable (any Dependency) throws -> T
+    )
+    
+    /// Register class for using with resolve
+    /// - Parameters:
+    ///   - type: The type of the object you will register
+    ///   - key The dependency key
+    ///   - completion: The completion
+    mutating func register<T: Sendable>(
+        _ type: T.Type,
+        key: DependencyKey?,
+        completion: @escaping @Sendable (any Dependency) throws -> T
+    )
 
     /// Register class conform to protocol ```DependencyServiceType``` and use it with resolve
     /// - Parameter type: The `DependencyServiceType` type of the object you will register
-    mutating func register<T>(_ type: T.Type) where T: DependencyServiceType
+    mutating func register<T: Sendable>(
+        _ type: T.Type
+    ) where T: DependencyServiceType
+    
+    /// Register class conform to protocol ```DependencyServiceType``` and use it with resolve
+    /// - Parameters:
+    ///     - type: The `DependencyServiceType` type of the object you will register
+    ///     - key: DependencyKey?,
+    mutating func register<T: Sendable>(
+        _ type: T.Type,
+        key: DependencyKey?
+    ) where T: DependencyServiceType
 
     /// Register the dependency
     /// - Parameter dependency: The dependency
@@ -24,7 +49,23 @@ public protocol DependencyRegister: Sendable {
     /// - Parameters:
     ///   - key: The dependency key of the object you will register
     ///   - completion: The completion
-    mutating func register<T>(key: DependencyKey, completion: @escaping @Sendable (any Dependency) throws -> T)
+    mutating func register<T: Sendable>(
+        key: DependencyKey,
+        completion: @escaping @Sendable (
+            any Dependency
+        ) throws -> T
+    )
+
+    /// Register class for using with resolve
+    /// - Parameters:
+    ///   - typeKey: The dependency type key of the object you will register
+    ///   - completion: The completion
+    mutating func register<T: Sendable>(
+        typeKey: DependencyTypeKey,
+        completion: @escaping @Sendable (
+            any Dependency
+        ) throws -> T
+    )
 }
 
 public protocol DependencyRegisterOperation: Sendable {
