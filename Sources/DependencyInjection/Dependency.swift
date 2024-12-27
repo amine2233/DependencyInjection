@@ -44,28 +44,6 @@ public protocol DependencyRegister: Sendable {
     /// Register the dependency
     /// - Parameter dependency: The dependency
     mutating func register(_ dependency: any DependencyResolver)
-
-    /// Register class for using with resolve
-    /// - Parameters:
-    ///   - key: The dependency key of the object you will register
-    ///   - completion: The completion
-    mutating func register<T: Sendable>(
-        key: DependencyKey,
-        completion: @escaping @Sendable (
-            any Dependency
-        ) throws -> T
-    )
-
-    /// Register class for using with resolve
-    /// - Parameters:
-    ///   - typeKey: The dependency type key of the object you will register
-    ///   - completion: The completion
-    mutating func register<T: Sendable>(
-        typeKey: DependencyTypeKey,
-        completion: @escaping @Sendable (
-            any Dependency
-        ) throws -> T
-    )
 }
 
 public protocol DependencyRegisterOperation: Sendable {
@@ -79,6 +57,19 @@ public protocol DependencyRegisterOperation: Sendable {
         completion: @escaping @Sendable (any Dependency) throws -> T,
         operation: @escaping @Sendable (T, any Dependency) throws -> T
     ) throws
+    
+    /// Register singleton class for using with resolve
+    /// - Parameters:
+    ///   - type: The type of the object you will register
+    ///   - key: The dependency key.
+    ///   - completion: The completion
+    ///   - operation: The operation after registration
+    mutating func registerOperation<T>(
+        _ type: T.Type,
+        key: DependencyKey,
+        completion: @escaping @Sendable (any Dependency) throws -> T,
+        operation: @escaping @Sendable (T, any Dependency) throws -> T
+    ) throws
 }
 
 public protocol DependencyUnregister: Sendable {
@@ -86,48 +77,99 @@ public protocol DependencyUnregister: Sendable {
     /// - Parameter type: The type of the object you will unregister
     /// - Returns: the object removed
     mutating func unregister<T>(_ type: T.Type)
+
+    /// Unregister class
+    /// - Parameters:
+    ///   - type: The type of the object you will unregister
+    ///   - key: The dependency key.
+    /// - Returns: the object removed
+    mutating func unregister<T>(
+        _ type: T.Type,
+        key: DependencyKey
+    )
 }
 
-public protocol DependencyReslove: Sendable {
+public protocol DependencyResolve: Sendable {
     /// Get a class who was registred or get a singleton
     /// - Parameter type: The type of the object you will reolve
     /// - Returns: The new object
-    func resolve<T>(_ type: T.Type) throws -> T
+    func resolve<T: Sendable>(_ type: T.Type) throws -> T
+    
+    /// Get a class who was registred or get a singleton
+    /// - Parameters:
+    ///    - type: The type of the object you will resolve
+    ///    - key: The dependency key.
+    /// - Returns: The new object
+    func resolve<T: Sendable>(_ type: T.Type, key: DependencyKey) throws -> T
 
     /// Get a class who was registred or get a singleton
-    /// - Parameter key: The key of the object you will reolve
     /// - Returns: The new object
-    func resolve<T>(key: DependencyKey) throws -> T
-
-    /// Get a class who was registred or get a singleton
-    /// - Returns: The new object
-    func resolve<T>() throws -> T
+    func resolve<T: Sendable>() throws -> T
 }
 
 public protocol DependencySingleton: Sendable {
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
-    mutating func registerSingleton<T>(completion: @escaping @Sendable (any Dependency) throws -> T) throws
+    mutating func registerSingleton<T: Sendable>(
+        completion: @escaping @Sendable (any Dependency) throws -> T
+    ) throws
 
     /// Create a singleton
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    mutating func registerSingleton<T>(_ type: T.Type, completion: @escaping @Sendable (any Dependency) throws -> T) throws
+    mutating func registerSingleton<T: Sendable>(
+        _ type: T.Type,
+        completion: @escaping @Sendable (any Dependency) throws -> T
+    ) throws
+    
+    /// Create a singleton
+    /// - Parameters:
+    ///   - type: The type of the object you will register
+    ///   - key: The dependency key.
+    ///   - completion: The completion
+    mutating func registerSingleton<T: Sendable>(
+        _ type: T.Type,
+        key: DependencyKey,
+        completion: @escaping @Sendable (any Dependency) throws -> T
+    ) throws
 
     /// Create a singleton with class conform to protocol ```DependencyServiceType```
     /// - Parameter type: The type of the singleton
-    mutating func registerSingleton<T: DependencyServiceType>(_ type: T.Type) throws
+    mutating func registerSingleton<T: DependencyServiceType & Sendable>(
+        _ type: T.Type
+    ) throws
+    
+    /// Create a singleton with class conform to protocol ```DependencyServiceType```
+    /// - Parameters:
+    ///    - type: The type of the singleton
+    ///    - key: The dependency key.
+    mutating func registerSingleton<T: DependencyServiceType & Sendable>(
+        _ type: T.Type,
+        key: DependencyKey
+    ) throws
 
     /// Unregister singleton
     /// - Parameter type: The type of the object you will unregister
     /// - Returns: the singleton you will remove
-    mutating func unregisterSingleton<T>(_ type: T.Type)
-
+    mutating func unregisterSingleton<T: Sendable>(
+        _ type: T.Type
+    )
+    
     /// Unregister singleton
-    /// - Parameter key: The key of the object you will unregister
+    /// - Parameter type: The type of the object you will unregister
     /// - Returns: the singleton you will remove
-    mutating func unregisterSingleton(key: DependencyKey)
+    mutating func unregisterSingleton<T: Sendable>(
+        _ type: T.Type,
+        key: DependencyKey
+    )
+    
+    /// Unregister singleton
+    /// - Parameter typeKey: The type of the object you will unregister
+    /// - Returns: the singleton you will remove
+    mutating func unregisterSingleton(
+        typeKey: DependencyTypeKey
+    )
 }
 
 public protocol DependencySingletonOperation: Sendable {
@@ -136,8 +178,21 @@ public protocol DependencySingletonOperation: Sendable {
     ///   - type: The type of the object you will register
     ///   - completion: The completion
     ///   - operation: The operation after registration
-    mutating func registerSingletonOperation<T>(
+    mutating func registerSingletonOperation<T: Sendable>(
         _ type: T.Type,
+        completion: @escaping @Sendable (any Dependency) throws -> T,
+        operation: @escaping @Sendable (T, any Dependency) throws -> T
+    ) throws
+    
+    /// Register class for using with resolve
+    /// - Parameters:
+    ///   - type: The type of the object you will register
+    ///   - key: The dependency key
+    ///   - completion: The completion
+    ///   - operation: The operation after registration
+    mutating func registerSingletonOperation<T: Sendable>(
+        _ type: T.Type,
+        key: DependencyKey,
         completion: @escaping @Sendable (any Dependency) throws -> T,
         operation: @escaping @Sendable (T, any Dependency) throws -> T
     ) throws
@@ -169,8 +224,19 @@ public protocol DependencyDescription: Sendable, CustomStringConvertible {
 }
 
 public protocol DependencySubscript: Sendable {
-    subscript<T>(_ keyPath: DependencyKey) -> T? { get set }
+    subscript<T>(_ keyPath: DependencyTypeKey) -> T? { get set }
 }
 
 /// The dependency protocol
-public typealias Dependency = DependencyDescription & DependencyParameters & DependencyProvider & DependencyRegister & DependencyRegisterOperation & DependencyReslove & DependencySingleton & DependencySingletonOperation & DependencySubscript & DependencyUnregister
+public protocol Dependency:
+    DependencyDescription,
+    DependencyParameters,
+    DependencyProvider,
+    DependencyRegister,
+    DependencyRegisterOperation,
+    DependencyResolve,
+    DependencySingleton,
+    DependencySingletonOperation,
+    DependencySubscript,
+    DependencyUnregister
+{}

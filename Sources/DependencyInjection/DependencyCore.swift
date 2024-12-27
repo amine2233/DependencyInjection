@@ -17,28 +17,30 @@ import Foundation
 ///     }
 ///
 ///
-public struct DependencyCore: Dependency {
+struct DependencyCore: Dependency {
+    static let shared: DependencyCore = DependencyCore()
+    
     /// The environment parameter
-    public var environment: DependencyEnvironment
+    var environment: DependencyEnvironment
 
     /// The number of the dependency
-    public var dependenciesCount: Int {
+    var dependenciesCount: Int {
         dependencies.count
     }
 
     /// The number of the provider
-    public var providersCount: Int {
+    var providersCount: Int {
         providers.count
     }
 
     /// The dependencies container
-    package var dependencies: [DependencyTypeKey: any DependencyResolver]
+    var dependencies: [DependencyTypeKey: any DependencyResolver]
 
     /// The providers container
     private var providers: [any Provider]
 
     /// The description of the container
-    public var description: String {
+    var description: String {
         var desc: [String] = []
 
         desc.append("Environment:")
@@ -70,7 +72,7 @@ public struct DependencyCore: Dependency {
     ///   - dependencies: The dependencies
     ///   - singletons: The singletons
     ///   - providers: The providers
-    public init(
+    init(
         environment: DependencyEnvironment = .production,
         dependencies: [DependencyTypeKey: any DependencyResolver] = [:],
         providers: [any Provider] = []
@@ -81,25 +83,25 @@ public struct DependencyCore: Dependency {
     }
 
     /// Provider will boot
-    public func willBoot() -> Self {
+    func willBoot() -> Self {
         _ = providers.map { $0.willBoot(self) }
         return self
     }
 
     /// Provider did boot
-    public func didBoot() -> Self {
+    func didBoot() -> Self {
         _ = providers.map { $0.didBoot(self) }
         return self
     }
 
     /// Provider will shutdown
-    public func willShutdown() -> Self {
+    func willShutdown() -> Self {
         _ = providers.map { $0.willShutdown(self) }
         return self
     }
 
     /// Provider did enter on background
-    public func didEnterBackground() -> Self {
+    func didEnterBackground() -> Self {
         _ = providers.map { $0.didEnterBackground(self) }
         return self
     }
@@ -112,7 +114,7 @@ extension DependencyCore {
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    public mutating func register<T: Sendable>(
+    mutating func register<T: Sendable>(
         _ type: T.Type,
         completion: @escaping @Sendable (any Dependency) throws -> T
     ) {
@@ -122,7 +124,7 @@ extension DependencyCore {
 
     /// Register class conform to protocol ```DependencyServiceType``` and use it with resolve
     /// - Parameter type: The `DependencyServiceType` type of the object you will register
-    public mutating func register<T: Sendable>(_ type: T.Type) where T: DependencyServiceType {
+    mutating func register<T: Sendable>(_ type: T.Type) where T: DependencyServiceType {
         let completion = { @Sendable (container: any Dependency) in
             try T.makeService(for: container)
         }
@@ -132,19 +134,11 @@ extension DependencyCore {
 
     /// Register the dependency
     /// - Parameter dependency: The dependency
-    public mutating func register(_ dependency: any DependencyResolver) {
-        dependencies[dependency.key] = dependency
-    }
-
-    public mutating func register<T: Sendable>(
-        key: DependencyKey,
-        completion: @escaping @Sendable (any Dependency) throws -> T
-    ) {
-        let typeKey = DependencyTypeKey(type: key.rawValue)
-        return register(typeKey: typeKey, completion: completion)
+    mutating func register(_ dependency: any DependencyResolver) {
+        dependencies[dependency.typeKey] = dependency
     }
     
-    public mutating func register<T: Sendable>(
+    mutating func register<T: Sendable>(
         _ type: T.Type,
         key: DependencyKey?,
         completion: @escaping @Sendable (any Dependency) throws -> T
@@ -153,7 +147,7 @@ extension DependencyCore {
         return register(typeKey: typeKey, completion: completion)
     }
     
-    public mutating func register<T: Sendable>(
+    mutating func register<T: Sendable>(
         _ type: T.Type,
         key: DependencyKey?
     ) where T : DependencyServiceType {
@@ -164,12 +158,12 @@ extension DependencyCore {
         return register(typeKey: typeKey, completion: completion)
     }
     
-    public mutating func register<T: Sendable>(
+    mutating func register<T: Sendable>(
         typeKey: DependencyTypeKey,
         completion: @escaping @Sendable (any Dependency) throws -> T
     ) {
         dependencies[typeKey] = DependencyResolverFactory.build(
-            key: typeKey.asDependencyKey(),
+            typeKey: typeKey,
             isSingleton: false,
             resolveBlock: completion
         )
@@ -184,79 +178,68 @@ extension DependencyCore {
     ///   - type: The type of the object you will register
     ///   - completion: The completion
     ///   - operation: The operation after registration
-    public mutating func registerOperation<T: Sendable>(
+    mutating func registerOperation<T: Sendable>(
         _ type: T.Type,
         completion: @escaping @Sendable (any Dependency) throws -> T,
         operation: @escaping @Sendable (T, any Dependency) throws -> T
     ) {
-        register(type, completion: { dependencies in
+        register(type) { dependencies in
             let result = try completion(dependencies)
             return try operation(result, dependencies)
-        })
-    }
-}
-
-// MARK: - Factory methods
-
-extension DependencyCore {
-    /// Create a unique object, this method not register class
-    /// - Parameter completion: the completion to create a new object
-    /// - Returns: the new object
-    public func factory<T: Sendable>(completion: @Sendable (any Dependency) throws -> T) throws -> T {
-        try completion(self)
-    }
-
-    /// Create a new object conform to protocol ```DependencyServiceType```, this method not register class
-    /// - Parameter _: The object you will create
-    /// - Returns: The new object
-    public func factory<T: Sendable>(_ type: T.Type) throws -> T where T: DependencyServiceType {
-        try type.makeService(for: self)
-    }
-
-    /// Create a new object, this method not register object
-    /// - Parameter dependency: The dependency object
-    /// - Returns: the new object
-    public mutating func factory(_ dependency: inout any DependencyResolver) throws -> Any {
-        try dependency.resolve(dependencies: self)
-
-        guard let value = try? dependency.value() else {
-            throw DependencyError.notResolved(name: dependency.key.description)
         }
-        return value
+    }
+    
+    mutating func registerOperation<T: Sendable>(
+        _ type: T.Type,
+        key: DependencyKey,
+        completion: @escaping @Sendable (any Dependency) throws -> T,
+        operation: @escaping @Sendable (T, any Dependency) throws -> T
+    ) throws {
+        register(type, key: key) { dependencies in
+            let result = try completion(dependencies)
+            return try operation(result, dependencies)
+        }
     }
 }
 
 // MARK: - Unregister service
 
 extension DependencyCore {
-    /// Unregister class
-    /// - Parameter type: The type of the object you will unregister
-    public mutating func unregister<T>(_ type: T.Type) {
-        dependencies.removeValue(forKey: DependencyTypeKey(type: type))
+    mutating func unregister<T: Sendable>(_ type: T.Type) {
+        let typeKey = DependencyTypeKey(type: type)
+        dependencies.removeValue(forKey: typeKey)
+    }
+    
+    mutating func unregister<T: Sendable>(
+        _ type: T.Type,
+        key: DependencyKey
+    ) {
+        let typeKey = DependencyTypeKey(type: type, key: key)
+        dependencies.removeValue(forKey: typeKey)
     }
 }
 
-// MARK: - Resolve methods
+// MARK: - DependencyResolve
 
 extension DependencyCore {
-    /// Get a class who was registred or get a singleton
-    /// - Parameter type: The type of the object you will reolve
-    /// - Returns: The new object
-    public func resolve<T>(_ type: T.Type) throws -> T {
-        let identifier = DependencyKey(type: type)
-        return try resolve(key: identifier)
+    func resolve<T: Sendable>(_ type: T.Type) throws -> T {
+        let typeKey = DependencyTypeKey(type: type)
+        return try resolve(typeKey: typeKey)
     }
 
-    /// Get a class who was registred or get a singleton
-    /// - Returns: The new object
-    public func resolve<T>() throws -> T {
-        let identifier = DependencyKey(type: T.self)
-        return try resolve(key: identifier)
+    func resolve<T: Sendable>() throws -> T {
+        let typeKey = DependencyTypeKey(type: T.self)
+        return try resolve(typeKey: typeKey)
     }
-
-    public func resolve<T>(key: DependencyKey) throws -> T {
-        guard var dependency = dependencies[DependencyTypeKey(type: key.rawValue)] else {
-            throw DependencyError.notFound(name: key.rawValue)
+    
+    func resolve<T: Sendable>(_ type: T.Type, key: DependencyKey) throws -> T {
+        let typeKey = DependencyTypeKey(type: key.rawValue, key: key)
+        return try resolve(typeKey: typeKey)
+    }
+    
+    func resolve<T: Sendable>(typeKey: DependencyTypeKey) throws -> T {
+        guard var dependency = dependencies[typeKey] else {
+            throw DependencyError.notFound(name: typeKey.description)
         }
 
         if !dependency.isSingleton {
@@ -264,101 +247,112 @@ extension DependencyCore {
         }
 
         guard let object = try? dependency.value() as? T else {
-            throw DependencyError.notResolved(name: key.rawValue)
+            throw DependencyError.notResolved(name: typeKey.description)
         }
 
         return object
     }
 }
 
-// MARK: - Singleton methods
+// MARK: - DependencySingleton
 
 extension DependencyCore {
-    /// Resolve singleton
-    /// - Returns: singleton object
-    public func singleton<T: Sendable>() throws -> T {
-        let identifier = DependencyKey(type: T.self)
-        return try singleton(key: identifier)
-    }
-
-    public func singleton<T: Sendable>(key: DependencyKey) throws -> T {
-        try resolve(key: key)
-    }
-
-    /// Create a singleton
-    /// - Parameter completion: The completion to create a singleton
-    /// - Returns: The singleton object
-    public mutating func registerSingleton<T: Sendable>(
+    mutating func registerSingleton<T: Sendable>(
         completion: @escaping @Sendable (any Dependency) throws -> T
     ) throws {
-        let identifier = DependencyTypeKey(type: T.self)
-        var dependency = DependencyResolverFactory.build(
-            key: identifier.asDependencyKey(),
-            isSingleton: true,
-            resolveBlock: completion
-        )
-
-        try dependency.resolve(dependencies: self)
-
-        dependencies[identifier] = dependency
+        let typeKey = DependencyTypeKey(type: T.self)
+        return try registerSingleton(typeKey: typeKey, completion: completion)
     }
-
-    /// Create a singleton
-    /// - Parameters:
-    ///   - type: The type of the object you will register
-    ///   - completion: The completion
-    public mutating func registerSingleton<T: Sendable>(
+    
+    mutating func registerSingleton<T: Sendable>(
         _ type: T.Type,
         completion: @escaping @Sendable (any Dependency) throws -> T
     ) throws {
-        let identifier = DependencyTypeKey(type: type)
+        let typeKey = DependencyTypeKey(type: type)
         var dependency = DependencyResolverFactory.build(
-            key: identifier.asDependencyKey(),
+            typeKey: typeKey,
             isSingleton: true,
             resolveBlock: completion
         )
-        dependencies[identifier] = try dependency.resolveDependency(dependencies: self)
+        dependencies[typeKey] = try dependency.resolveDependency(dependencies: self)
     }
-
-    /// Create a singleton with class conform to protocol ```DependencyServiceType```
-    /// - Parameter type: The type of the singleton
-    /// - Returns: the singleton object
-    public mutating func registerSingleton<T: DependencyServiceType & Sendable>(_ type: T.Type) throws {
-        let completion: @Sendable (any Dependency) throws -> T = { @Sendable dependency in
-            try T.makeService(for: dependency)
-        }
-        let identifier = DependencyTypeKey(type: T.self)
+    
+    mutating func registerSingleton<T: Sendable>(
+        _ type: T.Type,
+        key: DependencyKey,
+        completion: @escaping @Sendable (any Dependency) throws -> T
+    ) throws {
+        let typeKey = DependencyTypeKey(type: type, key: key)
         var dependency = DependencyResolverFactory.build(
-            key: identifier.asDependencyKey(),
+            typeKey: typeKey,
+            isSingleton: true,
+            resolveBlock: completion
+        )
+        dependencies[typeKey] = try dependency.resolveDependency(dependencies: self)
+    }
+    
+    mutating func registerSingleton<T: Sendable>(
+        typeKey: DependencyTypeKey,
+        completion: @escaping @Sendable (any Dependency) throws -> T
+    ) throws {
+        var dependency = DependencyResolverFactory.build(
+            typeKey: typeKey,
             isSingleton: true,
             resolveBlock: completion
         )
 
         try dependency.resolve(dependencies: self)
 
-        dependencies[identifier] = dependency
+        dependencies[typeKey] = dependency
     }
 
-    /// Unregister singleton
-    /// - Parameter type: The type of the object you will unregister
-    public mutating func unregisterSingleton<T>(_ type: T.Type) {
-        unregisterSingleton(key: DependencyKey(type: T.self))
+    mutating func registerSingleton<T: Sendable>(
+        _ type: T.Type
+    ) throws where T: DependencyServiceType & Sendable {
+        let completion: @Sendable (any Dependency) throws -> T = { @Sendable dependency in
+            try T.makeService(for: dependency)
+        }
+        let typeKey = DependencyTypeKey(type: T.self)
+        return try registerSingleton(typeKey: typeKey, completion: completion)
     }
 
-    public mutating func unregisterSingleton(key: DependencyKey) {
-        dependencies.removeValue(forKey: DependencyTypeKey(type: key.rawValue))
+    mutating func registerSingleton<T: Sendable>(
+        _ type: T.Type,
+        key: DependencyKey
+    ) throws where T: DependencyServiceType & Sendable {
+        let typeKey = DependencyTypeKey(type: T.self, key: key)
+        let completion: @Sendable (any Dependency) throws -> T = { @Sendable dependency in
+            try T.makeService(for: dependency)
+        }
+        return try registerSingleton(typeKey: typeKey, completion: completion)
+    }
+
+    mutating func unregisterSingleton<T: Sendable>(
+        _ type: T.Type
+    ) {
+        let typeKey = DependencyTypeKey(type: T.self)
+        unregisterSingleton(typeKey: typeKey)
+    }
+    
+    mutating func unregisterSingleton<T: Sendable>(
+        _ type: T.Type,
+        key: DependencyKey
+    ) {
+        let typeKey = DependencyTypeKey(type: T.self, key: key)
+        unregisterSingleton(typeKey: typeKey)
+    }
+    
+    mutating func unregisterSingleton(
+        typeKey: DependencyTypeKey
+    ) {
+        dependencies.removeValue(forKey: typeKey)
     }
 }
 
-// MARK: - Register singleton methods with operation
+// MARK: - DependencySingletonOperation
 
 extension DependencyCore {
-    /// Register singleton class for using with resolve
-    /// - Parameters:
-    ///   - type: The type of the object you will register
-    ///   - completion: The completion
-    ///   - operation: The operation after registration
-    public mutating func registerSingletonOperation<T: Sendable>(
+    mutating func registerSingletonOperation<T: Sendable>(
         _ type: T.Type,
         completion: @escaping @Sendable (any Dependency) throws -> T,
         operation: @escaping @Sendable (T, any Dependency) throws -> T
@@ -368,42 +362,57 @@ extension DependencyCore {
             return try operation(result, dependencies)
         })
     }
+    
+    mutating func registerSingletonOperation<T: Sendable>(
+        _ type: T.Type,
+        key: DependencyKey,
+        completion: @escaping @Sendable (any Dependency) throws -> T,
+        operation: @escaping @Sendable (T, any Dependency) throws -> T
+    ) throws {
+        let typeKey = DependencyTypeKey(type: type, key: key)
+        try registerSingleton(
+            typeKey: typeKey
+        ) { dependencies in
+            let result = try completion(dependencies)
+            return try operation(result, dependencies)
+        }
+    }
 }
 
-// MARK: - Register & Unregister Provider
+// MARK: - DependencyProvider
 
 extension DependencyCore {
     /// Register provider
     /// - Parameter provider: the provider you will add
-    public mutating func registerProvider(_ provider: any Provider) {
+    mutating func registerProvider(_ provider: any Provider) {
         providers.append(provider)
     }
 
     /// Unregister provider
     /// - Parameter provider: the provider you will unregister
-    public mutating func unregisterProvider(_ provider: any Provider) {
+    mutating func unregisterProvider(_ provider: any Provider) {
         providers = providers.filter { $0.description != provider.description }
     }
 }
 
+// MARK: - DependencySubscript
+
 extension DependencyCore {
     /// Get or set service's value from the dependencies.
     /// - Parameter keyPath: the dependency key
-    public subscript<T: Sendable>(
-        _ keyPath: DependencyKey
+    subscript<T: Sendable>(
+        _ keyPath: DependencyTypeKey
     ) -> T? {
         get {
-            let identifier = DependencyTypeKey(type: keyPath.rawValue)
-            guard var dependencyResolver = dependencies[identifier] else { return nil }
+            guard var dependencyResolver = dependencies[keyPath] else { return nil }
             if !dependencyResolver.isSingleton {
                 try? dependencyResolver.resolve(dependencies: self)
             }
             return try? dependencyResolver.value() as? T
         }
         mutating set(value) {
-            let identifier = DependencyTypeKey(type: keyPath.rawValue)
             if value != nil {
-                let isSingleton = dependencies[identifier]?.isSingleton ?? false
+                let isSingleton = dependencies[keyPath]?.isSingleton ?? false
                 var dependencyResolver = DependencyResolverFactory.build(
                     isSingleton: isSingleton,
                     resolveBlock: { _ in value }
@@ -411,9 +420,9 @@ extension DependencyCore {
                 if isSingleton {
                     try? dependencyResolver.resolve(dependencies: self)
                 }
-                self.dependencies[identifier] = dependencyResolver
+                self.dependencies[keyPath] = dependencyResolver
             } else {
-                self.dependencies.removeValue(forKey: identifier)
+                self.dependencies.removeValue(forKey: keyPath)
             }
         }
     }

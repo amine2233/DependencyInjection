@@ -8,27 +8,10 @@ public protocol DependencyRegistering {
     static func registerAllServices(in dependencies: inout any Dependency)
 }
 
-/// A protocol that indicates that a type has dependencies.
-public protocol HasDependencies {
-    /// The dependency container.
-    var dependencies: any Dependency { get }
-}
-
-/// Default implementation for types conforming to `HasDependencies`.
-extension HasDependencies {
-    /// Provides access to the default dependency container.
-    var dependencies: any Dependency {
-        DependencyInjector.default.dependencies
-    }
-}
-
 /// The singleton dependency container reference which can be reassigned to another container
 public struct DependencyInjector: Sendable {
     /// The dependencies
     public var dependencies: any Dependency
-
-    /// The dependencyCore singleton
-    public static let `default` = DependencyInjector()
 
     @resultBuilder
     struct DependencyBuilder {
@@ -55,7 +38,7 @@ public struct DependencyInjector: Sendable {
 
     /// Create a new dependency injection
     /// - Parameter dependencies: The dependencies
-    public init(dependencies: any Dependency = DependencyCore()) {
+    public init(dependencies: any Dependency) {
         self.dependencies = dependencies
     }
 
@@ -65,7 +48,7 @@ public struct DependencyInjector: Sendable {
     ///   - block: to add `DependencyResolver` manually
     ///   - providers: to add `Provider` manually
     public init(
-        dependencies: any Dependency = DependencyCore(),
+        dependencies: any Dependency,
         @DependencyBuilder _ block: () -> [any DependencyResolver] = { [] },
         @ProviderBuilder _ providers: () -> [any Provider] = { [] }
     ) {
@@ -80,7 +63,7 @@ public struct DependencyInjector: Sendable {
     ///   - block: to add one `DependencyResolver` manually
     ///   - providers: to add  one `Provider` manually
     public init(
-        dependencies: any Dependency = DependencyCore(),
+        dependencies: any Dependency,
         @DependencyBuilder _ dependency: () -> any DependencyResolver,
         @ProviderBuilder _ provider: () -> any Provider
     ) {
@@ -93,7 +76,7 @@ public struct DependencyInjector: Sendable {
     /// - Parameters:
     ///   - dependencies: The dependencies
     ///   - register: The registration
-    public init(dependencies: any Dependency = DependencyCore(), register: any DependencyRegistering.Type) {
+    public init(dependencies: any Dependency, register: any DependencyRegistering.Type) {
         self.init(dependencies: dependencies)
         register.registerAllServices(in: &self.dependencies)
     }
@@ -103,7 +86,7 @@ public struct DependencyInjector: Sendable {
     ///   - dependencies: The dependencies
     ///   - register: register one register type using resultBuilder
     public init(
-        dependencies: any Dependency = DependencyCore(),
+        dependencies: any Dependency,
         @DependencyRegisteringBuilder _ register: () -> any DependencyRegistering.Type
     ) {
         self.init(dependencies: dependencies)
@@ -115,7 +98,7 @@ public struct DependencyInjector: Sendable {
     ///   - dependencies: The dependencies
     ///   - registers: registers many register type using resultBuilder
     public init(
-        dependencies: any Dependency = DependencyCore(),
+        dependencies: any Dependency,
         @DependencyRegisteringBuilder _ registers: () -> [any DependencyRegistering.Type]
     ) {
         self.init(dependencies: dependencies)

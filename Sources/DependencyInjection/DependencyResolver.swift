@@ -61,25 +61,6 @@ public enum DependencyResolverFactory: Sendable {
             resolveBlock: resolveBlock
         )
     }
-    
-    /// Creates a `DependencyResolver` with the given key and resolution block.
-    ///
-    /// - Parameters:
-    ///   - key: The `DependencyKey` used to identify the dependency.
-    ///   - isSingleton: A Boolean indicating whether the resolver should create a singleton instance. Default is `false`.
-    ///   - resolveBlock: A closure that defines how to resolve the dependency.
-    /// - Returns: An instance of `DependencyResolver`.
-    public static func build<T: Sendable>(
-        key: DependencyKey,
-        isSingleton: Bool = false,
-        resolveBlock: @escaping @Sendable (any Dependency) throws -> T
-    ) -> any DependencyResolver {
-        DependencyResolverDefault(
-            typeKey: DependencyTypeKey(key: key),
-            isSingleton: isSingleton,
-            resolveBlock: resolveBlock
-        )
-    }
 
     /// Creates a `DependencyResolver` without a key, using the provided resolution block.
     ///
