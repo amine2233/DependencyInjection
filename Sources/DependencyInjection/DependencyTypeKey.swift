@@ -4,7 +4,7 @@ import Foundation
 public struct DependencyTypeKey: Hashable, Sendable, CustomStringConvertible {
     let type: String
     let key: DependencyKey?
-    
+
     /// The description
     public var description: String {
         var _name = type
@@ -22,7 +22,7 @@ public struct DependencyTypeKey: Hashable, Sendable, CustomStringConvertible {
         self.type = String(describing: type.self)
         self.key = key
     }
-    
+
     /// The initializer
     /// - Parameters:
     ///   - type: The `String` type

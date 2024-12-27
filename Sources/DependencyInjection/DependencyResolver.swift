@@ -26,8 +26,6 @@ public protocol DependencyResolver: Sendable {
     /// - Throws: An error if the dependency cannot be resolved.
     mutating func resolve(dependencies: any Dependency) throws
 
-    var type: Any.Type { get }
-
     /// Get the value inside the
     func value() throws -> Value
 }

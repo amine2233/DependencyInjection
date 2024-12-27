@@ -38,8 +38,8 @@ extension Dependency where Self == DependencyCore {
 ///
 ///
 struct DependencyCore: Dependency {
-    static let shared: DependencyCore = DependencyCore()
-    
+    static let shared: DependencyCore = .init()
+
     /// The environment parameter
     var environment: DependencyEnvironment
 
@@ -203,7 +203,7 @@ extension DependencyCore {
     mutating func register(_ dependency: any DependencyResolver) {
         dependencies[dependency.typeKey] = dependency
     }
-    
+
     mutating func register<T: Sendable>(
         _ type: T.Type,
         key: DependencyKey?,
@@ -212,18 +212,18 @@ extension DependencyCore {
         let typeKey = DependencyTypeKey(type: type, key: key)
         return register(typeKey: typeKey, completion: completion)
     }
-    
+
     mutating func register<T: Sendable>(
         _ type: T.Type,
         key: DependencyKey?
-    ) where T : DependencyServiceType {
+    ) where T: DependencyServiceType {
         let completion = { @Sendable (container: any Dependency) in
             try T.makeService(for: container)
         }
         let typeKey = DependencyTypeKey(type: type, key: key)
         return register(typeKey: typeKey, completion: completion)
     }
-    
+
     mutating func register<T: Sendable>(
         typeKey: DependencyTypeKey,
         completion: @escaping @Sendable (any Dependency) throws -> T
@@ -254,7 +254,7 @@ extension DependencyCore {
             return try operation(result, dependencies)
         }
     }
-    
+
     mutating func registerOperation<T: Sendable>(
         _ type: T.Type,
         key: DependencyKey,
@@ -275,7 +275,7 @@ extension DependencyCore {
         let typeKey = DependencyTypeKey(type: type)
         dependencies.removeValue(forKey: typeKey)
     }
-    
+
     mutating func unregister<T: Sendable>(
         _ type: T.Type,
         key: DependencyKey
@@ -297,12 +297,12 @@ extension DependencyCore {
         let typeKey = DependencyTypeKey(type: T.self)
         return try resolve(typeKey: typeKey)
     }
-    
+
     func resolve<T: Sendable>(_ type: T.Type, key: DependencyKey) throws -> T {
         let typeKey = DependencyTypeKey(type: key.rawValue, key: key)
         return try resolve(typeKey: typeKey)
     }
-    
+
     func resolve<T: Sendable>(typeKey: DependencyTypeKey) throws -> T {
         guard var dependency = dependencies[typeKey] else {
             throw DependencyError.notFound(name: typeKey.description)
@@ -329,7 +329,7 @@ extension DependencyCore {
         let typeKey = DependencyTypeKey(type: T.self)
         return try registerSingleton(typeKey: typeKey, completion: completion)
     }
-    
+
     mutating func registerSingleton<T: Sendable>(
         _ type: T.Type,
         completion: @escaping @Sendable (any Dependency) throws -> T
@@ -342,7 +342,7 @@ extension DependencyCore {
         )
         dependencies[typeKey] = try dependency.resolveDependency(dependencies: self)
     }
-    
+
     mutating func registerSingleton<T: Sendable>(
         _ type: T.Type,
         key: DependencyKey,
@@ -356,7 +356,7 @@ extension DependencyCore {
         )
         dependencies[typeKey] = try dependency.resolveDependency(dependencies: self)
     }
-    
+
     mutating func registerSingleton<T: Sendable>(
         typeKey: DependencyTypeKey,
         completion: @escaping @Sendable (any Dependency) throws -> T
@@ -399,7 +399,7 @@ extension DependencyCore {
         let typeKey = DependencyTypeKey(type: T.self)
         unregisterSingleton(typeKey: typeKey)
     }
-    
+
     mutating func unregisterSingleton<T: Sendable>(
         _ type: T.Type,
         key: DependencyKey
@@ -407,7 +407,7 @@ extension DependencyCore {
         let typeKey = DependencyTypeKey(type: T.self, key: key)
         unregisterSingleton(typeKey: typeKey)
     }
-    
+
     mutating func unregisterSingleton(
         typeKey: DependencyTypeKey
     ) {
@@ -428,7 +428,7 @@ extension DependencyCore {
             return try operation(result, dependencies)
         })
     }
-    
+
     mutating func registerSingletonOperation<T: Sendable>(
         _ type: T.Type,
         key: DependencyKey,
