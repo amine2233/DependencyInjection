@@ -21,7 +21,7 @@ public protocol DependencyResolver: Sendable {
     /// - Parameter dependencies: The dependency container.
     /// - Throws: An error if the dependency cannot be resolved.
     mutating func resolve(dependencies: any Dependency) throws
-    
+
     /// Get the value inside the
     func value() throws -> (any Sendable)
 }
@@ -42,7 +42,6 @@ extension DependencyResolver {
 ///
 /// The `DependencyResolverFactory` provides methods to build `DependencyResolver` objects, which can be used to manage dependency resolution, optionally with singleton behavior.
 public enum DependencyResolverFactory: Sendable {
-
     /// Creates a `DependencyResolver` with the given key and resolution block.
     ///
     /// - Parameters:
@@ -92,7 +91,7 @@ private struct DependencyResolverDefault: DependencyResolver {
         init(block: (any Sendable)? = nil) {
             self.block = block
         }
-        
+
         func copy() -> Storage {
             Storage(
                 block: block
@@ -162,7 +161,7 @@ private struct DependencyResolverDefault: DependencyResolver {
         }
         return block
     }
-    
+
     private mutating func ensureUniqueness() {
         guard !isKnownUniquelyReferenced(&storage) else { return }
         storage = storage.copy()

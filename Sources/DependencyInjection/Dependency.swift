@@ -14,7 +14,7 @@ public protocol DependencyRegister: Sendable {
         _ type: T.Type,
         completion: @escaping @Sendable (any Dependency) throws -> T
     )
-    
+
     /// Register class for using with resolve
     /// - Parameters:
     ///   - type: The type of the object you will register
@@ -31,7 +31,7 @@ public protocol DependencyRegister: Sendable {
     mutating func register<T: Sendable>(
         _ type: T.Type
     ) where T: DependencyServiceType
-    
+
     /// Register class conform to protocol ```DependencyServiceType``` and use it with resolve
     /// - Parameters:
     ///     - type: The `DependencyServiceType` type of the object you will register
@@ -57,7 +57,7 @@ public protocol DependencyRegisterOperation: Sendable {
         completion: @escaping @Sendable (any Dependency) throws -> T,
         operation: @escaping @Sendable (T, any Dependency) throws -> T
     ) throws
-    
+
     /// Register singleton class for using with resolve
     /// - Parameters:
     ///   - type: The type of the object you will register
@@ -94,7 +94,7 @@ public protocol DependencyResolve: Sendable {
     /// - Parameter type: The type of the object you will reolve
     /// - Returns: The new object
     func resolve<T: Sendable>(_ type: T.Type) throws -> T
-    
+
     /// Get a class who was registred or get a singleton
     /// - Parameters:
     ///    - type: The type of the object you will resolve
@@ -122,7 +122,7 @@ public protocol DependencySingleton: Sendable {
         _ type: T.Type,
         completion: @escaping @Sendable (any Dependency) throws -> T
     ) throws
-    
+
     /// Create a singleton
     /// - Parameters:
     ///   - type: The type of the object you will register
@@ -139,7 +139,7 @@ public protocol DependencySingleton: Sendable {
     mutating func registerSingleton<T: DependencyServiceType & Sendable>(
         _ type: T.Type
     ) throws
-    
+
     /// Create a singleton with class conform to protocol ```DependencyServiceType```
     /// - Parameters:
     ///    - type: The type of the singleton
@@ -155,7 +155,7 @@ public protocol DependencySingleton: Sendable {
     mutating func unregisterSingleton<T: Sendable>(
         _ type: T.Type
     )
-    
+
     /// Unregister singleton
     /// - Parameter type: The type of the object you will unregister
     /// - Returns: the singleton you will remove
@@ -163,7 +163,7 @@ public protocol DependencySingleton: Sendable {
         _ type: T.Type,
         key: DependencyKey
     )
-    
+
     /// Unregister singleton
     /// - Parameter typeKey: The type of the object you will unregister
     /// - Returns: the singleton you will remove
@@ -183,7 +183,7 @@ public protocol DependencySingletonOperation: Sendable {
         completion: @escaping @Sendable (any Dependency) throws -> T,
         operation: @escaping @Sendable (T, any Dependency) throws -> T
     ) throws
-    
+
     /// Register class for using with resolve
     /// - Parameters:
     ///   - type: The type of the object you will register

@@ -14,13 +14,13 @@ public enum DependencyFactory: Sendable {
         dependencies: [DependencyTypeKey: any DependencyResolver] = [:],
         providers: [any Provider] = []
     ) -> any Dependency {
-        return DependencyCore(
+        DependencyCore(
             environment: environment,
             dependencies: dependencies,
             providers: providers
         )
     }
-    
+
     /// The default dependency
     public static func `default`() -> any Dependency {
         DependencyCore.shared

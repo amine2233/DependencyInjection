@@ -252,15 +252,15 @@ class DependencyInjectionTests: XCTestCase {
             }
         }
         let dependencies = factory().dependencies
-        
+
         // WHEN
         let description = dependencies.description
-        
+
         // THEN
         XCTAssertTrue(description.contains("\n- \(DependencyTypeKey(type: (any LocationService).self, key: key))"))
         XCTAssertTrue(description.contains("\n- \(DependencyTypeKey(type: (any JourneyService).self, key: keyJourney))"))
     }
-    
+
     func test_description_when_add_singleton() throws {
         // Given
         var dependencies = factory().dependencies
