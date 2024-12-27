@@ -21,7 +21,10 @@ class DependencyInjectorTests: XCTestCase {
         // given
 
         // when
-        let injector = DependencyInjector(register: DependencyRegisteringTest.self)
+        let injector = DependencyInjector(
+            dependencies: DependencyFactory.make(),
+            register: DependencyRegisteringTest.self
+        )
 
         // then
         XCTAssertEqual(injector.dependencies.dependenciesCount, 1)

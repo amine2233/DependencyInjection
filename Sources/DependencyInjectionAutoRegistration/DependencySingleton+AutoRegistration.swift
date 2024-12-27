@@ -23,7 +23,7 @@ extension DependencySingleton {
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service.
-    public mutating func autoregisterSingleton<Service>(
+    public mutating func autoregisterSingleton<Service: Sendable>(
         _ service: Service.Type,
         initializer: @escaping @Sendable () -> Service
     ) throws {
@@ -36,9 +36,8 @@ extension DependencySingleton {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking one
-    /// dependency as a parameter.
-    public mutating func autoregisterSingleton<Service, A>(
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking one dependency as a parameter.
+    public mutating func autoregisterSingleton<Service: Sendable, A: Sendable>(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A) -> Service
     ) throws {
@@ -51,9 +50,8 @@ extension DependencySingleton {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking two
-    /// dependencies as parameters.
-    public mutating func autoregisterSingleton<Service, A, B>(
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking two dependencies as parameters.
+    public mutating func autoregisterSingleton<Service: Sendable, A: Sendable, B: Sendable>(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B) -> Service
     ) throws {
@@ -69,9 +67,8 @@ extension DependencySingleton {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking three
-    /// dependencies as parameters.
-    public mutating func autoregisterSingleton<Service, A, B, C>(
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking three dependencies as parameters.
+    public mutating func autoregisterSingleton<Service: Sendable, A: Sendable, B: Sendable, C: Sendable>(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C) -> Service
     ) throws {
@@ -88,9 +85,14 @@ extension DependencySingleton {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking four
-    /// dependencies as parameters.
-    public mutating func autoregisterSingleton<Service, A, B, C, D>(
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking four dependencies as parameters.
+    public mutating func autoregisterSingleton<
+        Service: Sendable,
+        A: Sendable,
+        B: Sendable,
+        C: Sendable,
+        D: Sendable
+    >(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D) -> Service
     ) throws {
@@ -108,9 +110,15 @@ extension DependencySingleton {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking five
-    /// dependencies as parameters.
-    public mutating func autoregisterSingleton<Service, A, B, C, D, E>(
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking five dependencies as parameters.
+    public mutating func autoregisterSingleton<
+        Service: Sendable,
+        A: Sendable,
+        B: Sendable,
+        C: Sendable,
+        D: Sendable,
+        E: Sendable
+    >(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D, E) -> Service
     ) throws {
@@ -129,9 +137,16 @@ extension DependencySingleton {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking six
-    /// dependencies as parameters.
-    public mutating func autoregisterSingleton<Service, A, B, C, D, E, F>(
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking six dependencies as parameters.
+    public mutating func autoregisterSingleton<
+        Service: Sendable,
+        A: Sendable,
+        B: Sendable,
+        C: Sendable,
+        D: Sendable,
+        E: Sendable,
+        F: Sendable
+    >(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D, E, F) -> Service
     ) throws {
@@ -151,9 +166,17 @@ extension DependencySingleton {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking seven
-    /// dependencies as parameters.
-    public mutating func autoregisterSingleton<Service, A, B, C, D, E, F, G>(
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking seven dependencies as parameters.
+    public mutating func autoregisterSingleton<
+        Service: Sendable,
+        A: Sendable,
+        B: Sendable,
+        C: Sendable,
+        D: Sendable,
+        E: Sendable,
+        F: Sendable,
+        G: Sendable
+    >(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D, E, F, G) -> Service
     ) throws {
@@ -174,9 +197,18 @@ extension DependencySingleton {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight
-    /// dependencies as parameters.
-    public mutating func autoregisterSingleton<Service, A, B, C, D, E, F, G, H>(
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight dependencies as parameters.
+    public mutating func autoregisterSingleton<
+        Service: Sendable,
+        A: Sendable,
+        B: Sendable,
+        C: Sendable,
+        D: Sendable,
+        E: Sendable,
+        F: Sendable,
+        G: Sendable,
+        H: Sendable
+    >(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D, E, F, G, H) -> Service
     ) throws {
@@ -198,9 +230,19 @@ extension DependencySingleton {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight
-    /// dependencies as parameters.
-    public mutating func autoregisterSingleton<Service, A, B, C, D, E, F, G, H, I>(
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight dependencies as parameters.
+    public mutating func autoregisterSingleton<
+        Service: Sendable,
+        A: Sendable,
+        B: Sendable,
+        C: Sendable,
+        D: Sendable,
+        E: Sendable,
+        F: Sendable,
+        G: Sendable,
+        H: Sendable,
+        I: Sendable
+    >(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D, E, F, G, H, I) -> Service
     ) throws {
@@ -223,9 +265,20 @@ extension DependencySingleton {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight
-    /// dependencies as parameters.
-    public mutating func autoregisterSingleton<Service, A, B, C, D, E, F, G, H, I, J>(
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight dependencies as parameters.
+    public mutating func autoregisterSingleton<
+        Service: Sendable,
+        A: Sendable,
+        B: Sendable,
+        C: Sendable,
+        D: Sendable,
+        E: Sendable,
+        F: Sendable,
+        G: Sendable,
+        H: Sendable,
+        I: Sendable,
+        J: Sendable
+    >(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D, E, F, G, H, I, J) -> Service
     ) throws {
