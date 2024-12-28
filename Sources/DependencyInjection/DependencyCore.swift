@@ -173,7 +173,7 @@ struct DependencyCore: Dependency {
     }
 }
 
-// MARK: - Register methods
+// MARK: - DependencyRegister
 
 extension DependencyCore {
     /// Register class for using with resolve
@@ -233,6 +233,18 @@ extension DependencyCore {
             isSingleton: false,
             resolveBlock: completion
         )
+    }
+
+    mutating func register<T: Sendable, S: Sendable>(
+        _ type: T.Type,
+        key: DependencyKey?,
+        service: S.Type
+    ) where S: DependencyServiceType {
+        let completion = { @Sendable (container: any Dependency) in
+            try service.makeService(for: container)
+        }
+        let typeKey = DependencyTypeKey(type: type, key: key)
+        return register(typeKey: typeKey, completion: completion)
     }
 }
 
@@ -304,7 +316,13 @@ extension DependencyCore {
     }
 
     func resolve<T: Sendable>(typeKey: DependencyTypeKey) throws -> T {
-        guard var dependency = dependencies[typeKey] else {
+        var dependency: (any DependencyResolver)? = if typeKey.key == nil {
+            dependencies.first(where: { $0.key.type == typeKey.type })?.value
+        } else {
+            dependencies[typeKey]
+        }
+
+        guard var dependency else {
             throw DependencyError.notFound(name: typeKey.description)
         }
 
@@ -317,6 +335,32 @@ extension DependencyCore {
         }
 
         return object
+    }
+}
+
+// MARK: - DependencyResolves
+
+extension DependencyCore {
+    func resolves<T: Sendable>(
+        _ type: T.Type
+    ) throws -> [T] {
+        let typeKeys = dependencies
+            .keys.filter { $0.type == String(describing: type.self) }
+        var values: [T] = []
+        for typeKey in typeKeys {
+            try values.append(resolve(typeKey: typeKey))
+        }
+        return values
+    }
+
+    func resolves<T: Sendable>() throws -> [T] {
+        let typeKeys = dependencies
+            .keys.filter { $0.type == String(describing: T.self) }
+        var values: [T] = []
+        for typeKey in typeKeys {
+            try values.append(resolve(typeKey: typeKey))
+        }
+        return values
     }
 }
 
