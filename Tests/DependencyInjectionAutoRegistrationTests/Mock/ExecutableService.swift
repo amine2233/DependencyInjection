@@ -7,7 +7,7 @@ protocol ExecutableService: Sendable {
 final class ExecutableServiceMock: ExecutableService, @unchecked Sendable {
     var invokedExec = false
     var invokedExecCount = 0
-    
+
     @Sendable
     init() {}
 

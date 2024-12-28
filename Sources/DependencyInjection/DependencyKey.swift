@@ -26,12 +26,3 @@ extension DependencyKey: CustomStringConvertible {
     /// A textual representation of the `DependencyKey`.
     public var description: String { rawValue }
 }
-
-extension DependencyKey {
-    /// Initializes a new `DependencyKey` based on the type of a dependency.
-    ///
-    /// - Parameter type: The type of the dependency.
-    public init<T>(type: T.Type) {
-        self.rawValue = String(describing: type.self)
-    }
-}

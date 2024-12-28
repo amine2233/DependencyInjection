@@ -7,7 +7,7 @@ extension DependencyRegister {
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service.
-    mutating func autoregister<Service>(
+    mutating func autoregister<Service: Sendable>(
         _ service: Service.Type,
         factory: Factory0<Service>
     ) {
@@ -21,7 +21,7 @@ extension DependencyRegister {
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service.
-    mutating func autoregister<Service, A>(
+    mutating func autoregister<Service: Sendable, A: Sendable>(
         _ service: Service.Type,
         factory: Factory1<Service, A>
     ) {
@@ -35,7 +35,7 @@ extension DependencyRegister {
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service.
-    mutating func autoregister<Service, A, B>(
+    mutating func autoregister<Service: Sendable, A: Sendable, B: Sendable>(
         _ service: Service.Type,
         factory: Factory2<Service, A, B>
     ) {
@@ -52,7 +52,7 @@ extension DependencyRegister {
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service.
-    mutating func autoregister<Service, A, B, C>(
+    mutating func autoregister<Service: Sendable, A: Sendable, B: Sendable, C: Sendable>(
         _ service: Service.Type,
         factory: Factory3<Service, A, B, C>
     ) {
@@ -70,7 +70,7 @@ extension DependencyRegister {
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service.
-    mutating func autoregister<Service, A, B, C, D>(
+    mutating func autoregister<Service: Sendable, A: Sendable, B: Sendable, C: Sendable, D: Sendable>(
         _ service: Service.Type,
         factory: Factory4<Service, A, B, C, D>
     ) {
@@ -89,7 +89,7 @@ extension DependencyRegister {
     /// - Parameters:
     ///   - service: The type of the service to register.
     ///   - initializer: A closure that initializes and returns an instance of the service.
-    mutating func autoregister<Service, A, B, C, D, E>(
+    mutating func autoregister<Service: Sendable, A: Sendable, B: Sendable, C: Sendable, D: Sendable, E: Sendable>(
         _ service: Service.Type,
         factory: Factory5<Service, A, B, C, D, E>
     ) {

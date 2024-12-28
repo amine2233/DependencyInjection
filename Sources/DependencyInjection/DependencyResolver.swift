@@ -11,8 +11,8 @@ public enum DependencyResolverError: Error {
 /// The `DependencyResolver` protocol is used to define resolvers responsible for resolving dependencies in a system. Conforming types must be `Sendable` to ensure they can be safely used in concurrent environments.
 public protocol DependencyResolver: Sendable {
     /// The key used to identify the dependency.
-    var key: DependencyKey { get }
-    
+    var typeKey: DependencyTypeKey { get }
+
     /// A flag indicating whether the dependency is a singleton.
     var isSingleton: Bool { get }
 
@@ -21,7 +21,7 @@ public protocol DependencyResolver: Sendable {
     /// - Parameter dependencies: The dependency container.
     /// - Throws: An error if the dependency cannot be resolved.
     mutating func resolve(dependencies: any Dependency) throws
-    
+
     /// Get the value inside the
     func value() throws -> (any Sendable)
 }
@@ -42,7 +42,6 @@ extension DependencyResolver {
 ///
 /// The `DependencyResolverFactory` provides methods to build `DependencyResolver` objects, which can be used to manage dependency resolution, optionally with singleton behavior.
 public enum DependencyResolverFactory: Sendable {
-
     /// Creates a `DependencyResolver` with the given key and resolution block.
     ///
     /// - Parameters:
@@ -51,12 +50,12 @@ public enum DependencyResolverFactory: Sendable {
     ///   - resolveBlock: A closure that defines how to resolve the dependency.
     /// - Returns: An instance of `DependencyResolver`.
     public static func build<T: Sendable>(
-        key: DependencyKey,
+        typeKey: DependencyTypeKey,
         isSingleton: Bool = false,
         resolveBlock: @escaping @Sendable (any Dependency) throws -> T
     ) -> any DependencyResolver {
         DependencyResolverDefault(
-            key: key,
+            typeKey: typeKey,
             isSingleton: isSingleton,
             resolveBlock: resolveBlock
         )
@@ -92,7 +91,7 @@ private struct DependencyResolverDefault: DependencyResolver {
         init(block: (any Sendable)? = nil) {
             self.block = block
         }
-        
+
         func copy() -> Storage {
             Storage(
                 block: block
@@ -112,7 +111,7 @@ private struct DependencyResolverDefault: DependencyResolver {
     }
 
     /// The key used to identify the dependency.
-    let key: DependencyKey
+    let typeKey: DependencyTypeKey
 
     /// The closure that resolves the dependency.
     private let resolveBlock: ResolveBlock<any Sendable>
@@ -130,7 +129,7 @@ private struct DependencyResolverDefault: DependencyResolver {
         resolveBlock: @escaping ResolveBlock<T>
     ) {
         self.init(
-            key: DependencyKey(type: T.self),
+            typeKey: DependencyTypeKey(type: T.self),
             isSingleton: isSingleton,
             resolveBlock: resolveBlock
         )
@@ -139,15 +138,15 @@ private struct DependencyResolverDefault: DependencyResolver {
     /// Initializes a new `DependencyResolver` with a specific key.
     ///
     /// - Parameters:
-    ///   - key: The key used to identify the dependency.
+    ///   - typeKey: The key used to identify the dependency.
     ///   - isSingleton: A Boolean value indicating whether the dependency is a singleton.
     ///   - resolveBlock: The closure that resolves the dependency.
     init<T: Sendable>(
-        key: DependencyKey,
+        typeKey: DependencyTypeKey,
         isSingleton: Bool,
         resolveBlock: @escaping ResolveBlock<T>
     ) {
-        self.key = key
+        self.typeKey = typeKey
         self.isSingleton = isSingleton
         self.resolveBlock = resolveBlock
     }
@@ -162,7 +161,7 @@ private struct DependencyResolverDefault: DependencyResolver {
         }
         return block
     }
-    
+
     private mutating func ensureUniqueness() {
         guard !isKnownUniquelyReferenced(&storage) else { return }
         storage = storage.copy()

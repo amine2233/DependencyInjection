@@ -8,7 +8,6 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     override func setUpWithError() throws {
         dependencyCore = DependencyCore()
         factory(&dependencyCore)
-        // factory(&DependencyInjector.default.dependencies)
     }
 
     override func tearDownWithError() throws {
@@ -223,7 +222,9 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testGetInjectionUsingKey() throws {
         // given
         let key = DependencyKey(rawValue: "execution")
-        dependencyCore[key] = ExecutableServiceMock()
+        let typeKey = DependencyTypeKey(type: ExecutableServiceMock.self, key: key)
+
+        dependencyCore[typeKey] = ExecutableServiceMock()
 
         @InjectionKey(key, dependencies: dependencyCore)
         var executionService: ExecutableServiceMock
@@ -252,7 +253,9 @@ class DependencyInjectionPropertyWrapperTests: XCTestCase {
     func testGetOptionalInjectionUsingKey() throws {
         // given
         let key = DependencyKey(rawValue: "execution")
-        dependencyCore[key] = ExecutableServiceMock()
+        let typeKey = DependencyTypeKey(type: ExecutableServiceMock.self, key: key)
+
+        dependencyCore[typeKey] = ExecutableServiceMock()
 
         @OptionalInjectionKey(key, dependencies: dependencyCore)
         var executionService: ExecutableServiceMock?
