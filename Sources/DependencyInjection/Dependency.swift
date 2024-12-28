@@ -41,6 +41,16 @@ public protocol DependencyRegister: Sendable {
         key: DependencyKey?
     ) where T: DependencyServiceType
 
+    /// Register class conform to protocol ```DependencyServiceType``` and use it with resolve
+    /// - Parameters:
+    ///     - type: The `DependencyServiceType` type of the object you will register
+    ///     - key: DependencyKey?,
+    mutating func register<T: Sendable, S: Sendable>(
+        _ type: T.Type,
+        key: DependencyKey?,
+        service: S.Type
+    ) where S: DependencyServiceType
+
     /// Register the dependency
     /// - Parameter dependency: The dependency
     mutating func register(_ dependency: any DependencyResolver)
@@ -90,21 +100,34 @@ public protocol DependencyUnregister: Sendable {
 }
 
 public protocol DependencyResolve: Sendable {
-    /// Get a class who was registred or get a singleton
-    /// - Parameter type: The type of the object you will reolve
+    /// Get a class who was registered or get a singleton
+    /// - Parameter type: The type of the object you will resolve
     /// - Returns: The new object
     func resolve<T: Sendable>(_ type: T.Type) throws -> T
 
-    /// Get a class who was registred or get a singleton
+    /// Get a class who was registered or get a singleton
     /// - Parameters:
     ///    - type: The type of the object you will resolve
     ///    - key: The dependency key.
     /// - Returns: The new object
     func resolve<T: Sendable>(_ type: T.Type, key: DependencyKey) throws -> T
 
-    /// Get a class who was registred or get a singleton
+    /// Get a class who was registered or get a singleton
     /// - Returns: The new object
     func resolve<T: Sendable>() throws -> T
+}
+
+public protocol DependencyResolves: Sendable {
+    /// Get a class who was registered or get a singleton
+    /// - Parameter type: The type of the object you will resolve
+    /// - Returns: The array of objects
+    func resolves<T: Sendable>(
+        _ type: T.Type
+    ) throws -> [T]
+
+    /// Get a class who was registered or get a singleton
+    /// - Returns: The array of object
+    func resolves<T: Sendable>() throws -> [T]
 }
 
 public protocol DependencySingleton: Sendable {
@@ -238,5 +261,6 @@ public protocol Dependency:
     DependencySingleton,
     DependencySingletonOperation,
     DependencySubscript,
-    DependencyUnregister
+    DependencyUnregister,
+    DependencyResolves
 {}

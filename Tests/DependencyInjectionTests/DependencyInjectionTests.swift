@@ -56,38 +56,6 @@ class DependencyInjectionTests: XCTestCase {
         XCTAssertThrowsError(try dependencies.resolve(ExecutableServiceMock.self))
     }
 
-    func testRegisterWithServiceType() throws {
-        // Given
-        // WHEN
-        var dependencies = factory().dependencies
-        dependencies.register(ExecutableServiceMock.self)
-
-        // THEN
-        XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
-    }
-
-    func testRegisterDependency() throws {
-        // Given
-        // WHEN
-        var dependencies = factory().dependencies
-        dependencies.register(DependencyResolverFactory.build { _ in ExecutableServiceMock() })
-
-        // THEN
-        XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
-    }
-
-    func testRegisterWithTypeAndCompletion() throws {
-        // Given
-        // WHEN
-        var dependencies = factory().dependencies
-        dependencies.register(ExecutableServiceMock.self) { _ in
-            ExecutableServiceMock()
-        }
-
-        // THEN
-        XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
-    }
-
     func testUnregister() throws {
         // Given
         var dependencies = factory().dependencies
@@ -348,5 +316,146 @@ class DependencyInjectionTests: XCTestCase {
 
         // THEN
         XCTAssertEqual(dependencies.dependenciesCount, 2)
+    }
+}
+
+// MARK: - DependencyRegister
+
+extension DependencyInjectionTests {
+    func testRegisterWithServiceType() throws {
+        // Given
+        var dependencies = factory().dependencies
+
+        // WHEN
+        dependencies.register(ExecutableServiceMock.self)
+
+        // THEN
+        XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
+    }
+
+    func testRegisterDependency() throws {
+        // Given
+        var dependencies = factory().dependencies
+
+        // WHEN
+        dependencies.register(DependencyResolverFactory.build { _ in ExecutableServiceMock() })
+
+        // THEN
+        XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
+    }
+
+    func testRegisterWithTypeAndCompletion() throws {
+        // Given
+        var dependencies = factory().dependencies
+
+        // WHEN
+        dependencies.register(ExecutableServiceMock.self) { _ in
+            ExecutableServiceMock()
+        }
+
+        // THEN
+        XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
+    }
+
+    func test_register_with_type_key_and_completion() throws {
+        // Given
+        let key = DependencyKey(rawValue: "mock")
+        var dependencies = factory().dependencies
+
+        // when
+        dependencies.register(
+            (any LocationService).self,
+            key: key
+        ) { _ in
+            LocationMock()
+        }
+
+        // Then
+        XCTAssertNoThrow(try dependencies.resolve((any LocationService).self))
+    }
+
+    func test_register_with_type_key_DependencyServiceType() throws {
+        // Given
+        let key = DependencyKey(rawValue: "mock")
+        var dependencies = factory().dependencies
+
+        // when
+        dependencies.register(
+            ExecutableServiceMock.self,
+            key: key
+        )
+
+        // Then
+        XCTAssertNoThrow(try dependencies.resolve() as ExecutableServiceMock)
+    }
+
+    func test_register_with_type_key_DependencyServiceType_with_service() throws {
+        // Given
+        let key = DependencyKey(rawValue: "mock")
+        var dependencies = factory().dependencies
+
+        // when
+        dependencies.register(
+            (any ExecutableService).self,
+            key: key,
+            service: ExecutableServiceMock.self
+        )
+
+        // Then
+        XCTAssertNoThrow(try dependencies.resolve() as any ExecutableService)
+    }
+}
+
+// MARK: - DependencyResolves
+
+extension DependencyInjectionTests {
+    private func registerFactoriesLocation() -> DependencyInjector {
+        DependencyInjector(dependencies: dependencyCore) {
+            DependencyResolverFactory.build(
+                typeKey: DependencyTypeKey(
+                    type: (any LocationService).self,
+                    key: DependencyKey(rawValue: "mock")
+                ),
+                resolveBlock: { _ in LocationMock() }
+            )
+            DependencyResolverFactory.build(
+                typeKey: DependencyTypeKey(
+                    type: (any LocationService).self,
+                    key: DependencyKey(rawValue: "apple_api")
+                ),
+                resolveBlock: { _ in LocationAppleAPI() }
+            )
+            DependencyResolverFactory.build(
+                typeKey: DependencyTypeKey(
+                    type: (any LocationService).self,
+                    key: DependencyKey(rawValue: "default")
+                ),
+                resolveBlock: { _ in LocationDefault() }
+            )
+        }
+    }
+
+    func test_get_dependencies_using_resolves_with_type() throws {
+        // GIVEN
+        let dependencies = registerFactoriesLocation().dependencies
+
+        // WHEN
+
+        let values = try dependencies.resolves((any LocationService).self)
+
+        // THEN
+        XCTAssertEqual(values.count, 3)
+    }
+
+    func test_get_dependencies_using_resolves() throws {
+        // GIVEN
+        let dependencies = registerFactoriesLocation().dependencies
+
+        // WHEN
+
+        let values: [any LocationService] = try dependencies.resolves()
+
+        // THEN
+        XCTAssertEqual(values.count, 3)
     }
 }

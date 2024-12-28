@@ -9,29 +9,19 @@ protocol LocationService: Sendable {
 }
 
 final class LocationMock: LocationService {
-    // private let timer = Timer.publish(every: 1, on: RunLoop.main, in: .default) // 1
-    // private let subject = PassthroughSubject<Location, Never>() // 2
-    // private var cancellables = Set<AnyCancellable>()
+    init() {}
 
-    // var location: AnyPublisher<Location, Never>
+    func start() {}
+}
 
-    init() {
-        // location = subject.eraseToAnyPublisher()
-        // timer
-        //     .map { _ in
-        //         (
-        //             Double.random(in: 50..<55),
-        //             Double.random(in: 33..<36)
-        //         )
-        //     }
-        //     .subscribe(subject) // 3
-        //     .store(in: &cancellables)
-    }
+final class LocationAppleAPI: LocationService {
+    init() {}
 
-    func start() {
-        // timer
-        //     .connect() // 4
-        //     .store(in: &cancellables)
-        // debugPrint("Mock Location service has been started")
-    }
+    func start() {}
+}
+
+final class LocationDefault: LocationService {
+    init() {}
+
+    func start() {}
 }
