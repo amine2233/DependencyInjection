@@ -33,7 +33,8 @@ public struct DependencyInjector: Sendable {
     @resultBuilder
     struct DependencyBuilder {
         static func buildBlock(_ dependency: any DependencyResolver) -> any DependencyResolver { dependency }
-        static func buildBlock(_ dependencies: any DependencyResolver...) -> [any DependencyResolver] { dependencies }
+        static func buildBlock(_ dependencies: any DependencyResolver...)
+            -> [any DependencyResolver] { dependencies }
     }
 
     @resultBuilder
@@ -44,11 +45,14 @@ public struct DependencyInjector: Sendable {
 
     @resultBuilder
     struct DependencyRegisteringBuilder {
-        static func buildBlock(_ components: any DependencyRegistering.Type...) -> [any DependencyRegistering.Type] {
+        static func buildBlock(_ components: any DependencyRegistering
+            .Type...
+        ) -> [any DependencyRegistering.Type] {
             components
         }
 
-        static func buildBlock(_ component: any DependencyRegistering.Type) -> any DependencyRegistering.Type {
+        static func buildBlock(_ component: any DependencyRegistering.Type) -> any DependencyRegistering
+            .Type {
             component
         }
     }
@@ -158,7 +162,9 @@ public struct DependencyInjector: Sendable {
 
     /// Register dependency for preview using result builder
     /// - Parameter register: The callback contain the registration type
-    public mutating func preview(@DependencyRegisteringBuilder _ preview: () -> any DependencyRegistering.Type) {
+    public mutating func preview(@DependencyRegisteringBuilder _ preview: () -> any DependencyRegistering
+        .Type
+    ) {
         if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
             preview().registerAllServices(in: &dependencies)
         }

@@ -8,11 +8,12 @@ public enum DependencyResolverError: Error {
 
 /// A protocol representing a dependency resolver.
 ///
-/// The `DependencyResolver` protocol is used to define resolvers responsible for resolving dependencies in a system. Conforming types must be `Sendable` to ensure they can be safely used in concurrent environments.
+/// The `DependencyResolver` protocol is used to define resolvers responsible for resolving dependencies in a
+/// system. Conforming types must be `Sendable` to ensure they can be safely used in concurrent environments.
 public protocol DependencyResolver: Sendable {
     /// The key used to identify the dependency.
     var key: DependencyKey { get }
-    
+
     /// A flag indicating whether the dependency is a singleton.
     var isSingleton: Bool { get }
 
@@ -21,7 +22,7 @@ public protocol DependencyResolver: Sendable {
     /// - Parameter dependencies: The dependency container.
     /// - Throws: An error if the dependency cannot be resolved.
     mutating func resolve(dependencies: any Dependency) throws
-    
+
     /// Get the value inside the
     func value() throws -> (any Sendable)
 }
@@ -40,14 +41,15 @@ extension DependencyResolver {
 
 /// A factory for creating `DependencyResolver` instances, which are responsible for resolving dependencies.
 ///
-/// The `DependencyResolverFactory` provides methods to build `DependencyResolver` objects, which can be used to manage dependency resolution, optionally with singleton behavior.
+/// The `DependencyResolverFactory` provides methods to build `DependencyResolver` objects, which can be used
+/// to manage dependency resolution, optionally with singleton behavior.
 public enum DependencyResolverFactory: Sendable {
-
     /// Creates a `DependencyResolver` with the given key and resolution block.
     ///
     /// - Parameters:
     ///   - key: The `DependencyKey` used to identify the dependency.
-    ///   - isSingleton: A Boolean indicating whether the resolver should create a singleton instance. Default is `false`.
+    ///   - isSingleton: A Boolean indicating whether the resolver should create a singleton instance. Default
+    /// is `false`.
     ///   - resolveBlock: A closure that defines how to resolve the dependency.
     /// - Returns: An instance of `DependencyResolver`.
     public static func build<T: Sendable>(
@@ -65,7 +67,8 @@ public enum DependencyResolverFactory: Sendable {
     /// Creates a `DependencyResolver` without a key, using the provided resolution block.
     ///
     /// - Parameters:
-    ///   - isSingleton: A Boolean indicating whether the resolver should create a singleton instance. Default is `false`.
+    ///   - isSingleton: A Boolean indicating whether the resolver should create a singleton instance. Default
+    /// is `false`.
     ///   - resolveBlock: A closure that defines how to resolve the dependency.
     /// - Returns: An instance of `DependencyResolver`.
     public static func build<T: Sendable>(
@@ -86,13 +89,13 @@ private struct DependencyResolverDefault: DependencyResolver {
     /// - Returns: The resolved dependency of type `T`.
     typealias ResolveBlock<T: Sendable> = @Sendable (any Dependency) throws -> T
 
-    fileprivate final class Storage: @unchecked Sendable {
-        var block: (any Sendable)?
+    fileprivate final class Storage: Sendable {
+        let block: (any Sendable)?
 
         init(block: (any Sendable)? = nil) {
             self.block = block
         }
-        
+
         func copy() -> Storage {
             Storage(
                 block: block
@@ -107,7 +110,7 @@ private struct DependencyResolverDefault: DependencyResolver {
         get { storage.block }
         set {
             ensureUniqueness()
-            storage.block = newValue
+            storage = Storage(block: newValue)
         }
     }
 
@@ -160,11 +163,13 @@ private struct DependencyResolverDefault: DependencyResolver {
         guard let block else {
             throw DependencyResolverError.notResolved
         }
+
         return block
     }
-    
+
     private mutating func ensureUniqueness() {
         guard !isKnownUniquelyReferenced(&storage) else { return }
+
         storage = storage.copy()
     }
 }

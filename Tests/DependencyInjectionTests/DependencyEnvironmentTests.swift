@@ -132,7 +132,10 @@ class DependencyEnvironmentTests: XCTestCase {
 
         // Then
         XCTAssertThrowsError(try callback(), "not found parameter") { error in
-            XCTAssertEqual(error as? DependencyEnvironmentError, DependencyEnvironmentError.notFoundParameter(key))
+            XCTAssertEqual(
+                error as? DependencyEnvironmentError,
+                DependencyEnvironmentError.notFoundParameter(key)
+            )
         }
     }
 

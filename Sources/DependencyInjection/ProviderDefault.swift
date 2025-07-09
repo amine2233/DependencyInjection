@@ -1,5 +1,15 @@
 import Foundation
 
+extension Provider where Self == ProviderDefault {
+    /// Create a new provider with a resolution block.
+    ///
+    /// - Parameter block: A closure that resolves the dependency from the `DependencyProvider`.
+    public static func `default`<T>(_ block: @escaping ProviderDefault.ResolveBlock<T>) -> Self
+        where T: Provider {
+        ProviderDefault(block)
+    }
+}
+
 /// A default implementation of a provider that conforms to the `Provider` protocol.
 /// It manages the resolution and lifecycle of dependencies.
 public struct ProviderDefault: Provider {
@@ -24,7 +34,7 @@ public struct ProviderDefault: Provider {
     /// Initializes a new provider with a resolution block.
     ///
     /// - Parameter block: A closure that resolves the dependency from the `DependencyProvider`.
-    public init<T: Provider>(_ block: @escaping ResolveBlock<T>) {
+    init<T: Provider>(_ block: @escaping ResolveBlock<T>) {
         self.resolveBlock = block // Save block for future
         self.description = String(describing: T.self)
     }

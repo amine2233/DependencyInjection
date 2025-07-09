@@ -12,10 +12,11 @@ import Foundation
 /// ```
 ///
 /// Some related reads & inspiration:
-/// [swift-evolution proposal](https://github.com/apple/swift-evolution/blob/master/proposals/0258-property-wrappers.md)
+/// [swift-evolution
+/// proposal](https://github.com/apple/swift-evolution/blob/master/proposals/0258-property-wrappers.md)
 /// [Environment variables in Mac OSX](https://stackoverflow.com/a/4567308)
 @propertyWrapper
-public struct EnvironmentVariable {
+public struct EnvironmentVariable: Sendable {
     private var name: String
 
     public init(name: String) {
@@ -26,6 +27,7 @@ public struct EnvironmentVariable {
     public var wrappedValue: String? {
         get {
             guard let pointer = getenv(name) else { return nil }
+
             return String(cString: pointer)
         }
         set {
@@ -33,6 +35,7 @@ public struct EnvironmentVariable {
                 unsetenv(name)
                 return
             }
+
             setenv(name, value, 1)
         }
     }

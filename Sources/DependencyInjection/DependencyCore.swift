@@ -1,5 +1,24 @@
 import Foundation
 
+extension Dependency where Self == DependencyCore {
+    /// Shared dependency
+    /// - Parameters:
+    ///   - dependencies: The dependencies
+    ///   - singletons: The singletons
+    ///   - providers: The providers
+    public static func shared(
+        environment: DependencyEnvironment = .production,
+        dependencies: [DependencyKey: any DependencyResolver] = [:],
+        providers: [any Provider] = []
+    ) -> Self {
+        DependencyCore(
+            environment: environment,
+            dependencies: dependencies,
+            providers: providers
+        )
+    }
+}
+
 /// The dependency injection
 ///
 ///
@@ -126,7 +145,11 @@ extension DependencyCore {
             try T.makeService(for: container)
         }
         let identifier = DependencyKey(type: type)
-        dependencies[identifier] = DependencyResolverFactory.build(key: identifier, isSingleton: false, resolveBlock: completion)
+        dependencies[identifier] = DependencyResolverFactory.build(
+            key: identifier,
+            isSingleton: false,
+            resolveBlock: completion
+        )
     }
 
     /// Register the dependency
@@ -139,7 +162,11 @@ extension DependencyCore {
         key: DependencyKey,
         completion: @escaping @Sendable (any Dependency) throws -> T
     ) {
-        dependencies[key] = DependencyResolverFactory.build(key: key, isSingleton: false, resolveBlock: completion)
+        dependencies[key] = DependencyResolverFactory.build(
+            key: key,
+            isSingleton: false,
+            resolveBlock: completion
+        )
     }
 }
 
@@ -189,6 +216,7 @@ extension DependencyCore {
         guard let value = try? dependency.value() else {
             throw DependencyError.notResolved(name: dependency.key.rawValue)
         }
+
         return value
     }
 }
@@ -255,9 +283,16 @@ extension DependencyCore {
     /// Create a singleton
     /// - Parameter completion: The completion to create a singleton
     /// - Returns: The singleton object
-    public mutating func registerSingleton<T: Sendable>(completion: @escaping @Sendable (any Dependency) throws -> T) throws {
+    public mutating func registerSingleton<T: Sendable>(
+        completion: @escaping @Sendable (any Dependency) throws
+            -> T
+    ) throws {
         let identifier = DependencyKey(type: T.self)
-        var dependency = DependencyResolverFactory.build(key: identifier, isSingleton: true, resolveBlock: completion)
+        var dependency = DependencyResolverFactory.build(
+            key: identifier,
+            isSingleton: true,
+            resolveBlock: completion
+        )
 
         try dependency.resolve(dependencies: self)
 
@@ -273,7 +308,11 @@ extension DependencyCore {
         completion: @escaping @Sendable (any Dependency) throws -> T
     ) throws {
         let identifier = DependencyKey(type: type)
-        var dependency = DependencyResolverFactory.build(key: identifier, isSingleton: true, resolveBlock: completion)
+        var dependency = DependencyResolverFactory.build(
+            key: identifier,
+            isSingleton: true,
+            resolveBlock: completion
+        )
         dependencies[identifier] = try dependency.resolveDependency(dependencies: self)
     }
 
@@ -285,7 +324,11 @@ extension DependencyCore {
             try T.makeService(for: dependency)
         }
         let identifier = DependencyKey(type: T.self)
-        var dependency = DependencyResolverFactory.build(key: identifier, isSingleton: true, resolveBlock: completion)
+        var dependency = DependencyResolverFactory.build(
+            key: identifier,
+            isSingleton: true,
+            resolveBlock: completion
+        )
 
         try dependency.resolve(dependencies: self)
 
@@ -347,6 +390,7 @@ extension DependencyCore {
     ) -> T? {
         get {
             guard var dependencyResolver = dependencies[keyPath] else { return nil }
+
             if !dependencyResolver.isSingleton {
                 try? dependencyResolver.resolve(dependencies: self)
             }

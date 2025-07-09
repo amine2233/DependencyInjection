@@ -35,7 +35,8 @@ extension DependencyRegister {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking one dependency as a parameter.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking one
+    /// dependency as a parameter.
     public mutating func autoregister<Service, A>(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A) -> Service
@@ -49,7 +50,8 @@ extension DependencyRegister {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking two dependencies as parameters.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking two
+    /// dependencies as parameters.
     public mutating func autoregister<Service, A, B>(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B) -> Service
@@ -66,7 +68,8 @@ extension DependencyRegister {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking three dependencies as parameters.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking three
+    /// dependencies as parameters.
     public mutating func autoregister<Service, A, B, C>(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C) -> Service
@@ -84,7 +87,8 @@ extension DependencyRegister {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking four dependencies as parameters.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking four
+    /// dependencies as parameters.
     public mutating func autoregister<Service, A, B, C, D>(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D) -> Service
@@ -103,7 +107,8 @@ extension DependencyRegister {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking five dependencies as parameters.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking five
+    /// dependencies as parameters.
     public mutating func autoregister<Service, A, B, C, D, E>(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D, E) -> Service
@@ -123,7 +128,8 @@ extension DependencyRegister {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking six dependencies as parameters.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking six
+    /// dependencies as parameters.
     public mutating func autoregister<Service, A, B, C, D, E, F>(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D, E, F) -> Service
@@ -144,7 +150,8 @@ extension DependencyRegister {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking seven dependencies as parameters.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking seven
+    /// dependencies as parameters.
     public mutating func autoregister<Service, A, B, C, D, E, F, G>(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D, E, F, G) -> Service
@@ -166,7 +173,8 @@ extension DependencyRegister {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight dependencies as parameters.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight
+    /// dependencies as parameters.
     public mutating func autoregister<Service, A, B, C, D, E, F, G, H>(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D, E, F, G, H) -> Service
@@ -189,7 +197,8 @@ extension DependencyRegister {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight dependencies as parameters.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight
+    /// dependencies as parameters.
     public mutating func autoregister<Service, A, B, C, D, E, F, G, H, I>(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D, E, F, G, H, I) -> Service
@@ -213,7 +222,8 @@ extension DependencyRegister {
     ///
     /// - Parameters:
     ///   - service: The type of the service to register.
-    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight dependencies as parameters.
+    ///   - initializer: A closure that initializes and returns an instance of the service, taking eight
+    /// dependencies as parameters.
     public mutating func autoregister<Service, A, B, C, D, E, F, G, H, I, J>(
         _ service: Service.Type,
         initializer: @escaping @Sendable (A, B, C, D, E, F, G, H, I, J) -> Service

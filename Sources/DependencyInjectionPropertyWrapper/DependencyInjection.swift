@@ -8,7 +8,7 @@ import DependencyInjection
 /// ```
 ///
 @propertyWrapper
-public struct Injection<Service> {
+public struct Injection<Service: Sendable>: Sendable {
     private var service: Service
 
     /// Initialization
@@ -42,13 +42,16 @@ public struct Injection<Service> {
 /// ```
 ///
 @propertyWrapper
-public struct InjectionKey<Service> {
+public struct InjectionKey<Service: Sendable>: Sendable {
     private var key: DependencyKey
     private var dependencies: any DependencySubscript
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(_ key: DependencyKey, dependencies: any Dependency = DependencyInjector.default.dependencies) {
+    public init(
+        _ key: DependencyKey,
+        dependencies: any Dependency = DependencyInjector.default.dependencies
+    ) {
         self.dependencies = dependencies
         self.key = key
     }
@@ -59,6 +62,7 @@ public struct InjectionKey<Service> {
             guard let service = dependencies[key] as Service? else {
                 fatalError("Can't resolve \(Service.self). Error: missing value")
             }
+
             return service
         }
         mutating set {
@@ -81,7 +85,7 @@ public struct InjectionKey<Service> {
 /// ```
 ///
 @propertyWrapper
-public struct OptionalInjection<Service> {
+public struct OptionalInjection<Service: Sendable>: Sendable {
     private var service: Service?
 
     /// Initialization
@@ -111,7 +115,7 @@ public struct OptionalInjection<Service> {
 /// ```
 ///
 @propertyWrapper
-public struct OptionalInjectionKey<Service> {
+public struct OptionalInjectionKey<Service: Sendable>: Sendable {
     private var key: DependencyKey
     private var dependencies: any DependencySubscript
 
@@ -150,7 +154,7 @@ public struct OptionalInjectionKey<Service> {
 /// ```
 ///
 @propertyWrapper
-public struct LazyInjection<Service> {
+public struct LazyInjection<Service: Sendable>: Sendable {
     private(set) var isInitialized: Bool = false
     private var service: Service!
     private let dependencies: any Dependency
@@ -206,7 +210,7 @@ public struct LazyInjection<Service> {
 /// ```
 ///
 @propertyWrapper
-public struct WeakLazyInjection<Service> {
+public struct WeakLazyInjection<Service: Sendable>: Sendable {
     private(set) var isInitialized: Bool = false
     private var service: Service?
     private let dependencies: any Dependency
@@ -249,39 +253,3 @@ public struct WeakLazyInjection<Service> {
         isInitialized = false
     }
 }
-
-#if canImport(SwifUI)
-
-/// A  property wrapper to resolve dependency values.
-///
-/// ```
-/// @ObjectInjection)
-/// var viewModel: ObjectViewModel
-/// ```
-///
-@propertyWrapper
-public struct ObjectInjection<Service>: DynamicProperty where Service: ObservableObject {
-    @ObservedObject private var service: Service
-
-    /// Initialization
-    public init(dependencies: Dependency = DependencyInjector.default.dependencies) {
-        do {
-            self.service = try dependencies.resolve()
-        } catch {
-            fatalError("Can't resolve \(Service.self). Error: \(error.localizedDescription)")
-        }
-    }
-
-    /// The property wrapper
-    public var wrappedValue: Service {
-        get { service }
-        mutating set { service = newValue }
-    }
-
-    /// The property wrapper
-    public var projectedValue: ObjectInjection<Service>.Wrapper {
-        $service
-    }
-}
-
-#endif
