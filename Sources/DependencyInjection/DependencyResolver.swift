@@ -11,6 +11,9 @@ public enum DependencyResolverError: Error {
 /// The `DependencyResolver` protocol is used to define resolvers responsible for resolving dependencies in a
 /// system. Conforming types must be `Sendable` to ensure they can be safely used in concurrent environments.
 public protocol DependencyResolver: Sendable {
+    /// The Value will be generated
+    associatedtype Value: Sendable
+
     /// The key used to identify the dependency.
     var key: DependencyKey { get }
 
@@ -23,8 +26,10 @@ public protocol DependencyResolver: Sendable {
     /// - Throws: An error if the dependency cannot be resolved.
     mutating func resolve(dependencies: any Dependency) throws
 
+    var type: Any.Type { get }
+
     /// Get the value inside the
-    func value() throws -> (any Sendable)
+    func value() throws -> Value
 }
 
 extension DependencyResolver {
@@ -83,13 +88,15 @@ public enum DependencyResolverFactory: Sendable {
 }
 
 /// A struct responsible for resolving dependencies.
-private struct DependencyResolverDefault: DependencyResolver {
+struct DependencyResolverDefault: DependencyResolver {
     /// A typealias representing a closure that resolves a dependency.
     /// - Parameter Dependency: The dependency container.
     /// - Returns: The resolved dependency of type `T`.
     typealias ResolveBlock<T: Sendable> = @Sendable (any Dependency) throws -> T
 
-    fileprivate final class Storage: Sendable {
+    var type: any Any.Type
+
+    final class Storage: Sendable {
         let block: (any Sendable)?
 
         init(block: (any Sendable)? = nil) {
@@ -103,7 +110,7 @@ private struct DependencyResolverDefault: DependencyResolver {
         }
     }
 
-    private var storage: Storage = .init()
+    var storage: Storage = .init()
 
     /// The resolved dependency value.
     private var block: (any Sendable)? {
@@ -150,6 +157,7 @@ private struct DependencyResolverDefault: DependencyResolver {
         isSingleton: Bool,
         resolveBlock: @escaping ResolveBlock<T>
     ) {
+        self.type = T.self
         self.key = key
         self.isSingleton = isSingleton
         self.resolveBlock = resolveBlock
