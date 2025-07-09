@@ -123,7 +123,10 @@ class DependencyInjectionTests: XCTestCase {
         dependencies[key] = ExecutableServiceMock()
 
         // THEN
-        XCTAssertEqual(String(describing: ExecutableServiceMock.self).components(separatedBy: ".").last, String(describing: ExecutableServiceMock.self))
+        XCTAssertEqual(
+            String(describing: ExecutableServiceMock.self).components(separatedBy: ".").last,
+            String(describing: ExecutableServiceMock.self)
+        )
     }
 
     func test_Create_Using_Subscript_DependencyKey_For_Singleton() throws {
@@ -142,7 +145,10 @@ class DependencyInjectionTests: XCTestCase {
         var dependencies = factory().dependencies
 
         // WHEN
-        try dependencies.registerSingleton((any ExecutableService).self) { _ -> (any ExecutableService) in ExecutableServiceMock() }
+        try dependencies
+            .registerSingleton((any ExecutableService).self) { _ -> (any ExecutableService) in
+                ExecutableServiceMock()
+            }
 
         // THEN
         XCTAssertNoThrow(try dependencies.resolve((any ExecutableService).self))
@@ -151,7 +157,10 @@ class DependencyInjectionTests: XCTestCase {
     func test_Create_Using_Subscript_DependencyKey_For_UnRegisterSingleton() throws {
         // GIVEN
         var dependencies = factory().dependencies
-        try dependencies.registerSingleton((any ExecutableService).self) { _ -> (any ExecutableService) in ExecutableServiceMock() }
+        try dependencies
+            .registerSingleton((any ExecutableService).self) { _ -> (any ExecutableService) in
+                ExecutableServiceMock()
+            }
 
         // WHEN
         dependencies.unregisterSingleton((any ExecutableService).self)
@@ -164,7 +173,10 @@ class DependencyInjectionTests: XCTestCase {
         // GIVEN
         var dependencies = factory().dependencies
         let key = DependencyKey(type: (any ExecutableService).self)
-        try dependencies.registerSingleton((any ExecutableService).self) { _ -> (any ExecutableService) in ExecutableServiceMock() }
+        try dependencies
+            .registerSingleton((any ExecutableService).self) { _ -> (any ExecutableService) in
+                ExecutableServiceMock()
+            }
 
         // WHEN
         dependencies.unregisterSingleton(key: key)
@@ -240,7 +252,9 @@ class DependencyInjectionTests: XCTestCase {
         try dependencies.registerSingleton(ExecutableServiceMock.self)
 
         // THEN
-        XCTAssertTrue(dependencies.description.contains("\n- \(DependencyKey(type: ExecutableServiceMock.self))"))
+        XCTAssertTrue(dependencies.description
+            .contains("\n- \(DependencyKey(type: ExecutableServiceMock.self))")
+        )
     }
 
     // MARK: Providers Tests

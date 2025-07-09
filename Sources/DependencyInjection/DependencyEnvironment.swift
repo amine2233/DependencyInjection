@@ -162,7 +162,10 @@ public struct DependencyEnvironment: Equatable, RawRepresentable, Sendable {
     /// - Parameters:
     ///   - key: The key for the option.
     ///   - value: The value to set, which must conform to `LosslessStringConvertible`.
-    mutating func setOption<T: LosslessStringConvertible & Sendable>(key: DependencyEnvironmentKey, value: T?) {
+    mutating func setOption<T: LosslessStringConvertible & Sendable>(
+        key: DependencyEnvironmentKey,
+        value: T?
+    ) {
         options[dynamicMember: key] = value
     }
 
@@ -175,6 +178,7 @@ public struct DependencyEnvironment: Equatable, RawRepresentable, Sendable {
         guard let value = options[dynamicMember: key] else {
             throw DependencyEnvironmentError.notFoundOption(key)
         }
+
         return value
     }
 
@@ -187,6 +191,7 @@ public struct DependencyEnvironment: Equatable, RawRepresentable, Sendable {
         guard let value = options[dynamicMember: key] as? T else {
             throw DependencyEnvironmentError.notFoundOption(key)
         }
+
         return value
     }
 
@@ -208,6 +213,7 @@ public struct DependencyEnvironment: Equatable, RawRepresentable, Sendable {
         guard let value = parameters[key] as? T else {
             throw DependencyEnvironmentError.notFoundParameter(key)
         }
+
         return value
     }
 }
@@ -233,7 +239,8 @@ extension DependencyEnvironment {
 
         /// Initializes a new `Process` instance with the given process information.
         ///
-        /// - Parameter info: The process information to use. Defaults to the current process information obtained from `ProcessInfo.processInfo`.
+        /// - Parameter info: The process information to use. Defaults to the current process information
+        /// obtained from `ProcessInfo.processInfo`.
         init(info: ProcessInfo = .processInfo) {
             self._info = info
         }
@@ -245,6 +252,7 @@ extension DependencyEnvironment {
         public subscript<T>(dynamicMember member: String) -> T? where T: LosslessStringConvertible {
             get {
                 guard let raw = _info.environment[member], let value = T(raw) else { return nil }
+
                 return value
             }
             nonmutating set(value) {
@@ -263,6 +271,7 @@ extension DependencyEnvironment {
         public subscript(dynamicMember member: String) -> String? {
             get {
                 guard let value = _info.environment[member] else { return nil }
+
                 return value
             }
             nonmutating set(value) {
@@ -294,9 +303,11 @@ extension DependencyEnvironment {
         ///
         ///     Environment.development.options.DATABASE_PORT = 3306
         ///     Environment.development.options.DATABASE_PORT // 3306
-        public subscript<T: Sendable>(dynamicMember member: DependencyEnvironmentKey) -> T? where T: LosslessStringConvertible {
+        public subscript<T: Sendable>(dynamicMember member: DependencyEnvironmentKey) -> T?
+            where T: LosslessStringConvertible {
             get {
                 guard let raw = _info[member], let value = raw as? T else { return nil }
+
                 return value
             }
             mutating set(value) {
@@ -311,6 +322,7 @@ extension DependencyEnvironment {
         public subscript(dynamicMember member: DependencyEnvironmentKey) -> String? {
             get {
                 guard let raw = _info[member], let value = raw as? String else { return nil }
+
                 return value
             }
             mutating set(value) {
@@ -364,9 +376,11 @@ extension DependencyEnvironment {
         }
     }
 
-    /// A final class that extends `Reference` to allow for mutable access to the referenced value's properties.
+    /// A final class that extends `Reference` to allow for mutable access to the referenced value's
+    /// properties.
     public final class MutableReference<Value: Sendable>: Reference<Value>, @unchecked Sendable {
-        /// Provides dynamic member lookup to access and modify properties of the referenced value using writable key paths.
+        /// Provides dynamic member lookup to access and modify properties of the referenced value using
+        /// writable key paths.
         ///
         /// - Parameter keyPath: The writable key path to the desired property.
         /// - Returns: The value at the specified key path.

@@ -24,7 +24,10 @@ public protocol DependencyRegister: Sendable {
     /// - Parameters:
     ///   - key: The dependency key of the object you will register
     ///   - completion: The completion
-    mutating func register<T>(key: DependencyKey, completion: @escaping @Sendable (any Dependency) throws -> T)
+    mutating func register<T>(
+        key: DependencyKey,
+        completion: @escaping @Sendable (any Dependency) throws -> T
+    )
 }
 
 public protocol DependencyRegisterOperation: Sendable {
@@ -47,7 +50,7 @@ public protocol DependencyUnregister: Sendable {
     mutating func unregister<T>(_ type: T.Type)
 }
 
-public protocol DependencyReslove: Sendable {
+public protocol DependencyResolve: Sendable {
     /// Get a class who was registred or get a singleton
     /// - Parameter type: The type of the object you will reolve
     /// - Returns: The new object
@@ -72,7 +75,10 @@ public protocol DependencySingleton: Sendable {
     /// - Parameters:
     ///   - type: The type of the object you will register
     ///   - completion: The completion
-    mutating func registerSingleton<T>(_ type: T.Type, completion: @escaping @Sendable (any Dependency) throws -> T) throws
+    mutating func registerSingleton<T>(
+        _ type: T.Type,
+        completion: @escaping @Sendable (any Dependency) throws -> T
+    ) throws
 
     /// Create a singleton with class conform to protocol ```DependencyServiceType```
     /// - Parameter type: The type of the singleton
@@ -132,4 +138,6 @@ public protocol DependencySubscript: Sendable {
 }
 
 /// The dependency protocol
-public typealias Dependency = DependencyDescription & DependencyParameters & DependencyProvider & DependencyRegister & DependencyRegisterOperation & DependencyReslove & DependencySingleton & DependencySingletonOperation & DependencySubscript & DependencyUnregister
+public protocol Dependency: DependencyDescription, DependencyParameters, DependencyProvider,
+    DependencyRegister, DependencyRegisterOperation, DependencyResolve, DependencySingleton,
+    DependencySingletonOperation, DependencySubscript, DependencyUnregister {}

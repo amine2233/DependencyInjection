@@ -7,7 +7,7 @@ protocol JourneyService: Sendable {
 final class JourneyMock: JourneyService, @unchecked Sendable {
     var invokedStart = false
     var invokedStartCount = 0
-    
+
     @Sendable
     init() {}
 
