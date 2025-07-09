@@ -1,4 +1,6 @@
 import Foundation
+import Runtime
+import SwiftGraph
 
 extension Dependency where Self == DependencyCore {
     /// Shared dependency
@@ -121,6 +123,32 @@ public struct DependencyCore: Dependency {
     public func didEnterBackground() -> Self {
         _ = providers.map { $0.didEnterBackground(self) }
         return self
+    }
+
+    public func check() throws {
+        let graph = UnweightedGraph<DependencyKey>(vertices: Array(dependencies.keys))
+
+        for value in dependencies.values {
+            for componentKey in try value.parameters() {
+                graph.addEdge(from: value.key, to: componentKey, directed: true)
+            }
+        }
+
+        guard let sorted = graph.topologicalSort() else {
+            throw DependencyError.cyclicDependency(graph.detectCycles())
+        }
+    }
+}
+
+extension DependencyResolver {
+    func parameters() throws -> Set<DependencyKey> {
+        let info = try typeInfo(of: type)
+        return Set(
+            info
+                .properties
+                .compactMap { String(describing: $0.type).split(separator: ".").last }
+                .map { DependencyKey(rawValue: String($0)) }
+        )
     }
 }
 

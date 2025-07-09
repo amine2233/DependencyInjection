@@ -1,7 +1,7 @@
 import Foundation
 
 /// A struct representing a key used to identify a dependency.
-public struct DependencyKey: RawRepresentable, Hashable, Sendable {
+public struct DependencyKey: RawRepresentable, Hashable, Sendable, Codable {
     /// The raw string value of the key.
     public let rawValue: String
 

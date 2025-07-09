@@ -22,6 +22,8 @@ public enum DependencyError: Error, Equatable {
     ///
     /// - Parameter name: The name of the unresolved dependency.
     case notResolved(name: String)
+
+    case cyclicDependency([[DependencyKey]])
 }
 
 /// Extension to provide localized error descriptions for DependencyError.
@@ -37,6 +39,8 @@ extension DependencyError: LocalizedError {
             "Dependency not found: \(name)"
         case let .notResolved(name):
             "Dependency not resolved: \(name)"
+        case let .cyclicDependency(keys):
+            "Cyclic dependency detected: \(keys)"
         }
     }
 }

@@ -1,0 +1,24 @@
+{
+  "originHash" : "bf10ef8c3576fb364c27ba2da06a0567700ef91bc1a0af33d12ffdb4205023dd",
+  "pins" : [
+    {
+      "identity" : "runtime",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/wickwirew/Runtime",
+      "state" : {
+        "revision" : "b90e9ab1c66a964a9edf32fe38ea2774c0e5821b",
+        "version" : "2.2.7"
+      }
+    },
+    {
+      "identity" : "swiftgraph",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/davecom/SwiftGraph",
+      "state" : {
+        "revision" : "76b5180a5cc32eda7f5236a756f4c1e0936311c6",
+        "version" : "3.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}

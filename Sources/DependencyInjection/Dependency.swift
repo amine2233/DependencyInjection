@@ -137,7 +137,11 @@ public protocol DependencySubscript: Sendable {
     subscript<T>(_ keyPath: DependencyKey) -> T? { get set }
 }
 
+public protocol DependencyCheck: Sendable {
+    func check() throws
+}
+
 /// The dependency protocol
 public protocol Dependency: DependencyDescription, DependencyParameters, DependencyProvider,
     DependencyRegister, DependencyRegisterOperation, DependencyResolve, DependencySingleton,
-    DependencySingletonOperation, DependencySubscript, DependencyUnregister {}
+    DependencySingletonOperation, DependencySubscript, DependencyUnregister, DependencyCheck {}
