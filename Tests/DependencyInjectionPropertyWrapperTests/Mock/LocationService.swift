@@ -8,6 +8,12 @@ protocol LocationService: Sendable {
     func start()
 }
 
+extension LocationService {
+    var nameStructure: String {
+        String(String(describing: self).split(separator: ".").last!)
+    }
+}
+
 final class LocationMock: LocationService {
     // private let timer = Timer.publish(every: 1, on: RunLoop.main, in: .default) // 1
     // private let subject = PassthroughSubject<Location, Never>() // 2

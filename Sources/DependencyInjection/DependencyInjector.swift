@@ -18,7 +18,7 @@ public protocol HasDependencies {
 extension HasDependencies {
     /// Provides access to the default dependency container.
     var dependencies: any Dependency {
-        DependencyInjector.default.dependencies
+        DependencyInjector.current.dependencies
     }
 }
 
@@ -28,8 +28,10 @@ public struct DependencyInjector: Sendable {
     public var dependencies: any Dependency
 
     /// The dependencyCore singleton
-    public static let `default` = DependencyInjector()
+    @TaskLocal package static var current = DependencyInjector()
 
+    public static var `default`: DependencyInjector { .current }
+    
     @resultBuilder
     struct DependencyBuilder {
         static func buildBlock(_ dependency: any DependencyResolver) -> any DependencyResolver { dependency }
@@ -207,10 +209,46 @@ public struct DependencyInjector: Sendable {
     public mutating func provider(@ProviderBuilder _ provider: () -> any Provider) {
         dependencies.registerProvider(provider())
     }
+    
+    public mutating func register<T>(_ type: T.Type, completion: @escaping @Sendable (any Dependency) throws -> T) {
+        dependencies.register(type, completion: completion)
+    }
+}
 
-    public func withDependency(_ completion: (inout any Dependency) -> Void) -> Self {
-        var copy = self
-        completion(&copy.dependencies)
-        return copy
+@discardableResult
+public func withDependencies<T: Sendable>(
+    _ updateValuesForOperation: (inout ( DependencyInjector)) throws -> Void,
+    operation: () throws -> T
+) throws -> T {
+    var injector = DependencyInjector.current
+    try updateValuesForOperation(&injector)
+    return try DependencyInjector.$current.withValue(injector) {
+        return try operation()
+        
+    }
+}
+
+@discardableResult
+public func withDependencies<T: Sendable>(
+    _ updateValuesForOperation: (inout ( DependencyInjector)) -> Void,
+    operation: () -> T
+) -> T {
+    var injector = DependencyInjector.current
+    updateValuesForOperation(&injector)
+    return DependencyInjector.$current.withValue(injector) {
+        return operation()
+    }
+}
+
+@discardableResult
+public func withDependencies<T: Sendable>(
+    isolation: isolated (any Actor)? = #isolation,
+    _ updateValuesForOperation: (inout ( DependencyInjector)) async throws -> Void,
+    operation: () async throws -> T
+) async throws -> T {
+    var injector = DependencyInjector.current
+    try await updateValuesForOperation(&injector)
+    return try await DependencyInjector.$current.withValue(injector) {
+        return try await operation()
     }
 }

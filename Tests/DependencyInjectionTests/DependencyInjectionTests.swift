@@ -337,28 +337,4 @@ class DependencyInjectionTests: XCTestCase {
         // THEN
         XCTAssertEqual(dependencies.dependenciesCount, 2)
     }
-
-    func testResolveWithDependencyType() throws {
-        final class LocationPrivate: LocationService, AnyObject {
-            func start() {}
-        }
-        // GIVEN
-        // WHEN
-        let dependencies = factory().withDependency {
-            $0.register((any LocationService).self) { _ in
-                LocationPrivate()
-            }
-        }.dependencies
-
-        // THEN
-        let value = try dependencies.resolve((any LocationService).self)
-        XCTAssertEqual(value.nameStructure, String(describing: LocationPrivate.self))
-        XCTAssertNoThrow(try dependencies.resolve() as JourneyMock)
-    }
-}
-
-extension LocationService {
-    var nameStructure: String {
-        String(String(describing: self).split(separator: ".").last!)
-    }
 }
