@@ -207,4 +207,10 @@ public struct DependencyInjector: Sendable {
     public mutating func provider(@ProviderBuilder _ provider: () -> any Provider) {
         dependencies.registerProvider(provider())
     }
+
+    public func withDependency(_ completion: (inout any Dependency) -> Void) -> Self {
+        var copy = self
+        completion(&copy.dependencies)
+        return copy
+    }
 }

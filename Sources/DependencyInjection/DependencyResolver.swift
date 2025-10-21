@@ -80,6 +80,25 @@ public enum DependencyResolverFactory: Sendable {
             resolveBlock: resolveBlock
         )
     }
+
+    /// Creates a `DependencyResolver` without a key, using the provided resolution block.
+    ///
+    /// - Parameters:
+    ///   - isSingleton: A Boolean indicating whether the resolver should create a singleton instance. Default
+    /// is `false`.
+    ///   - resolveBlock: A closure that defines how to resolve the dependency.
+    /// - Returns: An instance of `DependencyResolver`.
+    public static func build<T: Sendable>(
+        type: T.Type,
+        isSingleton: Bool = false,
+        resolveBlock: @escaping @Sendable (any Dependency) throws -> T
+    ) -> any DependencyResolver {
+        DependencyResolverDefault(
+            type: type,
+            isSingleton: isSingleton,
+            resolveBlock: resolveBlock
+        )
+    }
 }
 
 /// A struct responsible for resolving dependencies.
@@ -153,6 +172,23 @@ private struct DependencyResolverDefault: DependencyResolver {
         self.key = key
         self.isSingleton = isSingleton
         self.resolveBlock = resolveBlock
+    }
+
+    /// Initializes a new `DependencyResolver`.
+    ///
+    /// - Parameters:
+    ///   - isSingleton: A Boolean value indicating whether the dependency is a singleton. Default is `false`.
+    ///   - resolveBlock: The closure that resolves the dependency.
+    init<T: Sendable>(
+        type: T.Type,
+        isSingleton: Bool = false,
+        resolveBlock: @escaping ResolveBlock<T>
+    ) {
+        self.init(
+            key: DependencyKey(type: type),
+            isSingleton: isSingleton,
+            resolveBlock: resolveBlock
+        )
     }
 
     mutating func resolve(dependencies: any Dependency) throws {

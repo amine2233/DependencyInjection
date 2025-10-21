@@ -103,6 +103,18 @@ extension DependencyRegister {
             )
         })
     }
+
+//    @available(macOS 14.0.0, *)
+//    mutating func autoregister<Service, each Dependency>(
+//        _ service: Service.Type,
+//        factory: Factory<Service, repeat (each Dependency)>
+//    ) {
+//        register(service, completion: { dependency in
+//            try factory(
+//                (repeat (each dependency.resolve()))
+//            )
+//        })
+//    }
 }
 
 public struct Factory0<Service>: Sendable {
@@ -200,5 +212,22 @@ public struct Factory5<Service, A, B, C, D, E>: Sendable {
 
     public func callAsFunction(_ arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E) -> Service {
         builder(arg1, arg2, arg3, arg4, arg5)
+    }
+}
+
+@available(macOS 14.0.0, *)
+public struct Factory<Service, each Dependency>: Sendable {
+    private let builder: @Sendable (repeat each Dependency) -> Service
+
+    init(_ builder: @escaping @Sendable (repeat each Dependency) -> Service) {
+        self.builder = builder
+    }
+
+    public func build(_ args: repeat each Dependency) -> Service {
+        builder(repeat each args)
+    }
+
+    public func callAsFunction(_ args: repeat each Dependency) -> Service {
+        builder(repeat each args)
     }
 }
