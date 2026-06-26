@@ -1,0 +1,15 @@
+{
+  "originHash" : "9728613a20757266a78e0f4679142d6c1e3fc7136bb16413f8c541ad3ceabe9e",
+  "pins" : [
+    {
+      "identity" : "swiftgraph",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/davecom/SwiftGraph",
+      "state" : {
+        "revision" : "76b5180a5cc32eda7f5236a756f4c1e0936311c6",
+        "version" : "3.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}
