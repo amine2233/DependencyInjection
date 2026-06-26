@@ -42,3 +42,8 @@ public
 Combined.doccarchive
 *.log
 junit.xml
+
+# ia
+CLAUDE.md
+AGENT.md
+.claude
