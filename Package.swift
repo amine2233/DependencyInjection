@@ -3,7 +3,6 @@
 import PackageDescription
 
 let swiftSettings: [PackageDescription.SwiftSetting] = [
-    .unsafeFlags(["-require-explicit-sendable"]),
     .enableUpcomingFeature("ExistentialAny"),
     .enableExperimentalFeature("SuppressedAssociatedTypes"),
     .enableExperimentalFeature("StrictConcurrency")
