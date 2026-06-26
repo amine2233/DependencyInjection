@@ -13,7 +13,7 @@ public struct Injection<Service: Sendable>: Sendable {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency) {
         do {
             self.service = try dependencies.resolve()
         } catch {
@@ -50,7 +50,7 @@ public struct InjectionKey<Service: Sendable>: Sendable {
     /// - Parameter dependencies: The dependency manager
     public init(
         _ key: DependencyKey,
-        dependencies: any Dependency = DependencyInjector.default.dependencies
+        dependencies: any Dependency
     ) {
         self.dependencies = dependencies
         self.key = key
@@ -59,14 +59,16 @@ public struct InjectionKey<Service: Sendable>: Sendable {
     /// The property wrapper
     public var wrappedValue: Service {
         get {
-            guard let service = dependencies[key] as Service? else {
+            let typeKey = DependencyTypeKey(type: Service.self, key: key)
+            guard let service = dependencies[typeKey] as Service? else {
                 fatalError("Can't resolve \(Service.self). Error: missing value")
             }
 
             return service
         }
         mutating set {
-            dependencies[key] = newValue
+            let typeKey = DependencyTypeKey(type: Service.self, key: key)
+            dependencies[typeKey] = newValue
         }
     }
 
@@ -90,7 +92,7 @@ public struct OptionalInjection<Service: Sendable>: Sendable {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency) {
         self.service = try? dependencies.resolve(Service.self)
     }
 
@@ -123,7 +125,7 @@ public struct OptionalInjectionKey<Service: Sendable>: Sendable {
     /// - Parameter dependencies: The dependency manager
     public init(
         _ key: DependencyKey,
-        dependencies: any Dependency = DependencyInjector.default.dependencies
+        dependencies: any Dependency
     ) {
         self.dependencies = dependencies
         self.key = key
@@ -132,10 +134,12 @@ public struct OptionalInjectionKey<Service: Sendable>: Sendable {
     /// The property wrapper
     public var wrappedValue: Service? {
         get {
-            dependencies[key] as Service?
+            let typeKey = DependencyTypeKey(type: Service.self, key: key)
+            return dependencies[typeKey] as Service?
         }
         mutating set {
-            dependencies[key] = newValue
+            let typeKey = DependencyTypeKey(type: Service.self, key: key)
+            dependencies[typeKey] = newValue
         }
     }
 
@@ -161,7 +165,7 @@ public struct LazyInjection<Service: Sendable>: Sendable {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency) {
         self.dependencies = dependencies
     }
 
@@ -217,7 +221,7 @@ public struct WeakLazyInjection<Service: Sendable>: Sendable {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency) {
         self.dependencies = dependencies
     }
 
@@ -253,3 +257,39 @@ public struct WeakLazyInjection<Service: Sendable>: Sendable {
         isInitialized = false
     }
 }
+
+#if canImport(SwifUI)
+
+/// A  property wrapper to resolve dependency values.
+///
+/// ```
+/// @ObjectInjection)
+/// var viewModel: ObjectViewModel
+/// ```
+///
+@propertyWrapper
+public struct ObjectInjection<Service: Sendable>: Sendable, DynamicProperty where Service: ObservableObject {
+    @ObservedObject private var service: Service
+
+    /// Initialization
+    public init(dependencies: Dependency) {
+        do {
+            self.service = try dependencies.resolve()
+        } catch {
+            fatalError("Can't resolve \(Service.self). Error: \(error.localizedDescription)")
+        }
+    }
+
+    /// The property wrapper
+    public var wrappedValue: Service {
+        get { service }
+        mutating set { service = newValue }
+    }
+
+    /// The property wrapper
+    public var projectedValue: ObjectInjection<Service>.Wrapper {
+        $service
+    }
+}
+
+#endif

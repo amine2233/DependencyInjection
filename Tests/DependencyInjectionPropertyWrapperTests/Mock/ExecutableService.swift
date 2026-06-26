@@ -1,6 +1,6 @@
 import DependencyInjection
 
-protocol ExecutableService {
+protocol ExecutableService: Sendable {
     func exec()
 }
 

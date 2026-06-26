@@ -14,7 +14,7 @@ public struct EnvironmentInjection: Sendable {
 
     /// Initialization
     /// - Parameter dependencies: The dependency manager
-    public init(dependencies: any Dependency = DependencyInjector.default.dependencies) {
+    public init(dependencies: any Dependency) {
         self.dependencies = dependencies
     }
 
@@ -48,7 +48,7 @@ public struct EnvironmentParameter<T: Sendable>: Sendable {
     /// - Parameter dependencies: The dependency manager
     public init(
         key: DependencyEnvironmentKey,
-        dependencies: any Dependency = DependencyInjector.default.dependencies
+        dependencies: any Dependency
     ) {
         self.key = key
         self.dependencies = dependencies
@@ -85,7 +85,7 @@ public struct EnvironmentStringOption: Sendable {
     /// - Parameter dependencies: The dependency manager
     public init(
         key: DependencyEnvironmentKey,
-        dependencies: any Dependency = DependencyInjector.default.dependencies
+        dependencies: any Dependency
     ) {
         self.key = key
         self.dependencies = dependencies
