@@ -38,4 +38,7 @@ core
 
 Mintfile
 Makefile
-.mise.toml
+public
+Combined.doccarchive
+*.log
+junit.xml
