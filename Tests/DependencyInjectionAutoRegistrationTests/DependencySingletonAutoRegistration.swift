@@ -42,4 +42,20 @@ final class DependencySingletonAutoRegistration: XCTestCase {
         // THEN
         XCTAssertNoThrow(try dependencyCore.resolve((any LocationService).self) as! LocationServiceMock)
     }
+
+    func test_AutoRegistration_with_three_parameters() throws {
+        // GIVEN — the single parameter-pack overload resolves an arity beyond the old fixed overloads
+        dependencyCore.autoregister((any JourneyService).self, initializer: JourneyMock.init)
+        dependencyCore.autoregister((any ExecutableService).self, initializer: ExecutableServiceMock.init)
+        dependencyCore.autoregister((any LocationService).self, initializer: LocationServiceMock.init)
+
+        // WHEN
+        try dependencyCore.autoregisterSingleton(
+            (any CompositeService).self,
+            initializer: CompositeServiceMock.init
+        )
+
+        // THEN
+        XCTAssertNoThrow(try dependencyCore.resolve((any CompositeService).self) as! CompositeServiceMock)
+    }
 }
