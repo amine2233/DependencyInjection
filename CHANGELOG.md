@@ -1,3 +1,12 @@
+# [3.0.1](https://github.com/amine2233/DependencyInjection/compare/3.0.0...3.0.1) (2026-06-26)
+
+
+## Bug Fixes
+
+
+* remove unsafe flag -require-explicit-sendable (#33) ([e7ced23](https://github.com/amine2233/DependencyInjection/commit/e7ced2354c8ca13d68bfaed34dfc12df7a78ad4b))
+
+
 # [3.0.0](https://github.com/amine2233/DependencyInjection/compare/2.8.0...3.0.0) (2026-06-26)
 
 
