@@ -1,15 +1,6 @@
 {
-  "originHash" : "bf10ef8c3576fb364c27ba2da06a0567700ef91bc1a0af33d12ffdb4205023dd",
+  "originHash" : "9728613a20757266a78e0f4679142d6c1e3fc7136bb16413f8c541ad3ceabe9e",
   "pins" : [
-    {
-      "identity" : "runtime",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/wickwirew/Runtime",
-      "state" : {
-        "revision" : "b90e9ab1c66a964a9edf32fe38ea2774c0e5821b",
-        "version" : "2.2.7"
-      }
-    },
     {
       "identity" : "swiftgraph",
       "kind" : "remoteSourceControl",

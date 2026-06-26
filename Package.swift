@@ -36,10 +36,6 @@ let package = Package(
         .package(
             url: "https://github.com/davecom/SwiftGraph",
             from: "3.1.0"
-        ),
-        .package(
-            url: "https://github.com/wickwirew/Runtime",
-            from: "2.2.7"
         )
     ],
     targets: [
@@ -52,10 +48,6 @@ let package = Package(
                 .product(
                     name: "SwiftGraph",
                     package: "SwiftGraph"
-                ),
-                .product(
-                    name: "Runtime",
-                    package: "Runtime"
                 )
             ],
             swiftSettings: swiftSettings

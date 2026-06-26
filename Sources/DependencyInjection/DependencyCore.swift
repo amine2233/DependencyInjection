@@ -1,5 +1,4 @@
 import Foundation
-import Runtime
 import SwiftGraph
 
 extension Dependency where Self == DependencyCore {
@@ -125,30 +124,50 @@ public struct DependencyCore: Dependency {
         return self
     }
 
+    /// Validates the dependency graph and throws if a cyclic dependency is detected.
+    ///
+    /// Edges are discovered by *probing*: each registered dependency is resolved through a recording
+    /// proxy (``RecordingDependency``) that captures every `resolve(...)` call its registration block
+    /// makes. The resulting directed graph is then topologically sorted; a missing topological order
+    /// means a cycle exists, and the offending cycles are reported via
+    /// ``DependencyError/cyclicDependency(_:)``.
+    ///
+    /// - Important: Probing **executes** the registration closures, so factory blocks with side
+    ///   effects will run. The live container is never mutated (resolution happens on copies and a
+    ///   snapshot, and singletons are not eagerly cached), but you should still prefer calling this in
+    ///   DEBUG/tests rather than on a hot production path.
+    /// - Note: A block that resolves dependencies behind a runtime branch only reveals the edges of
+    ///   the branch taken during probing — dynamic discovery cannot see paths it does not execute.
+    /// - Throws: ``DependencyError/cyclicDependency(_:)`` when one or more cycles are found.
     public func check() throws {
-        let graph = UnweightedGraph<DependencyKey>(vertices: Array(dependencies.keys))
+        let recorder = DependencyEdgeRecorder()
 
-        for value in dependencies.values {
-            for componentKey in try value.parameters() {
-                graph.addEdge(from: value.key, to: componentKey, directed: true)
+        for key in dependencies.keys {
+            let proxy = RecordingDependency(
+                resolvers: dependencies,
+                recorder: recorder,
+                snapshot: self,
+                current: key
+            )
+            do {
+                let _: Any = try proxy.recordingResolve(key: key, current: nil)
+            } catch is CycleProbe {
+                // Back-edge reached: the closing edge is already recorded, so keep probing.
+            } catch DependencyError.notFound, DependencyError.notResolved {
+                // A missing or optional dependency is not a cycle; ignore for this entry.
+            } catch {
+                // Any other side-effect error from a user block during probing is non-fatal here.
             }
         }
 
-        guard let sorted = graph.topologicalSort() else {
+        let graph = UnweightedGraph<DependencyKey>(vertices: Array(dependencies.keys))
+        for edge in recorder.snapshotEdges() {
+            graph.addEdge(from: edge.from, to: edge.to, directed: true)
+        }
+
+        if graph.topologicalSort() == nil {
             throw DependencyError.cyclicDependency(graph.detectCycles())
         }
-    }
-}
-
-extension DependencyResolver {
-    func parameters() throws -> Set<DependencyKey> {
-        let info = try typeInfo(of: type)
-        return Set(
-            info
-                .properties
-                .compactMap { String(describing: $0.type).split(separator: ".").last }
-                .map { DependencyKey(rawValue: String($0)) }
-        )
     }
 }
 
