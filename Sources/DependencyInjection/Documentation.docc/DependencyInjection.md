@@ -1,6 +1,6 @@
 # ``DependencyInjection``
 
-A lightweight, type-safe dependency injection container for Swift 6 with strict concurrency and zero third-party dependencies.
+A lightweight, type-safe dependency injection container for Swift 6 with strict concurrency.
 
 ## Overview
 
@@ -56,6 +56,10 @@ need a conventional shared container.
 
 - ``DependencySingleton``
 - ``DependencySingletonOperation``
+
+### Validation
+
+- ``DependencyCheck``
 
 ### Providers & Lifecycle
 

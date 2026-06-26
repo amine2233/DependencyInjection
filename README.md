@@ -1,12 +1,12 @@
 # DependencyInjection
 
-A lightweight, pure-Swift dependency injection container with **zero third-party dependencies**, built for Swift 6 with strict concurrency. The container is a value type, every registered service is `Sendable`, and resolution is fully type-safe.
+A lightweight, pure-Swift dependency injection container built for Swift 6 with strict concurrency. The container is a value type, every registered service is `Sendable`, and resolution is fully type-safe. Its only dependency is [SwiftGraph](https://github.com/davecom/SwiftGraph), used for the optional cyclic-dependency check (`check()`).
 
 The package ships three libraries:
 
 | Library | Description |
 | --- | --- |
-| `DependencyInjection` | The core container: register, resolve, singletons, factories, providers, environments. |
+| `DependencyInjection` | The core container: register, resolve, singletons, factories, providers, environments, cyclic-dependency check. |
 | `DependencyInjectionPropertyWrapper` | `@Injection`-style property wrappers for ergonomic resolution. |
 | `DependencyInjectionAutoRegistration` | `autoregister` helpers that auto-resolve initializer parameters. |
 
@@ -124,7 +124,7 @@ struct ProfileViewModel {
 
 ## Auto-Registration
 
-`import DependencyInjectionAutoRegistration`. `autoregister` resolves each initializer argument from the container automatically — no manual `resolve` calls:
+`import DependencyInjectionAutoRegistration`. `autoregister` resolves each initializer argument from the container automatically — no manual `resolve` calls. A single function backed by Swift **parameter packs** handles **any number of dependencies**, so there is no arity limit:
 
 ```swift
 container.autoregister(NetworkClient.self, initializer: NetworkClientDefault.init)
@@ -132,6 +132,11 @@ container.autoregister(NetworkClient.self, initializer: NetworkClientDefault.ini
 // One dependency — `client` is resolved for you
 container.autoregister(UserRepository.self) { (client: NetworkClient) in
     UserRepositoryDefault(client: client)
+}
+
+// Several dependencies — each argument is resolved in order
+container.autoregister(Dashboard.self) { (users: UserRepository, net: NetworkClient, db: Database) in
+    DashboardDefault(users: users, network: net, database: db)
 }
 
 // Singleton variant
@@ -169,6 +174,19 @@ container = container.willBoot().didBoot()
 
 `DependencyEnvironment` carries `.production`, `.development`, `.testing`, or `.custom(name:)`
 plus typed options and parameters for environment-specific configuration.
+
+## Cycle Detection
+
+`check()` validates the registered graph and throws `DependencyError.cyclicDependency` if a cycle
+exists. It discovers edges by probing — resolving each registration through a recording proxy — so it
+catches real cycles regardless of how dependencies are typed (protocols, optionals, generics):
+
+```swift
+try container.check()   // throws .cyclicDependency([...]) when A → B → A
+```
+
+It runs the registration closures on a snapshot (the live container and its singletons are never
+mutated). Prefer calling it in DEBUG/tests rather than on a hot path.
 
 ## Documentation
 
